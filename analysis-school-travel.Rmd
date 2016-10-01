@@ -1,0 +1,62 @@
+---
+title: "Analysis of UK travel to school data"
+author: "Robin Lovelace"
+date: "1 October 2016"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+source("setup.R")
+```
+
+```{r, eval=FALSE}
+source("R/load-all-data.R")
+```
+
+# School level data
+
+There are 21,523 schools reported in the 2011 schools census.
+Of those, 3,398 met the selection criteria for this analysis of having at least 100 full time 11 to 18 year old pupils.
+3.1 million students in this age range attended these schools.
+The top 5 of these are presented below
+
+```{r, eval=FALSE}
+countvars_ft = grep(pattern = "FT", names(sld11))
+sld11$ft = rowSums(sld11[,countvars_ft])
+# hist(sld11$ft)
+vname_secondary_f = paste0("LEA11_FT_Girls_", 11:18)
+vname_secondary_m = paste0("LEA11_FT_Boys_", 11:18)
+vname_secondary = c(vname_secondary_f, vname_secondary_m)
+sld11$Secondary = rowSums(sld11[,vname_secondary])
+sld = sld11[sld11$Secondary >= 100,]
+nrow(sld)
+sum(sld$Secondary)
+sld11_100 = top_n(x = sld11, n = 100, wt = sld11$Secondary)  %>%
+  arrange(desc(Secondary))
+dir.create("private_data")
+saveRDS(sld11_100, "private_data/sld11_100.Rds")
+```
+
+
+```{r}
+sld11_100 = readRDS("private_data/sld11_100.Rds")
+knitr::kable(
+  sld11_100 %>%
+    select(LEA11_SchoolName, LEA11_Form7_School_Type_Desc, Total = Secondary) %>%
+    slice(1:5)
+)
+```
+
+# Preliminary analysis of top 100 schools
+
+Preliminary analysis was done on the top 100 schools by number of pupils to test the method without loading all the data.
+
+```{r}
+
+```
+
+
+spatial distribution is illustrated below.
+
+# OD level data
