@@ -1,5 +1,5 @@
 ---
-title: Who cycles to school? A geographical analysis with estimates of its potential to grow in England
+title: 'Assessing the potential for uptake of cycling to school: a case study of England'
 author:
   - name: Robin Lovelace
     email: r.lovelace@leeds.ac.uk 
@@ -26,6 +26,11 @@ output: rticles::elsevier_article
 bib = httr::GET("https://www.zotero.org/api/groups/418217/collections/RZSVFK8G/items/top?limit=100&format=bibtex&v=1", httr::write_disk("paper/refs.bib", overwrite = T))
 ```
 
+
+# Introduction
+
+
+The purpose of this paper is therefore twofold: to develop and demonstrate methods for assessing the potential uptake of active travel modes for the school commute, and to apply these methods to England to estimate the potential for modal shift to cycling at the national level. Based on plausible scenarios for change and evidence of the benefits of physical activity for children and reduced road congestion, it would be possible to quantify the benefits of cycling uptake at high geographical resolution, building on these methods. This next stage is beyond the scope of this research, however: in this paper the focus is on the geographical distribution of cycling and cycling potential, and the methods needed to model modal shift in the school commute. 
 
 @singleton_gis_2014 investigated the CO^2^ emissions associated with the school commute...
 
