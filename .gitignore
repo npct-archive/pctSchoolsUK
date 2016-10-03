@@ -3,4 +3,5 @@
 .RData
 private_data
 *.pdf
+*.tex
 
