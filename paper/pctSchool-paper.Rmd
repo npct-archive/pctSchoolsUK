@@ -1,18 +1,31 @@
 ---
+output: pdf_document
+---
+
+
+```{r setup, include=FALSE}
+setwd("/home/geoif/pct/pctSchoolsUK")
+if(!exists("sld11"))
+  source("R/analysis-sld.R")
+setwd("/home/geoif/pct/pctSchoolsUK/paper")
+```
+
+
+---
 title: 'Assessing the potential for uptake of cycling to school: a case study of England'
 author:
   - name: Robin Lovelace
     email: r.lovelace@leeds.ac.uk 
     affiliation: University of Leeds
     footnote: Corresponding Author
-  - name: Ilan Fridman Rojas
-    email: bob@example.com
+  - name: Ilan Fridman-Rojas
+    email: I.FridmanRojas@leeds.ac.uk
     affiliation: University of Leeds
 address:
   - code: University of Leeds
     address: Institute for Transport Studies (ITS), Lifton Villas, 1-3 Lifton Place, University of Leeds, Leeds, LS2 9JT, United Kingdom 
   - code: University of Leeds
-    address: Leeds Institute for Data Analytics Level 11, Worsley Building Clarendon Way Leeds LS2 9NL, United Kingdom 
+    address: Leeds Institute for Data Analytics, Level 11, Worsley Building Clarendon Way Leeds LS2 9NL, United Kingdom 
 abstract: |
   This is the abstract.
 
@@ -25,6 +38,8 @@ output: rticles::elsevier_article
 ```{r, echo=FALSE}
 bib = httr::GET("https://www.zotero.org/api/groups/418217/collections/RZSVFK8G/items/top?limit=100&format=bibtex&v=1", httr::write_disk("refs.bib", overwrite = T))
 ```
+
+
 
 
 # Introduction
@@ -41,11 +56,15 @@ including aerobic capacity, muscle and bone strength, flexibility, insulin sensi
 
 Despite the strength of evidence of the benefits of active travel to school, it has been experiencing a long-term downward trend since at least the 1950s. 
 <!-- todo: add something on long-term trend -->
+In the US: [@davison_childrens_2008]
+
 This trend has continued into the 21^st^ Between 1993 and 2003, for example, the proportion of primary school children being driven to school increased from 29% to 41% while the proportion walking and cycling dropped [@cooper_physical_2005].
 
 The purpose of this paper is twofold: to develop and demonstrate methods for assessing the potential uptake of active travel modes for the school commute, and to apply these methods to England to estimate the potential for modal shift to cycling at the national level. Based on plausible scenarios for change and evidence of the benefits of physical activity for children and reduced road congestion, it would be possible to quantify the benefits of cycling uptake at high geographical resolution, building on these methods. This next stage is beyond the scope of this research, however: in this paper the focus is on the geographical distribution of cycling and cycling potential, and the methods needed to model modal shift in the school commute. 
 
-@singleton_gis_2014 investigated the CO^2^ emissions associated with the school commute...
+[@singleton_gis_2014] investigated the $CO_2$ emissions associated with the school commute...
+
+The data set used consists of `r length(unique(sld11$LEA11_URN))` schools
 
 References {#references .unnumbered}
 ==========
