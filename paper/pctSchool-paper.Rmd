@@ -22,15 +22,28 @@ bibliography: refs.bib
 output: rticles::elsevier_article
 ---
 
-```{r, echo=FALSE, eval=FALSE}
-bib = httr::GET("https://www.zotero.org/api/groups/418217/collections/RZSVFK8G/items/top?limit=100&format=bibtex&v=1", httr::write_disk("paper/refs.bib", overwrite = T))
+```{r, echo=FALSE}
+bib = httr::GET("https://www.zotero.org/api/groups/418217/collections/RZSVFK8G/items/top?limit=100&format=bibtex&v=1", httr::write_disk("refs.bib", overwrite = T))
 ```
 
 
 # Introduction
 
+Active travel to school offers many benefits across a range of policy objectives.
 
-The purpose of this paper is therefore twofold: to develop and demonstrate methods for assessing the potential uptake of active travel modes for the school commute, and to apply these methods to England to estimate the potential for modal shift to cycling at the national level. Based on plausible scenarios for change and evidence of the benefits of physical activity for children and reduced road congestion, it would be possible to quantify the benefits of cycling uptake at high geographical resolution, building on these methods. This next stage is beyond the scope of this research, however: in this paper the focus is on the geographical distribution of cycling and cycling potential, and the methods needed to model modal shift in the school commute. 
+In terms of health, regular exercise has multiple, mutually reinforcing benefits. Physical activity reduces the risk of common causes of death, including heart disease, diabetes and obesity.
+
+The educational benefits are increasingly well-known. Many of the physical and mental barriers to educational success are reduced by physical activity. 
+
+Compulsory competitive sport during school hours is one of the most commonly suggested remedies for physical inactivity, with the aim of boosting alertness and providing the aforementioned health benefits. However, evidence shows that competitive sport does not benefit every student, with 
+
+including aerobic capacity, muscle and bone strength, flexibility, insulin sensitivity, and lipid profiles; and reduces stress, anxiety, and depression.
+
+Despite the strength of evidence of the benefits of active travel to school, it has been experiencing a long-term downward trend since at least the 1950s. 
+<!-- todo: add something on long-term trend -->
+This trend has continued into the 21^st^ Between 1993 and 2003, for example, the proportion of primary school children being driven to school increased from 29% to 41% while the proportion walking and cycling dropped [@cooper_physical_2005].
+
+The purpose of this paper is twofold: to develop and demonstrate methods for assessing the potential uptake of active travel modes for the school commute, and to apply these methods to England to estimate the potential for modal shift to cycling at the national level. Based on plausible scenarios for change and evidence of the benefits of physical activity for children and reduced road congestion, it would be possible to quantify the benefits of cycling uptake at high geographical resolution, building on these methods. This next stage is beyond the scope of this research, however: in this paper the focus is on the geographical distribution of cycling and cycling potential, and the methods needed to model modal shift in the school commute. 
 
 @singleton_gis_2014 investigated the CO^2^ emissions associated with the school commute...
 

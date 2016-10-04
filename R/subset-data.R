@@ -8,3 +8,5 @@ proj4string(sld_sp) = proj4string(las)
 sld_leeds = sld_sp[leeds_la,]
 points(sld_leeds)
 saveRDS(sld_leeds, "private_data/sld_leeds.Rds")
+
+

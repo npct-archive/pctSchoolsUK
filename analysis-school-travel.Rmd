@@ -22,11 +22,11 @@ Of those, 3,398 met the selection criteria for this analysis of having at least 
 The top 5 of these are presented below
 
 ```{r}
-knitr::kable(
-  sld11_100 %>%
-    select(LEA11_SchoolName, LEA11_Form7_School_Type_Desc, Total = Secondary) %>%
-    slice(1:5)
-)
+# knitr::kable(
+#   sld11_100 %>%
+#     select(LEA11_SchoolName, LEA11_Form7_School_Type_Desc, Total = Secondary) %>%
+#     slice(1:5)
+# )
 ```
 
 # Preliminary analysis of top 100 schools
