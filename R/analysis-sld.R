@@ -12,6 +12,7 @@ vname_secondary_f = paste0("LEA11_FT_Girls_", 11:18)
 vname_secondary_m = paste0("LEA11_FT_Boys_", 11:18)
 vname_secondary = c(vname_secondary_f, vname_secondary_m)
 sld11$Secondary = rowSums(sld11[,vname_secondary])
+nrow(sld11)
 sld = sld11[sld11$Secondary >= 100,]
 nrow(sld)
 sld = sld[!is.na(sld$Northing) & !is.na(sld$Easting),]

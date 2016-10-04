@@ -1,5 +1,5 @@
 # Aim: load all schools data
-private_dir = "private_data/"
+private_dir = "private_data/DR160129_02"
 old = setwd(private_dir) 
 list.files() # what's there
 sld15 = readr::read_tsv(file = "SLD_CENSUS_2015.txt")
