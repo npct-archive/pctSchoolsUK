@@ -59,3 +59,7 @@ points(cents_lsoa)
 points(schools, col = 'red', pch = 4)
 flow = od2line(flow = s, zones = cents_lsoa, destinations = schools)
 flow = flow[flow$TOTAL > 10,]
+plot(leeds_la)
+points(cents_lsoa)
+points(schools, col = 'red', pch = 4)
+lines(flow)
