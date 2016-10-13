@@ -4,31 +4,54 @@
 source("R/analysis-sld.R")
 
 # Read in UK Local Authorities, subset Leeds only
-las = readRDS("../pct-bigdata/las.Rds")
+#las = readRDS("../pct-bigdata/las.Rds") ## 2001 LSOAs
+if(!file.exists("las_2011.Rds")){
+  las = shapefile("Lower_Layer_Super_Output_Areas_December_2011_Full_Clipped__Boundaries_in_England_and_Wales/Lower_Layer_Super_Output_Areas_December_2011_Full_Clipped__Boundaries_in_England_and_Wales.shp")
+  las = spTransform(las, CRS("+init=epsg:4326"))
+  saveRDS(las, "las_2011.Rds")
+} else{
+  las = readRDS("las_2011.Rds")
+}
+
+#sld_test = sld_sp
+#sld_test@coords = sld_sp[(sld_sp@coords[,1] != 654558) & (sld_sp@coords[,2] != 653613),]
+
 #leeds_la = las[las$NAME == "Leeds",]
 #plot(leeds_la)
-plot(las)
+#plot(las)
 # Match CRS of spatial data to that of Local Authorities data
-proj4string(sld_sp) = proj4string(las)
+#proj4string(sld_sp) = CRS("+init=epsg:27700")
+#proj4string(sld_sp) = proj4string(las)
+#sld_sp = spTransform(sld_sp, CRSobj = proj4string(las))
 # Subset schools data to Leeds
 #schools = sld_sp[leeds_la,]
-schools = sld_sp
 #points(schools)
 
-#schools = spTransform(schools, CRSobj = proj4string(las))
-
-saveRDS(schools, "private_data/sld_england.Rds")
-
+#schools = spTransform(schools, CRSobj = )
+if(!file.exists("private_data/sld_england.Rds")){
+  schools = spTransform(sld_sp, CRSobj = proj4string(las))
+  saveRDS(schools, "private_data/sld_england.Rds")
+} else{
+  schools = readRDS("private_data/sld_england.Rds")
+}
 # subset all ods that go to these schools
 
 # Get the centroids for UK LSOAs
-cents_lsoa = readRDS("../pct-bigdata/cents_lsoa.Rds")
-if(!exists("schools"))
-  schools = readRDS("private_data/sld_england.Rds")
+#cents_lsoa = readRDS("../pct-bigdata/cents_lsoa.Rds")
+if(!file.exists("cents_lsoa_2011.Rds")){
+  cents_lsoa = shapefile("lower_layer_super_output_areas_(e+w)_2011_population_weighted_centroids_v2/LSOA_2011_EW_PWC.shp")
+  #cents_lsoa = spTransform(cents_lsoa, CRS("+init=epsg:4326"))
+  cents_lsoa = spTransform(cents_lsoa, CRSobj = proj4string(las))
+  #proj4string(cents_lsoa) = proj4string(las)
+  saveRDS(cents_lsoa, "cents_lsoa_2011.Rds")
+} else{
+  cents_lsoa = readRDS("cents_lsoa_2011.Rds")
+}
+
 
 # Match CRS of LSOAs to be consistent with las and schools
-cents_lsoa = spTransform(cents_lsoa, CRSobj = proj4string(las))
-plot(cents_lsoa)
+
+#plot(cents_lsoa)
 #bbox(cents_lsoa)
 
 
@@ -62,6 +85,11 @@ names(s)[names(s)=="URN_SPR11"] <- "URN"
 names(schools)[names(schools)=="LEA11_URN"] <- "URN"
 #names(cents_lsoa)[1] = names(s)[1]
 #names(schools)[2] = names(s)[3]
+
+# Some LSOA centroids are wrong and are in the ocean. Remove the ones not within the Local Authorities
+cents_lsoa = cents_lsoa[las,]
+#schools = schools[las,]  # CAREFUL, THIS REMOVES ALL SCHOOLS FOR SOME REASON
+
 summary(s$LSOA %in% cents_lsoa$LSOA)
 summary(s$URN %in% schools$URN)
 
@@ -81,8 +109,10 @@ nrow(schools)
 
 summary(s$TOTAL)
 nrow(s)
-s_cut = s[s$TOTAL >= 10,]
+s_cut = s[s$TOTAL >= 1,]
 nrow(s_cut)
+
+
 
 starttime <- proc.time()
 flow = od2line(flow = s_cut, zones = cents_lsoa, destinations = schools)
@@ -90,6 +120,6 @@ flow = od2line(flow = s_cut, zones = cents_lsoa, destinations = schools)
 proc.time() - starttime
 
 plot(las)
-points(cents_lsoa)
-points(schools, col = 'red', pch = 4)
+#points(cents_lsoa)
+#points(schools, col = 'red', pch = 4)
 lines(flow, col = 'blue')

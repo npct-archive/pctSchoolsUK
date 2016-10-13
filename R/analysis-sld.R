@@ -25,6 +25,7 @@ names(sld11) = gsub("^LEA11_","", names(sld11))
 #sld11$Secondary = rowSums(sld11[,vname_secondary])
 school_levels = unique(sld11[, c("Form7_School_Type","Form7_School_Type_Desc")])
 school_levels
+#write.csv(school_levels, "school_levels.csv", row.names=FALSE)
 sld = sld11[sld11$Form7_School_Type %in% c(7, 8, 21, 39, 41, 46),]
 nrow(sld11)
 nrow(sld)
@@ -47,7 +48,8 @@ sld11_100
 # make the data spatial
 coords = cbind(as.numeric(sld$Easting), as.numeric(sld$Northing))
 #summary(coords)
-sld_sp = SpatialPointsDataFrame(coords = coords, data = sld)
-plot(sld_sp) # all the schools in England
+#sld_sp = SpatialPointsDataFrame(coords = coords, data = sld, proj4string = CRS("+init=epsg:32610 +datum=WGS84"))
+sld_sp = SpatialPointsDataFrame(coords = coords, data = sld, proj4string = CRS("+init=epsg:32610"))
+#plot(sld_sp) # all the schools in England
 
 
