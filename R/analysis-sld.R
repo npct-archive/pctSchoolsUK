@@ -23,14 +23,42 @@ names(sld11) = gsub("^LEA11_","", names(sld11))
 #vname_secondary_m = paste0("LEA11_FT_Boys_", 11:18)
 #vname_secondary = c(vname_secondary_f, vname_secondary_m)
 #sld11$Secondary = rowSums(sld11[,vname_secondary])
-school_levels = unique(sld11[, c("Form7_School_Type","Form7_School_Type_Desc")])
-school_levels
-#write.csv(school_levels, "school_levels.csv", row.names=FALSE)
-sld = sld11[sld11$Form7_School_Type %in% c(7, 8, 21, 39, 41, 46),]
+#######
+## sudo apt-get install default-jdk libpcre3-dev bzip2 liblzma-dev libbz2-dev
+## sudo R CMD javareconf
+## install.packages("XLConnect", dependencies=TRUE)
+
+#install.packages("gdata", dependencies = TRUE)
+# gdata::installXLSXsupport()
+
+# https://www.whatdotheyknow.com/request/list_of_all_schools_in_england_w
+phase_edu = gdata::read.xls("phase_of_education.xls")
+#names(phase_edu)
+#names(sld11)
+
+vname_secondary_f = paste0("FT_Girls_", 11:18)
+vname_secondary_m = paste0("FT_Boys_", 11:18)
+vname_secondary = c(vname_secondary_f, vname_secondary_m)
+sld11$Headcount_Secondary = rowSums(sld11[,vname_secondary])
+
 nrow(sld11)
+sld11 = dplyr::inner_join(sld11, phase_edu, by = c("URN" = "URN"))
+nrow(sld11)
+
+unique(sld11$Phase)
+nrow(sld11)
+sld = sld11[(sld11$Phase == "Secondary") | (sld11$Headcount_Secondary > 0), ]
 nrow(sld)
+  
+#school_levels = unique(sld11[, c("Form7_School_Type","Form7_School_Type_Desc")])
+#school_levels
+##write.csv(school_levels, "school_levels.csv", row.names=FALSE)
+
+#sld = sld11[sld11$Form7_School_Type %in% c(7, 8, 21, 39, 41, 46),]
+#nrow(sld11)
+#nrow(sld)
 # Filter out schools with less than 100 Secondary-level students
-nrow(sld)
+#nrow(sld)
 sld = sld[sld$Headcount_FT_Pupils >= 100,]
 nrow(sld)
 # Get rid of schools for which we have no coordinates
@@ -49,7 +77,9 @@ sld11_100
 coords = cbind(as.numeric(sld$Easting), as.numeric(sld$Northing))
 #summary(coords)
 #sld_sp = SpatialPointsDataFrame(coords = coords, data = sld, proj4string = CRS("+init=epsg:32610 +datum=WGS84"))
-sld_sp = SpatialPointsDataFrame(coords = coords, data = sld, proj4string = CRS("+init=epsg:32610"))
+#sld_sp = SpatialPointsDataFrame(coords = coords, data = sld, proj4string = CRS("+init=epsg:27700"))
+sld_sp = SpatialPointsDataFrame(coords = coords, data = sld)
+proj4string(sld_sp) = CRS("+init=epsg:27700")
 #plot(sld_sp) # all the schools in England
 
 
