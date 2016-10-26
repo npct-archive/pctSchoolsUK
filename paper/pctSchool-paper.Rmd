@@ -1,17 +1,4 @@
 ---
-output: pdf_document
----
-
-
-```{r setup, include=FALSE}
-setwd("/home/geoif/pct/pctSchoolsUK")
-if(!exists("sld11"))
-  source("R/analysis-sld.R")
-setwd("/home/geoif/pct/pctSchoolsUK/paper")
-```
-
-
----
 title: 'Assessing the potential for uptake of cycling to school: a case study of England'
 author:
   - name: Robin Lovelace
@@ -31,9 +18,20 @@ abstract: |
 
   It consists of two paragraphs.
 
+header-includes:
+   - \usepackage{amsmath}
+   - \usepackage{amssymb}
 bibliography: refs.bib
 output: rticles::elsevier_article
 ---
+
+
+```{r setup, include=FALSE}
+setwd("/home/geoif/pct/pctSchoolsUK")
+if(!exists("sld11"))
+  source("R/analysis-sld.R")
+setwd("/home/geoif/pct/pctSchoolsUK/paper")
+```
 
 ```{r, echo=FALSE}
 bib = httr::GET("https://www.zotero.org/api/groups/418217/collections/RZSVFK8G/items/top?limit=100&format=bibtex&v=1", httr::write_disk("refs.bib", overwrite = T))
@@ -41,30 +39,57 @@ bib = httr::GET("https://www.zotero.org/api/groups/418217/collections/RZSVFK8G/i
 
 
 
-
 # Introduction
 
-Active travel to school offers many benefits across a range of policy objectives.
+Active travel to school offers many benefits across a range of policy objectives. From a public health policy point of view it contributes to both the physical and mental health outlook of new generations, while having a positive impact on their quality of life and a potentially meaningful impact on environmental quality in the form of reduced motorised traffic and improved air quality. From a perspective of education policy, many of the physical and mental barriers to educational success are likely reduced by physical activity, producing a positive effect in learning and academic performance.
 
-In terms of health, regular exercise has multiple, mutually reinforcing benefits. Physical activity reduces the risk of common causes of death, including heart disease, diabetes and obesity.
+In terms of health, regular exercise has multiple, mutually reinforcing benefits. Over the space of a lifetime habitual physical activity reduces the risk of common causes of death, including heart disease and diabetes. In addition to mitigating health risks, the benefits of regular physical activity also include increased aerobic capacity, muscle and bone strength, flexibility, insulin sensitivity, and healthier blood lipid profiles; as well as reduced stress, anxiety, and depression. Heart health in particular benefits from exercise, and the benefits of active transport (e.g. walking or cycling) to school on heart health have been specifically studied before [@pate_promoting_2006, @sleap_are_1993]. In a more general context, the impact of childhood obesity intervention programmes (including increased physical activity) on health as measured by blood lipid levels has also been studied and found to be positive [@cai_effect_2014]. The impact of regular physical activity on pupils' mental health is harder to quantitatively ascertain, though studies in this direction give tentative indications pointing to a positive impact as well [@biddle_physical_2011, @ahn_meta-analysis_2011]. These health benefits are possibly further enhanced by an observed correlation between active transport to school and overall higher levels of physical activity [@cooper_commuting_2003, @cooper_physical_2005], if such a correlation proved to be causal.
 
-The educational benefits are increasingly well-known. Many of the physical and mental barriers to educational success are reduced by physical activity. 
+A further additional positive effect of increasing rates of active transport to school is the beneficial environmental impact of reduced motorised traffic. In this context @singleton_gis_2014 investigated the $CO_2$ emissions associated with school commutes, finding that school commutes make a sizeable contribution to $CO_2$ emissions, and uncovering various interesting patterns in carbon emissions in England by region, geodemographic classification, school level, and commute distance.
 
-Compulsory competitive sport during school hours is one of the most commonly suggested remedies for physical inactivity, with the aim of boosting alertness and providing the aforementioned health benefits. However, evidence shows that competitive sport does not benefit every student, with 
+The primary impact however is perhaps on the physical and mental health of the pupils. Across the industrialised world child and youth obesity rates have been on the rise in recent decades, with the USA reaching obesity rates amongst children and youths of 17\% in recent years [@fryar_prevalence_2012, @karnik_childhood_2012], and Europe reaching similar crisis levels of 10–30% obesity rates in children and 25% in youths [@ben-sefer_childhood_2009]. This childhood obesity problem has now been by and large been acknowledged as an epidemic, one which is at present difficult to treat (though interventions have had some measured successes, see for example [@flodmark_interventions_2006]), and which in consequence will likely only increase in the coming years [@reilly_childhood_2007].
 
-including aerobic capacity, muscle and bone strength, flexibility, insulin sensitivity, and lipid profiles; and reduces stress, anxiety, and depression.
+Interventions and policies aimed at combating childhood and youth obesity by and large focus on dietary education and restrictions, as well as the promotion of increased levels of physical activity. A standard recommendation of 60 minutes of daily moderate to vigorous physical activity can be found in reviews of the literature [@janssen_systematic_2010, @strong_evidence_2005] and is part of the NHS Physical Activity Guidelines for Children and Young People [@n.h.s._physical_2016]. In spite of this and the widespread existence of periodic Physical Education classes in schools, obesity levels remain high and are likely still rising.
 
-Despite the strength of evidence of the benefits of active travel to school, it has been experiencing a long-term downward trend since at least the 1950s. 
-<!-- todo: add something on long-term trend -->
-In the US: [@davison_childrens_2008]
+ 
 
-This trend has continued into the 21^st^ Between 1993 and 2003, for example, the proportion of primary school children being driven to school increased from 29% to 41% while the proportion walking and cycling dropped [@cooper_physical_2005].
+<!-- Canadian children for example fall very short of this guideline [@colley_physical_2011] (Physical Activity of Canadian Children, Colley; Physical activity of Canadian children and youth: accelerometer results from the 2007 to 2009 Canadian Health Measures Survey. -->
+It is in this context that a daily regime of active commuting to and from school could prove to be hugely beneficial both to pupils, and to education and public health outcomes, and one in which there is huge potential for improvement and development, both internationally and in the UK.
 
-The purpose of this paper is twofold: to develop and demonstrate methods for assessing the potential uptake of active travel modes for the school commute, and to apply these methods to England to estimate the potential for modal shift to cycling at the national level. Based on plausible scenarios for change and evidence of the benefits of physical activity for children and reduced road congestion, it would be possible to quantify the benefits of cycling uptake at high geographical resolution, building on these methods. This next stage is beyond the scope of this research, however: in this paper the focus is on the geographical distribution of cycling and cycling potential, and the methods needed to model modal shift in the school commute. 
+<!-- the percentage of children and youths actively commuting to school when the travel distance is $\leqslant 1 \mathrm{mile}$ has been found to be $< 20\%$ for the state of Georgia [@centers_for_disease_control_and_prevention_cdc_school_2002], and as low as $5 \%$ for Columbia, South Carolina [@sirard_prevalence_2005] -->
+<!-- The average commute to school for Primary school children takes 13 minutes and covers 1.6 miles, whereas for Secondary school children it takes 25 minutes and covers 3.4 miles. -->
 
-[@singleton_gis_2014] investigated the $CO_2$ emissions associated with the school commute...
 
-The data set used consists of `r length(unique(sld11$LEA11_URN))` schools
+As a point of reference in terms of development in active transport to school, in the US in 1969 $\sim 40\%$ of students walked or cycled to school, a figure which had dropped to $\sim 13\%$ by 2001 [@mcdonald_active_2007]. In the UK by comparison the percentage of pupils walking to school dropped $\sim 20\%$ in a similar period (1970 to 1991) [@tudor-locke_active_2012]. However despite this drop, the UK still has a much higher baseline of pupils actively commuting to school than the US, with 46\% of 5-10 year-olds and 38\% of 11-16 year-olds walking to school, and walking being the dominant form of transport for commutes under 1 mile, and car and bus being dominant for trips of 2 miles or more [@department_for_transport_national_2014].  At the Secondary school level the percentage of students walking has remained fairly stable over the last few years, however at the Primary level the percentage of children walking has decreased, and the percentage of those being driven to school has correspondingly increased.
+
+Active commuting to school in the UK is therefore --unlike in the US and other industrialised countries-- already an established habit for a significant fraction of families, with the potential for significant further increases, to the benefit of the communities and the health of students. This is particularly important in the face of the growing childhood obesity crisis, and the decreasing trend in children walking to school at the Primary level in the UK which represents a regression to less active modes of transport and risks exacerbating the childhood obesity problem. Public health policies and transport infrastructure planning to reverse this trend is therefore absolutely essential to mitigate risks to newer generations in the coming years.
+
+In this work we begin to explore the potential of geographic and spatial data analysis as a guiding principle for evidence-driven public policies and infrastructure development. The long term aim is to make active transport to school an even more dominant mode of transport, and a feasible part of the solution to the childhood and youth obesity epidemic in the UK, with England as a case study.
+
+More specifically the purpose of this paper is twofold: to develop and demonstrate methods for assessing the potential uptake of active travel modes for the school commute, and to apply these methods to England to estimate the potential for modal shift to cycling at the national level. Based on plausible scenarios for change and evidence of the benefits of physical activity for children and reduced road congestion, it would be possible to quantify the benefits of cycling uptake at high geographical resolution, building on these methods. This next stage is beyond the scope of the present work, however: in this paper the focus is on the geographical distribution of cycling and cycling potential, and the methods needed to model modal shift in the school commute. 
+
+
+
+
+
+
+
+
+<!-- Despite the strength of evidence of the benefits of active travel to school, it has been experiencing a long-term downward trend since at least the 1950s.  -->
+<!-- (Active Transportation to School: Trends Among U.S. Schoolchildren, 1969–2001, McDonald)  -->
+<!-- (Active Commuting to School: An Overlooked Source of Childrens’ Physical Activity?)  -->
+<!-- In the US: [@davison_childrens_2008] -->
+
+<!-- Walking to school correlates with overall greater physical activity at other times as well, for male pupils (Commuting to school: Are children who walk more physically active?, Cooper)  -->
+
+<!-- This trend has continued into the 21^st^ Between 1993 and 2003, for example, the proportion of primary school children being driven to school increased from 29% to 41% while the proportion walking and cycling dropped [@cooper_physical_2005]. -->
+
+
+
+
+
+The data set used consists of `r length(unique(sld11$URN))` schools
+
 
 References {#references .unnumbered}
 ==========

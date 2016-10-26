@@ -28,18 +28,19 @@ names(sld11) = gsub("^LEA11_","", names(sld11))
 ## sudo R CMD javareconf
 ## install.packages("XLConnect", dependencies=TRUE)
 
+
+vname_secondary_f = paste0("FT_Girls_", 12:18)
+vname_secondary_m = paste0("FT_Boys_", 12:18)
+vname_secondary = c(vname_secondary_f, vname_secondary_m)
+sld11$Headcount_Secondary = rowSums(sld11[,vname_secondary])
+
+# Load Phase of Education data so we can select Secondary schools only
 #install.packages("gdata", dependencies = TRUE)
 # gdata::installXLSXsupport()
-
 # https://www.whatdotheyknow.com/request/list_of_all_schools_in_england_w
 phase_edu = gdata::read.xls("phase_of_education.xls")
 #names(phase_edu)
 #names(sld11)
-
-vname_secondary_f = paste0("FT_Girls_", 11:18)
-vname_secondary_m = paste0("FT_Boys_", 11:18)
-vname_secondary = c(vname_secondary_f, vname_secondary_m)
-sld11$Headcount_Secondary = rowSums(sld11[,vname_secondary])
 
 nrow(sld11)
 sld11 = dplyr::inner_join(sld11, phase_edu, by = c("URN" = "URN"))
@@ -47,7 +48,7 @@ nrow(sld11)
 
 unique(sld11$Phase)
 nrow(sld11)
-sld = sld11[(sld11$Phase == "Secondary") | (sld11$Headcount_Secondary > 0), ]
+sld = sld11[(sld11$Phase == "Secondary") | (sld11$Phase == "Middle Deemed Secondary") | (sld11$Headcount_Secondary > 0), ]
 nrow(sld)
   
 #school_levels = unique(sld11[, c("Form7_School_Type","Form7_School_Type_Desc")])
@@ -59,7 +60,9 @@ nrow(sld)
 #nrow(sld)
 # Filter out schools with less than 100 Secondary-level students
 #nrow(sld)
-sld = sld[sld$Headcount_FT_Pupils >= 100,]
+
+#sld = sld[sld$Headcount_FT_Pupils >= 100,]
+sld = sld[sld$Headcount_Secondary >= 100,]
 nrow(sld)
 # Get rid of schools for which we have no coordinates
 sld = sld[!is.na(sld$Northing) & !is.na(sld$Easting),]
@@ -67,10 +70,11 @@ nrow(sld) # 5 schools removed
 # locations = ggmap::geocode(sld$LEA11_SchoolName[1:2000])
 # good chance to test the validity of ggmap geocode results
 sum(sld$Headcount_FT_Pupils)
+
 # Get top 100 schools with most Secondary-level students
-sld11_100 = top_n(x = sld11, n = 100, wt = sld11$Headcount_FT_Pupils)  %>%
-  arrange(desc(Headcount_FT_Pupils))
-sld11_100
+#sld11_100 = top_n(x = sld11, n = 100, wt = sld11$Headcount_FT_Pupils)  %>%
+#  arrange(desc(Headcount_FT_Pupils))
+#sld11_100
 # saveRDS(sld11_100, "private_data/sld11_100.Rds")
 
 # make the data spatial

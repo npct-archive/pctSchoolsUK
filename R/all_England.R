@@ -6,7 +6,10 @@ source("R/analysis-sld.R")
 # Read in UK Local Authorities, subset Leeds only
 #las = readRDS("../pct-bigdata/las.Rds") ## 2001 LSOAs
 if(!file.exists("las_2011.Rds")){
+  # Simplified LSOA boundaries
   las = shapefile("Lower_Layer_Super_Output_Areas_December_2011_Full_Clipped__Boundaries_in_England_and_Wales_SIMPLIFIED/Lower_Layer_Super_Output_Areas_December_2011_Full_Clipped__Boundaries_in_England_and_Wales.shp")
+  # Full LSOA boundaries
+  #las = shapefile("Lower_Layer_Super_Output_Areas_December_2011_Full_Clipped__Boundaries_in_England_and_Wales/Lower_Layer_Super_Output_Areas_December_2011_Full_Clipped__Boundaries_in_England_and_Wales.shp")
   las = spTransform(las, CRS("+init=epsg:4326"))
   saveRDS(las, "las_2011.Rds")
 } else{
@@ -83,14 +86,15 @@ names(cents_lsoa)[names(cents_lsoa)=="LSOA11CD"] <- "LSOA"
 names(s)[names(s)=="LLSOA_SPR11"] <- "LSOA"
 names(s)[names(s)=="URN_SPR11"] <- "URN"
 names(schools)[names(schools)=="LEA11_URN"] <- "URN"
+
 #names(cents_lsoa)[1] = names(s)[1]
 #names(schools)[2] = names(s)[3]
 
 # Some LSOA centroids are wrong and are in the ocean. Remove the ones not within the Local Authorities
 cents_lsoa = cents_lsoa[las,]
 nrow(cents_lsoa)
+schools = schools[las,]
 nrow(schools[las,])
-#schools = schools[las,]  # CAREFUL, THIS REMOVES ALL SCHOOLS FOR SOME REASON
 
 summary(s$LSOA %in% cents_lsoa$LSOA)
 summary(s$URN %in% schools$URN)
@@ -98,12 +102,12 @@ summary(s$URN %in% schools$URN)
 s = s[s$LSOA %in% cents_lsoa$LSOA,]
 s = s[s$URN %in% schools$URN,]
 
-nrow(cents_lsoa)
-nrow(schools)
-cents_lsoa = cents_lsoa[cents_lsoa$LSOA %in% s$LSOA,]
-schools = schools[schools$URN %in% s$URN,]
-nrow(cents_lsoa)
-nrow(schools)
+#nrow(cents_lsoa)
+#nrow(schools)
+#cents_lsoa = cents_lsoa[cents_lsoa$LSOA %in% s$LSOA,]
+#schools = schools[schools$URN %in% s$URN,]
+#nrow(cents_lsoa)
+#nrow(schools)
 
 #plot(las)
 #points(cents_lsoa)
@@ -111,7 +115,7 @@ nrow(schools)
 
 summary(s$TOTAL)
 nrow(s)
-s_cut = s[s$TOTAL >= 1,]
+s_cut = s[s$TOTAL >= 10,]
 nrow(s_cut)
 
 
