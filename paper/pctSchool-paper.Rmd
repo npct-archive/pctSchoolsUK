@@ -27,17 +27,13 @@ output: rticles::elsevier_article
 
 
 ```{r setup, include=FALSE}
-setwd("/home/geoif/pct/pctSchoolsUK")
-if(!exists("sld11"))
-  source("R/analysis-sld.R")
-setwd("/home/geoif/pct/pctSchoolsUK/paper")
+# Run from RStudio when the project pctSchoolsUK.Rproj is open
+# source("../R/analysis-sld.R") # note: replace with lsd11 = readRDS(...)
 ```
 
 ```{r, echo=FALSE}
 bib = httr::GET("https://www.zotero.org/api/groups/418217/collections/RZSVFK8G/items/top?limit=100&format=bibtex&v=1", httr::write_disk("refs.bib", overwrite = T))
 ```
-
-
 
 # Introduction
 
