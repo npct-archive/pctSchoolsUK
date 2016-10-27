@@ -85,5 +85,7 @@ coords = cbind(as.numeric(sld$Easting), as.numeric(sld$Northing))
 sld_sp = SpatialPointsDataFrame(coords = coords, data = sld)
 proj4string(sld_sp) = CRS("+init=epsg:27700")
 #plot(sld_sp) # all the schools in England
+# saveRDS(s11, "private_data/s11.Rds") # run once so commented
+# saveRDS(sld11, "private_data/sld11.Rds") # run once so commented
 
 
