@@ -22,7 +22,10 @@ header-includes:
    - \usepackage{amsmath}
    - \usepackage{amssymb}
 bibliography: refs.bib
-output: rticles::elsevier_article
+output:
+  rticles::elsevier_article:
+      toc: true
+      number_sections: true
 ---
 
 
@@ -35,6 +38,13 @@ sld11 = readRDS("../private_data/sld11.Rds")
 ```{r, echo=FALSE}
 bib = httr::GET("https://www.zotero.org/api/groups/418217/collections/RZSVFK8G/items/top?limit=100&format=bibtex&v=1", httr::write_disk("refs.bib", overwrite = T))
 ```
+
+# Planning (temporary section for ideas etc - also use GH issues)
+
+- Target journal: Journal of Transport and Health (JTH): [journals.elsevier.com](http://www.journals.elsevier.com/journal-of-transport-and-health)
+- Author [guidelines](https://www.elsevier.com/journals/journal-of-transport-and-health/2214-1405?generatepdf=true):
+    - "Divide your article into clearly defined and numbered sections"
+    
 
 # Introduction
 
