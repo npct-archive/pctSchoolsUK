@@ -98,10 +98,33 @@ Post,School,8888,200,"Type of School",Secondary,Max_age,15.3
 knitr::kable(df_input, caption = "Summary of input datasets provided by the Department for Education, before and after filtering")
 ```
 
+# Results
 
+## Area-level results
 
+```{r, echo=FALSE, fig.cap="Illustration of the current level of cycling to school nationally"}
+plot(1:10)
+```
 
+## School-level results
 
+## Desire-line level results
+
+```{r, echo=FALSE, fig.cap="Illustration of the current level of cycling to school at the desire line levels in two case study cities (Bradford and Cambridge)."}
+plot(1:10)
+```
+
+## Potential for cycling to school at the route network level
+
+The most illuminating finding of our research from a policy perspective is at the road network level. Estimates of the number of students who could cycle to school along specific road segments can help planners decide where to invest in new cycle paths that are designed with children in mind.
+
+```{r, echo=FALSE, fig.cap="Illustration of the potential uptake of cycling at the route network level in Leeds."}
+
+```
+
+# Discussion
+
+# Conclusions
 
 
 <!-- Despite the strength of evidence of the benefits of active travel to school, it has been experiencing a long-term downward trend since at least the 1950s.  -->
