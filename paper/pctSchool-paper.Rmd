@@ -28,7 +28,8 @@ output: rticles::elsevier_article
 
 ```{r setup, include=FALSE}
 # Run from RStudio when the project pctSchoolsUK.Rproj is open
-# source("../R/analysis-sld.R") # note: replace with lsd11 = readRDS(...)
+s11 = readRDS("../private_data/s11.Rds")
+sld11 = readRDS("../private_data/sld11.Rds")
 ```
 
 ```{r, echo=FALSE}
@@ -83,11 +84,7 @@ More specifically the purpose of this paper is twofold: to develop and demonstra
 <!-- This trend has continued into the 21^st^ Between 1993 and 2003, for example, the proportion of primary school children being driven to school increased from 29% to 41% while the proportion walking and cycling dropped [@cooper_physical_2005]. -->
 
 
-
-
-
-The data set used consists of 
-<!-- `r # length(unique(sld11$URN))` -->
+The data set used consists of `r length(unique(sld11$URN))`
 schools
 
 
