@@ -84,7 +84,9 @@ More specifically the purpose of this paper is twofold: to develop and demonstra
 
 
 
-The data set used consists of `r length(unique(sld11$URN))` schools
+The data set used consists of 
+<!-- `r # length(unique(sld11$URN))` -->
+schools
 
 
 References {#references .unnumbered}
