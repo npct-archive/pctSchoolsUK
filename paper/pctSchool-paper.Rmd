@@ -77,6 +77,26 @@ In this work we begin to explore the potential of geographic and spatial data an
 
 More specifically the purpose of this paper is twofold: to develop and demonstrate methods for assessing the potential uptake of active travel modes for the school commute, and to apply these methods to England to estimate the potential for modal shift to cycling at the national level. Based on plausible scenarios for change and evidence of the benefits of physical activity for children and reduced road congestion, it would be possible to quantify the benefits of cycling uptake at high geographical resolution, building on these methods. This next stage is beyond the scope of the present work, however: in this paper the focus is on the geographical distribution of cycling and cycling potential, and the methods needed to model modal shift in the school commute. 
 
+# Material and methods
+
+The data source for this paper was the 2011 School Census. This is an annual data source, but the Pupil Usual Mode of Travel was last provided 2011.^[The
+decision to remove this field from the School Census came as a surprise to many working in the transport an health field at the time, as explained on the
+[School Travel Health Check website](http://www.sthc.co.uk/SchoolCensus.aspx) [@school_travel_health_check_removal_2012]:
+"On the 29th July 2011 the Department for Education announced in the pages of issue no. 50 of the Information about children, education and schools (ICES) e-bulletin that they had unilaterally decided to remove the Pupil Usual Mode of Travel data field from the national school census with immediate effect. This was much to the surprise of ourselves and other providers of data analysis services, not to mention all other government departments, local authorities and schools who were reliant on the data for many of their own strategic planning and operational purposes."
+]
+A table summarising the input datasets, before and after filtering out non-secondary schools, is provided below.
+
+```{r, echo=FALSE}
+df_input = readr::read_csv(
+'"Filtering","Level","N. rows","N. columns","Example var (char)","Mode","Example var (num)","Mean"
+Pre,School,9999,50,"Type of School",Secondary,Max_age,12.5
+Post,School,8888,50,"Type of School",Secondary,Max_age,15.3
+Pre,"OD pair",55555,300,"Type of School",Secondary,Max_age,15.3
+Post,School,8888,200,"Type of School",Secondary,Max_age,15.3
+'
+)
+knitr::kable(df_input, caption = "Summary of input datasets provided by the Department for Education, before and after filtering")
+```
 
 
 
