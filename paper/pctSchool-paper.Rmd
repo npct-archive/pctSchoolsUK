@@ -22,7 +22,10 @@ header-includes:
    - \usepackage{amsmath}
    - \usepackage{amssymb}
 bibliography: refs.bib
-output: rticles::elsevier_article
+output:
+  rticles::elsevier_article:
+      toc: true
+      number_sections: true
 ---
 
 
@@ -35,6 +38,13 @@ sld11 = readRDS("../private_data/sld11.Rds")
 ```{r, echo=FALSE}
 bib = httr::GET("https://www.zotero.org/api/groups/418217/collections/RZSVFK8G/items/top?limit=100&format=bibtex&v=1", httr::write_disk("refs.bib", overwrite = T))
 ```
+
+# Planning (temporary section for ideas etc - also use GH issues)
+
+- Target journal: Journal of Transport and Health (JTH): [journals.elsevier.com](http://www.journals.elsevier.com/journal-of-transport-and-health)
+- Author [guidelines](https://www.elsevier.com/journals/journal-of-transport-and-health/2214-1405?generatepdf=true):
+    - "Divide your article into clearly defined and numbered sections"
+    
 
 # Introduction
 
@@ -67,11 +77,54 @@ In this work we begin to explore the potential of geographic and spatial data an
 
 More specifically the purpose of this paper is twofold: to develop and demonstrate methods for assessing the potential uptake of active travel modes for the school commute, and to apply these methods to England to estimate the potential for modal shift to cycling at the national level. Based on plausible scenarios for change and evidence of the benefits of physical activity for children and reduced road congestion, it would be possible to quantify the benefits of cycling uptake at high geographical resolution, building on these methods. This next stage is beyond the scope of the present work, however: in this paper the focus is on the geographical distribution of cycling and cycling potential, and the methods needed to model modal shift in the school commute. 
 
+# Material and methods
 
+The data source for this paper was the 2011 School Census. This is an annual data source, but the Pupil Usual Mode of Travel was last provided 2011.^[The
+decision to remove this field from the School Census came as a surprise to many working in the transport an health field at the time, as explained on the
+[School Travel Health Check website](http://www.sthc.co.uk/SchoolCensus.aspx) [@school_travel_health_check_removal_2012]:
+"On the 29th July 2011 the Department for Education announced in the pages of issue no. 50 of the Information about children, education and schools (ICES) e-bulletin that they had unilaterally decided to remove the Pupil Usual Mode of Travel data field from the national school census with immediate effect. This was much to the surprise of ourselves and other providers of data analysis services, not to mention all other government departments, local authorities and schools who were reliant on the data for many of their own strategic planning and operational purposes."
+]
+A table summarising the input datasets, before and after filtering out non-secondary schools, is provided below.
 
+```{r, echo=FALSE}
+df_input = readr::read_csv(
+'"Filtering","Level","N. rows","N. columns","Example var (char)","Mode","Example var (num)","Mean"
+Pre,School,9999,50,"Type of School",Secondary,Max_age,12.5
+Post,School,8888,50,"Type of School",Secondary,Max_age,15.3
+Pre,"OD pair",55555,300,"Type of School",Secondary,Max_age,15.3
+Post,School,8888,200,"Type of School",Secondary,Max_age,15.3
+'
+)
+knitr::kable(df_input, caption = "Summary of input datasets provided by the Department for Education, before and after filtering")
+```
 
+# Results
 
+## Area-level results
 
+```{r, echo=FALSE, fig.cap="Illustration of the current level of cycling to school nationally"}
+plot(1:10)
+```
+
+## School-level results
+
+## Desire-line level results
+
+```{r, echo=FALSE, fig.cap="Illustration of the current level of cycling to school at the desire line levels in two case study cities (Bradford and Cambridge)."}
+plot(1:10)
+```
+
+## Potential for cycling to school at the route network level
+
+The most illuminating finding of our research from a policy perspective is at the road network level. Estimates of the number of students who could cycle to school along specific road segments can help planners decide where to invest in new cycle paths that are designed with children in mind.
+
+```{r, echo=FALSE, fig.cap="Illustration of the potential uptake of cycling at the route network level in Leeds."}
+
+```
+
+# Discussion
+
+# Conclusions
 
 
 <!-- Despite the strength of evidence of the benefits of active travel to school, it has been experiencing a long-term downward trend since at least the 1950s.  -->
