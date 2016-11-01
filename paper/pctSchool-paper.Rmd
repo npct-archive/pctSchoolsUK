@@ -124,7 +124,8 @@ Comparison of cycling to work and cycling to school.
 par(mfrow=c(2,2))
 qtm(lads_active, fill = "Cycle")
 qtm(lad_pcycle, fill = "pcycle")
-pairs(~Cycle+pcycle, data=schoolvswork)
+plot(schoolvswork$Cycle, schoolvswork$pcycle, xlab="Cycling commutes to school (%)", ylab="Cycling commutes to work (%)")
+#pairs(~Cycle+pcycle, data=schoolvswork)
 ```
 
 # Results
