@@ -38,7 +38,8 @@ sld11$Headcount_Secondary = rowSums(sld11[,vname_secondary])
 #install.packages("gdata", dependencies = TRUE)
 # gdata::installXLSXsupport()
 # https://www.whatdotheyknow.com/request/list_of_all_schools_in_england_w
-phase_edu = gdata::read.xls("phase_of_education.xls")
+#phase_edu = gdata::read.xls("phase_of_education.xls")
+phase_edu = readxl::read_excel("phase_of_education.xls")
 #names(phase_edu)
 #names(sld11)
 

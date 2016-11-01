@@ -31,8 +31,9 @@ output:
 
 ```{r setup, include=FALSE}
 # Run from RStudio when the project pctSchoolsUK.Rproj is open
-s11 = readRDS("../private_data/s11.Rds")
-sld11 = readRDS("../private_data/sld11.Rds")
+#s11 = readRDS("../private_data/s11.Rds")
+#sld11 = readRDS("../private_data/sld11.Rds")
+source("../R/exploratory_analysis.R")
 ```
 
 ```{r, echo=FALSE}
@@ -48,7 +49,7 @@ bib = httr::GET("https://www.zotero.org/api/groups/418217/collections/RZSVFK8G/i
 
 # Introduction
 
-Active travel to school offers many benefits across a range of policy objectives. From a public health perspective it contributes to the physical and mental wellbeing of new generations (ref). Active travel to school also has environmental benefits, in the form of reduced motorised traffic, improved air quality and reduced greenhouse gas emissions @singleton_gis_2014. 
+Active travel to school offers many benefits across a range of policy objectives. From a public health perspective it contributes to the physical and mental wellbeing of new generations (ref). Active travel to school also has environmental benefits, in the form of reduced motorised traffic, improved air quality and reduced greenhouse gas emissions [@singleton_gis_2014]. 
 <!-- A knock-on health co-benefit reduced levels of danger of road traffic casualties resulting from the reduction in road traffic. -->
 From an education perspective, physical and mental barriers to educational success can be reduced by physical activity, and there is evidence to suggest that active travel to school can improve student learning (ref).
 
@@ -87,15 +88,43 @@ decision to remove this field from the School Census came as a surprise to many 
 A table summarising the input datasets, before and after filtering out non-secondary schools, is provided below.
 
 ```{r, echo=FALSE}
-df_input = readr::read_csv(
-'"Filtering","Level","N. rows","N. columns","Example var (char)","Mode","Example var (num)","Mean"
-Pre,School,9999,50,"Type of School",Secondary,Max_age,12.5
-Post,School,8888,50,"Type of School",Secondary,Max_age,15.3
-Pre,"OD pair",55555,300,"Type of School",Secondary,Max_age,15.3
-Post,School,8888,200,"Type of School",Secondary,Max_age,15.3
-'
-)
-knitr::kable(df_input, caption = "Summary of input datasets provided by the Department for Education, before and after filtering")
+# df_input = readr::read_csv(
+# '"Filtering","Level","N. rows","N. columns","Example var (char)","Mode","Example var (num)","Mean"
+# Pre,School,9999,50,"Type of School",Secondary,Max_age,12.5
+# Post,School,8888,50,"Type of School",Secondary,Max_age,15.3
+# Pre,"OD pair",55555,300,"Type of School",Secondary,Max_age,15.3
+# Post,School,8888,200,"Type of School",Secondary,Max_age,15.3
+# '
+# )
+knitr::kable(res_active[1:10,])
+#knitr::kable(df_input, caption = "Summary of input datasets provided by the Department for Education, before and after filtering")
+```
+
+The table below shows the top 10 Local Authorities by active transport prevalence.
+```{r, echo=FALSE}
+knitr::kable(res_active_la[1:10,])
+```
+
+The choropleth below shows cycling prevalence across Local Authorities in England
+
+```{r, echo=FALSE, fig.cap="Cycling as a fraction of all school commutes across Local Authorities in England."}
+#par(mfrow = c(1, 2))
+#spplot(lads_active, zcol="Cycle")
+#spplot(lads_active, zcol="Walk")
+
+library(tmap)
+#qtm(lads_active, fill = c("Walk", "Cycle"), free.scales.fill=FALSE)
+par(mfrow = c(2, 1))
+qtm(lads_active, fill = c("Walk", "Cycle"))
+```
+
+Comparison of cycling to work and cycling to school.
+
+```{r, echo=FALSE, fig.cap="Cycling fraction of commutes to work and to school, across Local Authorities in England."}
+par(mfrow=c(2,2))
+qtm(lads_active, fill = "Cycle")
+qtm(lad_pcycle, fill = "pcycle")
+pairs(~Cycle+pcycle, data=schoolvswork)
 ```
 
 # Results
@@ -137,8 +166,8 @@ The most illuminating finding of our research from a policy perspective is at th
 <!-- This trend has continued into the 21^st^ Between 1993 and 2003, for example, the proportion of primary school children being driven to school increased from 29% to 41% while the proportion walking and cycling dropped [@cooper_physical_2005]. -->
 
 
-The data set used consists of `r length(unique(sld11$URN))`
-schools
+<!-- The data set used consists of `r length(unique(sld11$URN))` -->
+<!-- schools -->
 
 
 References {#references .unnumbered}
