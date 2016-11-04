@@ -88,21 +88,42 @@ decision to remove this field from the School Census came as a surprise to many 
 A table summarising the input datasets, before and after filtering out non-secondary schools, is provided below.
 
 ```{r, echo=FALSE}
-# df_input = readr::read_csv(
-# '"Filtering","Level","N. rows","N. columns","Example var (char)","Mode","Example var (num)","Mean"
-# Pre,School,9999,50,"Type of School",Secondary,Max_age,12.5
-# Post,School,8888,50,"Type of School",Secondary,Max_age,15.3
-# Pre,"OD pair",55555,300,"Type of School",Secondary,Max_age,15.3
-# Post,School,8888,200,"Type of School",Secondary,Max_age,15.3
-# '
-# )
-knitr::kable(res_active[1:10,])
-#knitr::kable(df_input, caption = "Summary of input datasets provided by the Department for Education, before and after filtering")
+df_input = readr::read_csv(
+'"Filtering","Level","N. rows","N. columns","Example var (char)","Mode","Example var (num)","Mean"
+Pre,School,17183,179,"Type of School","Infant and Junior School 5-11","Headcount Pupils",316
+Post,School,1534,179,"Type of School","Comprehensive all-through 11-16","Headcount Pupils",951
+Pre,"OD pair",908034,10,"School Name","-","Total Flow",8.3
+Post,"OD pair",154754,10,"School Name","-","Total Flow",9.4
+'
+)
+knitr::kable(df_input, caption = "Summary of input datasets provided by the Department for Education, before and after filtering for Secondary schools only.")
+```
+
+Top schools by cycling to school percentage
+```{r, echo=FALSE}
+temp = res_active
+temp[1:10, "Cycle"] = scales::percent(temp[1:10, ]$Cycle/100)
+temp[1:10, "Walk"] = scales::percent(temp[1:10, ]$Walk/100)
+knitr::kable(temp[1:10,])
 ```
 
 The table below shows the top 10 Local Authorities by active transport prevalence.
 ```{r, echo=FALSE}
-knitr::kable(res_active_la[1:10,])
+temp = res_active_la_name
+temp[1:10, "Cycle"] = scales::percent(temp[1:10, ]$Cycle/100)
+temp[1:10, "Walk"] = scales::percent(temp[1:10, ]$Walk/100)
+knitr::kable(temp[1:10,])
+```
+
+The table below shows the bottom 10 Local Authorities by active transport prevalence.
+```{r, echo=FALSE}
+temp = res_active_la_name %>% arrange(Cycle,Walk) #%>% head(n=10)
+temp$Cycle = as.numeric(temp$Cycle)
+temp$Walk = as.numeric(temp$Walk)
+temp[1:10, "Cycle"] = scales::percent(temp[1:10, ]$Cycle/100)
+temp[1:10, "Walk"] = scales::percent(temp[1:10, ]$Walk/100)
+knitr::kable(temp[1:10,])
+#knitr::kable(res_active_la_name %>% arrange(desc(-Cycle,-Walk)) %>% head(n=10))
 ```
 
 The choropleth below shows cycling prevalence across Local Authorities in England

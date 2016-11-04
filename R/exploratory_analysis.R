@@ -23,6 +23,16 @@ setwd(old) # go back to working directory
 names(sld11) = gsub("^LEA11_","", names(sld11))
 sld11$Northing = as.integer(sld11$Northing)
 
+nrow(sld11)
+ncol(sld11)
+Mode = function(x) {
+  ux = unique(x)
+  ux[which.max(tabulate(match(x, ux)))]
+}
+Mode(sld11$Form7_School_Type_Desc)
+
+mean(sld11$Headcount_Pupils)
+
 # extract the Primary schools
 # vname_primary_f = paste0("FT_Girls_", 1:11)
 # vname_primary_m = paste0("FT_Boys_", 1:11)
@@ -68,6 +78,9 @@ sum(sldpri$Headcount_Pupils)/sum(sld11$Headcount_Pupils)
 #sldsec = sld11[(sld11$Phase == "Secondary") | (sld11$Phase == "Middle Deemed Secondary") | (sld11$Headcount_Secondary > 0), ]
 sldsec = sld11[(sld11$Phase == "Secondary") | (sld11$Phase == "Middle Deemed Secondary"), ]
 nrow(sldsec)
+ncol(sldsec)
+Mode(sldsec$Form7_School_Type_Desc)
+mean(sldsec$Headcount_Pupils)
 
 #sum(sldsec$Headcount_Secondary)
 sum(sldsec$Headcount_Pupils)
@@ -191,23 +204,34 @@ res_active = group_by(s11, SCHOOLNAME_SPR11) %>%
 # readr::write_csv(lsoa2la, "private_data/LSOA2LAD_lookup.csv") 
 lsoa2la = readr::read_csv("private_data/LSOA2LAD_lookup.csv")
 
-s11la = dplyr::left_join(s11, lsoa2la, by=c("LLSOA_SPR11"="LSOA11CD"))
+# /home/geoif/pct/pctSchoolsUK/private_data/Local_Authority_BoundaryData
+# https://census.edina.ac.uk/bds.html
+lads = shapefile("private_data/Local_Authority_BoundaryData/england_lad_2011.shp")
+lads = spTransform(lads, CRS("+init=epsg:4326"))
 
-res_active_la = group_by(s11la[!is.na(s11la$LAD11CD),], LAD11CD) %>%
+s11la = dplyr::left_join(s11, lsoa2la, by=c("LLSOA_SPR11"="LSOA11CD"))
+# nrow(dplyr::inner_join(s11la, as.data.frame(lads), by=c("LAD11CD"="code")))
+s11la = dplyr::left_join(s11la, as.data.frame(lads), by=c("LAD11CD"="code")) # Join to get Local Authority names
+
+res_active_la_name = group_by(s11la[!is.na(s11la$name),], name) %>%
   summarise(
     Cycle = 100*sum(CYCLE)/sum(TOTAL),
     Walk = 100*sum(WALK)/sum(TOTAL)
   ) %>% 
   arrange(desc(Cycle, Walk))
 
-res_active_la
+res_active_la_name
+
+#res_active_la_name_bottom = res_active_la_name %>% arrange(Cycle,Walk) %>% head(n=10)
 
 lad_pcycle = geojsonio::geojson_read("../pct-bigdata/las-pcycle.geojson", what="sp")
 
-# /home/geoif/pct/pctSchoolsUK/private_data/Local_Authority_BoundaryData
-# https://census.edina.ac.uk/bds.html
-lads = shapefile("private_data/Local_Authority_BoundaryData/england_lad_2011.shp")
-lads = spTransform(lads, CRS("+init=epsg:4326"))
+res_active_la = group_by(s11la[!is.na(s11la$name),], LAD11CD) %>%
+  summarise(
+    Cycle = 100*sum(CYCLE)/sum(TOTAL),
+    Walk = 100*sum(WALK)/sum(TOTAL)
+  ) %>% 
+  arrange(desc(Cycle, Walk))
 
 
 lads_active = sp::merge(lads, res_active_la, by.x="label", by.y="LAD11CD")
@@ -218,8 +242,9 @@ lads_active = sp::merge(lads, res_active_la, by.x="label", by.y="LAD11CD")
 #spplot(lads_active, zcol="Walk")
 
 library(tmap)
+# These plots commented to avoid long compilation times when running knitr to create paper
 #qtm(lads_active, fill = c("Walk", "Cycle"), free.scales.fill=FALSE)
-qtm(lads_active, fill = c("Walk", "Cycle"))
+#qtm(lads_active, fill = c("Walk", "Cycle"))
 
 #pairs(~Cycle+Walk, data=res_active)
 plot(res_active$Cycle, res_active$Walk, xlab="Cycling commutes to school (%)", ylab="Walking commutes to school (%)")
@@ -246,9 +271,21 @@ barplot(table(sld11$Admissions_Policy), las=2)
 
 
 
+# FLOWS DATA
 
+nrow(s11)
+ncol(s11)
+s = s11[!is.na(s11$LLSOA_SPR11),] # drop flows with no LSOA data
+nrow(s)
 
+mean(s11$TOTAL)
+s = s[s$URN_SPR11 %in% sldsec$URN,]
+nrow(s)
+ncol(s)
 
+mean(s$TOTAL)
+
+summary(sldsec$URN %in% s11$URN_SPR11)
 
 #par(par_orig)
 
