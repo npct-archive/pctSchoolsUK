@@ -15,6 +15,7 @@ if(!exists("sld11")){
 # Compute number full-time students
 #sld11$ft = rowSums(sld11[,countvars_ft])
 names(sld11) = gsub("^LEA11_","", names(sld11))
+sld11$Northing = as.integer(sld11$Northing)
 #names(sld11)[names(sld11) == "Headcount_FT_Pupils"] = "ft"
 # hist(sld11$ft)
 # summary(sld11$ft)
@@ -29,10 +30,10 @@ names(sld11) = gsub("^LEA11_","", names(sld11))
 ## install.packages("XLConnect", dependencies=TRUE)
 
 
-vname_secondary_f = paste0("FT_Girls_", 12:18)
-vname_secondary_m = paste0("FT_Boys_", 12:18)
-vname_secondary = c(vname_secondary_f, vname_secondary_m)
-sld11$Headcount_Secondary = rowSums(sld11[,vname_secondary])
+# vname_secondary_f = paste0("FT_Girls_", 12:18)
+# vname_secondary_m = paste0("FT_Boys_", 12:18)
+# vname_secondary = c(vname_secondary_f, vname_secondary_m)
+# sld11$Headcount_Secondary = rowSums(sld11[,vname_secondary])
 
 # Load Phase of Education data so we can select Secondary schools only
 #install.packages("gdata", dependencies = TRUE)
@@ -47,10 +48,16 @@ nrow(sld11)
 sld11 = dplyr::inner_join(sld11, phase_edu, by = c("URN" = "URN"))
 nrow(sld11)
 
-unique(sld11$Phase)
-nrow(sld11)
-sld = sld11[(sld11$Phase == "Secondary") | (sld11$Phase == "Middle Deemed Secondary") | (sld11$Headcount_Secondary > 0), ]
-nrow(sld)
+sldpri = sld11[(sld11$Phase == "Primary") | (sld11$Phase == "Middle Deemed Primary"), ]
+nrow(sldpri)
+
+sldsec = sld11[(sld11$Phase == "Secondary") | (sld11$Phase == "Middle Deemed Secondary"), ]
+nrow(sldsec)
+
+# unique(sld11$Phase)
+# nrow(sld11)
+# sld = sld11[(sld11$Phase == "Secondary") | (sld11$Phase == "Middle Deemed Secondary") | (sld11$Headcount_Secondary > 0), ]
+# nrow(sld)
   
 #school_levels = unique(sld11[, c("Form7_School_Type","Form7_School_Type_Desc")])
 #school_levels
@@ -63,14 +70,14 @@ nrow(sld)
 #nrow(sld)
 
 #sld = sld[sld$Headcount_FT_Pupils >= 100,]
-sld = sld[sld$Headcount_Secondary >= 100,]
-nrow(sld)
+sldsec = sldsec[sldsec$Headcount_Pupils >= 100,]
+nrow(sldsec)
 # Get rid of schools for which we have no coordinates
-sld = sld[!is.na(sld$Northing) & !is.na(sld$Easting),]
+sldsec = sldsec[!is.na(sldsec$Northing) & !is.na(sldsec$Easting),]
 nrow(sld) # 5 schools removed
 # locations = ggmap::geocode(sld$LEA11_SchoolName[1:2000])
 # good chance to test the validity of ggmap geocode results
-sum(sld$Headcount_FT_Pupils)
+sum(sldsec$Headcount_FT_Pupils)
 
 # Get top 100 schools with most Secondary-level students
 #sld11_100 = top_n(x = sld11, n = 100, wt = sld11$Headcount_FT_Pupils)  %>%
@@ -79,11 +86,11 @@ sum(sld$Headcount_FT_Pupils)
 # saveRDS(sld11_100, "private_data/sld11_100.Rds")
 
 # make the data spatial
-coords = cbind(as.numeric(sld$Easting), as.numeric(sld$Northing))
+coords = cbind(as.numeric(sldsec$Easting), as.numeric(sldsec$Northing))
 #summary(coords)
 #sld_sp = SpatialPointsDataFrame(coords = coords, data = sld, proj4string = CRS("+init=epsg:32610 +datum=WGS84"))
 #sld_sp = SpatialPointsDataFrame(coords = coords, data = sld, proj4string = CRS("+init=epsg:27700"))
-sld_sp = SpatialPointsDataFrame(coords = coords, data = sld)
+sld_sp = SpatialPointsDataFrame(coords = coords, data = sldsec)
 proj4string(sld_sp) = CRS("+init=epsg:27700")
 #plot(sld_sp) # all the schools in England
 # saveRDS(s11, "private_data/s11.Rds") # run once so commented

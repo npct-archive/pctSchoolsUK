@@ -2,8 +2,8 @@ setwd("/home/geoif/pct/pctSchoolsUK")
 source("setup.R")
 
 # read in the data
-#if(!exists("sld11"))
-#  source("R/analysis-sld.R")
+if(!exists("sld11"))
+  source("R/analysis-sld.R")
 
 # s11 contains the 2011 flows (origin-destination)
 # sld11 contains the information on the schools (destinations) for 2011
@@ -12,17 +12,17 @@ source("setup.R")
 # We ignored the 2015 data (sld15) as no corresponding flows (s15) exist for it
 
 # read in the raw data
-private_dir = "private_data"
-old = setwd(private_dir) 
-#list.files() # what's there
-sld11 = readr::read_tsv(file = "SLD_CENSUS_2011.txt")
-s11 = readr::read_tsv(file = "Spring_Census_2011.txt")
-setwd(old) # go back to working directory
-
-# fix column names and variable types
-names(sld11) = gsub("^LEA11_","", names(sld11))
-sld11$Northing = as.integer(sld11$Northing)
-
+# private_dir = "private_data"
+# old = setwd(private_dir) 
+# #list.files() # what's there
+# sld11 = readr::read_tsv(file = "SLD_CENSUS_2011.txt")
+# s11 = readr::read_tsv(file = "Spring_Census_2011.txt")
+# setwd(old) # go back to working directory
+# 
+# # fix column names and variable types
+# names(sld11) = gsub("^LEA11_","", names(sld11))
+# sld11$Northing = as.integer(sld11$Northing)
+# 
 nrow(sld11)
 ncol(sld11)
 Mode = function(x) {
@@ -32,51 +32,51 @@ Mode = function(x) {
 Mode(sld11$Form7_School_Type_Desc)
 
 mean(sld11$Headcount_Pupils)
-
-# extract the Primary schools
-# vname_primary_f = paste0("FT_Girls_", 1:11)
-# vname_primary_m = paste0("FT_Boys_", 1:11)
-# vname_primary = c(vname_primary_f, vname_primary_m)
-# sld11$Headcount_Primary_male = rowSums(sld11[,vname_primary_m])
-# sld11$Headcount_Primary_female = rowSums(sld11[,vname_primary_f])
-# sld11$Headcount_Primary = rowSums(sld11[,vname_primary])
 # 
-# # extract the Secondary schools
-# vname_secondary_f = paste0("FT_Girls_", 12:18)
-# vname_secondary_m = paste0("FT_Boys_", 12:18)
-# vname_secondary = c(vname_secondary_f, vname_secondary_m)
-# sld11$Headcount_Secondary_male = rowSums(sld11[,vname_secondary_m])
-# sld11$Headcount_Secondary_female = rowSums(sld11[,vname_secondary_f])
-# sld11$Headcount_Secondary = rowSums(sld11[,vname_secondary])
-
-# Load Phase of Education data so we can select Secondary schools only
-# https://www.whatdotheyknow.com/request/list_of_all_schools_in_england_w
-phase_edu = readxl::read_excel("phase_of_education.xls")
-#names(phase_edu)
-#names(sld11)
-
-before = nrow(sld11)
-sld11 = dplyr::inner_join(sld11, phase_edu, by = c("URN" = "URN"))
-nrow(sld11)
-# 5% of schools lost because we have no phase of education info for them
-before/nrow(sld11)
-
-unique(sld11$Phase)
-
-### Work out the number of Primary and Secondary schools, and the number of students in them
-nrow(sld11)
-#sldpri = sld11[(sld11$Phase == "Primary") | (sld11$Phase == "Middle Deemed Primary") | (sld11$Headcount_Primary > 0), ]
-sldpri = sld11[(sld11$Phase == "Primary") | (sld11$Phase == "Middle Deemed Primary"), ]
-nrow(sldpri)
-
+# # extract the Primary schools
+# # vname_primary_f = paste0("FT_Girls_", 1:11)
+# # vname_primary_m = paste0("FT_Boys_", 1:11)
+# # vname_primary = c(vname_primary_f, vname_primary_m)
+# # sld11$Headcount_Primary_male = rowSums(sld11[,vname_primary_m])
+# # sld11$Headcount_Primary_female = rowSums(sld11[,vname_primary_f])
+# # sld11$Headcount_Primary = rowSums(sld11[,vname_primary])
+# # 
+# # # extract the Secondary schools
+# # vname_secondary_f = paste0("FT_Girls_", 12:18)
+# # vname_secondary_m = paste0("FT_Boys_", 12:18)
+# # vname_secondary = c(vname_secondary_f, vname_secondary_m)
+# # sld11$Headcount_Secondary_male = rowSums(sld11[,vname_secondary_m])
+# # sld11$Headcount_Secondary_female = rowSums(sld11[,vname_secondary_f])
+# # sld11$Headcount_Secondary = rowSums(sld11[,vname_secondary])
+# 
+# # Load Phase of Education data so we can select Secondary schools only
+# # https://www.whatdotheyknow.com/request/list_of_all_schools_in_england_w
+# phase_edu = readxl::read_excel("phase_of_education.xls")
+names(phase_edu)
+names(sld11)
+# 
+# before = nrow(sld11)
+# sld11 = dplyr::inner_join(sld11, phase_edu, by = c("URN" = "URN"))
+# nrow(sld11)
+# # 5% of schools lost because we have no phase of education info for them
+# before/nrow(sld11)
+# 
+# unique(sld11$Phase)
+# 
+# ### Work out the number of Primary and Secondary schools, and the number of students in them
+# nrow(sld11)
+# #sldpri = sld11[(sld11$Phase == "Primary") | (sld11$Phase == "Middle Deemed Primary") | (sld11$Headcount_Primary > 0), ]
+# sldpri = sld11[(sld11$Phase == "Primary") | (sld11$Phase == "Middle Deemed Primary"), ]
+# nrow(sldpri)
+# 
 #sum(sldpri$Headcount_Primary)
 sum(sldpri$Headcount_Pupils)
 #sum(sldpri$Headcount_Primary)/sum(sld11$Headcount_Pupils)
 sum(sldpri$Headcount_Pupils)/sum(sld11$Headcount_Pupils)
-
-#nrow(sld11)
-#sldsec = sld11[(sld11$Phase == "Secondary") | (sld11$Phase == "Middle Deemed Secondary") | (sld11$Headcount_Secondary > 0), ]
-sldsec = sld11[(sld11$Phase == "Secondary") | (sld11$Phase == "Middle Deemed Secondary"), ]
+# 
+# #nrow(sld11)
+# #sldsec = sld11[(sld11$Phase == "Secondary") | (sld11$Phase == "Middle Deemed Secondary") | (sld11$Headcount_Secondary > 0), ]
+# sldsec = sld11[(sld11$Phase == "Secondary") | (sld11$Phase == "Middle Deemed Secondary"), ]
 nrow(sldsec)
 ncol(sldsec)
 Mode(sldsec$Form7_School_Type_Desc)
@@ -305,3 +305,4 @@ summary(sldsec$URN %in% s11$URN_SPR11)
 #   theme(axis.text.x = element_text(angle = 90, hjust = 1))
 # 
 # ggthemr_reset()
+
