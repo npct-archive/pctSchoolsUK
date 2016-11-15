@@ -54,6 +54,14 @@ mean(sld11$Headcount_Pupils)
 # phase_edu = readxl::read_excel("phase_of_education.xls")
 names(phase_edu)
 names(sld11)
+
+# The schools that are neither Primary or Secondary have a "Not applicable" phase of education
+nrow(sld11)
+nrow(sld11) - (nrow(sldpri) + nrow(sldsec))
+
+unique(dplyr::anti_join(sld11, rbind(sldpri,sldsec), by="URN")$Phase)
+
+
 # 
 # before = nrow(sld11)
 # sld11 = dplyr::inner_join(sld11, phase_edu, by = c("URN" = "URN"))

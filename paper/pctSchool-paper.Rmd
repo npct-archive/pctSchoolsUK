@@ -33,7 +33,9 @@ output:
 # Run from RStudio when the project pctSchoolsUK.Rproj is open
 #s11 = readRDS("../private_data/s11.Rds")
 #sld11 = readRDS("../private_data/sld11.Rds")
+setwd("/home/geoif/pct/pctSchoolsUK/paper")
 source("../R/exploratory_analysis.R")
+source("R/all_England.R")
 ```
 
 ```{r, echo=FALSE}
@@ -49,17 +51,17 @@ bib = httr::GET("https://www.zotero.org/api/groups/418217/collections/RZSVFK8G/i
 
 # Introduction
 
-Active travel to school offers many benefits across a range of policy objectives. From a public health perspective it contributes to the physical and mental wellbeing of new generations (ref). Active travel to school also has environmental benefits, in the form of reduced motorised traffic, improved air quality and reduced greenhouse gas emissions [@singleton_gis_2014]. 
+Active travel to school offers many benefits across a range of policy objectives. From a public health perspective it contributes to the physical and mental wellbeing of new generations [@oja_health_2011]. Active travel to school also has environmental benefits, in the form of reduced motorised traffic, improved air quality and reduced greenhouse gas emissions [@singleton_gis_2014]. 
 <!-- A knock-on health co-benefit reduced levels of danger of road traffic casualties resulting from the reduction in road traffic. -->
-From an education perspective, physical and mental barriers to educational success can be reduced by physical activity, and there is evidence to suggest that active travel to school can improve student learning (ref).
+From an education perspective, physical and mental barriers to educational success can be reduced by physical activity, and there is evidence to suggest that increased levels of physical activity can improve student learning [@shephard_required_1984, @sallis_effects_1999].
 
-In terms of health, regular exercise has multiple, mutually reinforcing benefits. Over the space of a lifetime habitual physical activity reduces the risk of common causes of death, including heart disease and diabetes. In addition to mitigating health risks, the benefits of regular physical activity also include increased aerobic capacity, muscle and bone strength, flexibility, insulin sensitivity, and healthier blood lipid profiles; as well as reduced stress, anxiety, and depression. Heart health in particular benefits from exercise, and the benefits of active transport (e.g. walking or cycling) to school on heart health have been specifically studied before [@pate_promoting_2006, @sleap_are_1993]. In a more general context, the impact of childhood obesity intervention programmes (including increased physical activity) on health as measured by blood lipid levels has also been studied and found to be positive [@cai_effect_2014]. The impact of regular physical activity on pupils' mental health is harder to quantitatively ascertain, though studies in this direction give tentative indications pointing to a positive impact as well [@biddle_physical_2011, @ahn_meta-analysis_2011]. These health benefits are possibly further enhanced by an observed correlation between active transport to school and overall higher levels of physical activity [@cooper_commuting_2003, @cooper_physical_2005], if such a correlation proved to be causal.
+In terms of health, regular exercise has multiple, mutually reinforcing benefits^[There are of course risks that come with cycling, which likely vary with the level of training and cycling proficiency [@teyhan_impact_2016, @tetali_road_2016], however we will not discuss those here.]. Over the space of a lifetime habitual physical activity reduces the risk of common causes of death, including heart disease and diabetes. In addition to mitigating health risks, the benefits of regular physical activity also include increased aerobic capacity, muscle and bone strength, flexibility, insulin sensitivity, and healthier blood lipid profiles; as well as reduced stress, anxiety, and depression. Heart health in particular benefits from exercise, and the benefits of active transport (e.g. walking or cycling) to school on heart health have been specifically studied before [@pate_promoting_2006, @sleap_are_1993]. In a more general context, the impact of childhood obesity intervention programmes (including increased physical activity) on health as measured by blood lipid levels has also been studied and found to be positive [@cai_effect_2014]. The impact of regular physical activity on pupils' mental health is harder to quantitatively ascertain, though studies in this direction give tentative indications pointing to a positive impact as well [@biddle_physical_2011, @ahn_meta-analysis_2011]. These health benefits are possibly further enhanced by an observed correlation between active transport to school and overall higher levels of physical activity [@cooper_commuting_2003, @cooper_physical_2005], if such a correlation proved to be causal.
 
 A further additional positive effect of increasing rates of active transport to school is the beneficial environmental impact of reduced motorised traffic. In this context @singleton_gis_2014 investigated the $CO_2$ emissions associated with school commutes, finding that school commutes make a sizeable contribution to $CO_2$ emissions, and uncovering various interesting patterns in carbon emissions in England by region, geodemographic classification, school level, and commute distance.
 
-The primary impact however is perhaps on the physical and mental health of the pupils. Across the industrialised world child and youth obesity rates have been on the rise in recent decades, with the USA reaching obesity rates amongst children and youths of 17\% in recent years [@fryar_prevalence_2012, @karnik_childhood_2012], and Europe reaching similar crisis levels of 10–30% obesity rates in children and 25% in youths [@ben-sefer_childhood_2009]. This childhood obesity problem has now been by and large been acknowledged as an epidemic, one which is at present difficult to treat (though interventions have had some measured successes, see for example [@flodmark_interventions_2006]), and which in consequence will likely only increase in the coming years [@reilly_childhood_2007].
+The primary impact however is perhaps on the physical and mental health of the pupils. Across the industrialised world child and youth obesity rates have been on the rise in recent decades, with the USA reaching obesity rates amongst children and youths of 17\% in recent years [@fryar_prevalence_2012, @karnik_childhood_2012], and Europe reaching similar crisis levels of 10–30% obesity rates in children and 25% in youths [@ben-sefer_childhood_2009]. This childhood obesity problem has now by and large been acknowledged as an epidemic, one which is at present difficult to treat (though interventions have had some measured successes, see for example [@flodmark_interventions_2006]), and which in consequence will likely only increase in the coming years [@reilly_childhood_2007].
 
-Interventions and policies aimed at combating childhood and youth obesity by and large focus on dietary education and restrictions, as well as the promotion of increased levels of physical activity. A standard recommendation of 60 minutes of daily moderate to vigorous physical activity can be found in reviews of the literature [@janssen_systematic_2010, @strong_evidence_2005] and is part of the NHS Physical Activity Guidelines for Children and Young People [@n.h.s._physical_2016]. In spite of this and the widespread existence of periodic Physical Education classes in schools, obesity levels remain high and are likely still rising.
+Interventions and policies aimed at combating childhood and youth obesity generally focus on dietary education and restrictions, as well as the promotion of increased levels of physical activity. A standard recommendation of 60 minutes of daily moderate to vigorous physical activity can be found in reviews of the literature [@janssen_systematic_2010, @strong_evidence_2005] and is part of the NHS Physical Activity Guidelines for Children and Young People [@n.h.s._physical_2016]. In spite of this and the widespread existence of periodic Physical Education classes in schools, obesity levels remain high and are likely still rising.
 
  
 
@@ -76,7 +78,7 @@ Active commuting to school in the UK is therefore --unlike in the US and other i
 
 In this work we begin to explore the potential of geographic and spatial data analysis as a guiding principle for evidence-driven public policies and infrastructure development. The long term aim is to make active transport to school an even more dominant mode of transport, and a feasible part of the solution to the childhood and youth obesity epidemic in the UK, with England as a case study.
 
-More specifically the purpose of this paper is twofold: to develop and demonstrate methods for assessing the potential uptake of active travel modes for the school commute, and to apply these methods to England to estimate the potential for modal shift to cycling at the national level. Based on plausible scenarios for change and evidence of the benefits of physical activity for children and reduced road congestion, it would be possible to quantify the benefits of cycling uptake at high geographical resolution, building on these methods. This next stage is beyond the scope of the present work, however: in this paper the focus is on the geographical distribution of cycling and cycling potential, and the methods needed to model modal shift in the school commute. 
+More specifically the purpose of this paper is twofold: to develop and demonstrate methods for assessing the potential uptake of active travel modes for the school commute, and to apply these methods to England to estimate the potential for modal shift to cycling at the national level^[There is evidence that the commuting distance is perhaps the primary concern in the decision for mode of transport in the school commute [@murtagh_determinants_2016], a problem which evidence-based correctly placed and adequate cycling paths planned could help ameliorate.]. Based on plausible scenarios for change and evidence of the benefits of physical activity for children and reduced road congestion, it would be possible to quantify the benefits of cycling uptake at high geographical resolution, building on these methods. This next stage is beyond the scope of the present work, however: in this paper the focus is on the geographical distribution of cycling and cycling potential, and the methods needed to model modal shift in the school commute. 
 
 # Material and methods
 
@@ -85,15 +87,26 @@ decision to remove this field from the School Census came as a surprise to many 
 [School Travel Health Check website](http://www.sthc.co.uk/SchoolCensus.aspx) [@school_travel_health_check_removal_2012]:
 "On the 29th July 2011 the Department for Education announced in the pages of issue no. 50 of the Information about children, education and schools (ICES) e-bulletin that they had unilaterally decided to remove the Pupil Usual Mode of Travel data field from the national school census with immediate effect. This was much to the surprise of ourselves and other providers of data analysis services, not to mention all other government departments, local authorities and schools who were reliant on the data for many of their own strategic planning and operational purposes."
 ]
-A table summarising the input datasets, before and after filtering out non-secondary schools, is provided below.
+Information on the phase of education (e.g. Primary, Secondary, etc.) was obtained from by a Freedom of Information request made by someone unrelated to this work, fulfilled by the Department for Education, and [made available online](https://www.whatdotheyknow.com/request/list_of_all_schools_in_england_w).
+
+After selecting only the schools deemed Secondary schools, and considering only schools with at least 100 pupils, the number of relevant schools (and their corresponding commuting flows data set) is reduced as shown in the table below.
 
 ```{r, echo=FALSE}
+# df_input = readr::read_csv(
+# '"Filtering","Level","N. rows","N. columns","Example var (char)","Mode","Example var (num)","Mean"
+# Pre,School,17183,179,"Type of School","Infant and Junior School 5-11","Headcount Pupils",316
+# Post,School,1534,179,"Type of School","Comprehensive all-through 11-16","Headcount Pupils",951
+# Pre,"OD pair",908034,10,"School Name","-","Total Flow",8.3
+# Post,"OD pair",154754,10,"School Name","-","Total Flow",9.4
+# '
+# )
+
 df_input = readr::read_csv(
-'"Filtering","Level","N. rows","N. columns","Example var (char)","Mode","Example var (num)","Mean"
-Pre,School,17183,179,"Type of School","Infant and Junior School 5-11","Headcount Pupils",316
-Post,School,1534,179,"Type of School","Comprehensive all-through 11-16","Headcount Pupils",951
-Pre,"OD pair",908034,10,"School Name","-","Total Flow",8.3
-Post,"OD pair",154754,10,"School Name","-","Total Flow",9.4
+'"Filtering","Level","N. rows","N. columns","Example var (num)","Mean"
+Pre,School,17183,179,"Headcount Pupils",316
+Post,School,1534,179,"Headcount Pupils",951
+Pre,"OD pair",908034,10,"Total Flow",8.3
+Post,"OD pair",154593,10,"Total Flow",9.4
 '
 )
 knitr::kable(df_input, caption = "Summary of input datasets provided by the Department for Education, before and after filtering for Secondary schools only.")
@@ -106,6 +119,41 @@ temp[1:10, "Cycle"] = scales::percent(temp[1:10, ]$Cycle/100)
 temp[1:10, "Walk"] = scales::percent(temp[1:10, ]$Walk/100)
 knitr::kable(temp[1:10,])
 ```
+
+The map below shows the distribution of Secondary schools along with the LSOA boundaries, and the school commuting flows (with at least 10 commuters) from LSOA centroids to the Secondary schools.
+```{r, echo=FALSE, fig.cap="The distribution of Census Secondary-level schools across LSOAs in England."}
+par(mfrow=c(1,2))
+plot(las); points(schools, col="red", pch='.', cex=2)
+plot(las); lines(flow, col = 'blue')
+```
+
+Comparison of cycling to work and cycling to school.
+
+```{r, echo=FALSE, fig.cap="Cycling fraction of commutes to work and to school, across Local Authorities in England."}
+par(mfrow=c(2,2))
+qtm(lads_active, fill = "Cycle")
+qtm(lad_pcycle, fill = "pcycle")
+plot(schoolvswork$Cycle, schoolvswork$pcycle, xlab="Cycling commutes to school (%)", ylab="Cycling commutes to work (%)")
+#pairs(~Cycle+pcycle, data=schoolvswork)
+```
+
+# Results
+
+## Area-level results
+
+The choropleth below shows cycling prevalence across Local Authorities in England
+
+```{r, echo=FALSE, fig.cap="Cycling as a fraction of all school commutes across Local Authorities in England."}
+#par(mfrow = c(1, 2))
+#spplot(lads_active, zcol="Cycle")
+#spplot(lads_active, zcol="Walk")
+
+library(tmap)
+#qtm(lads_active, fill = c("Walk", "Cycle"), free.scales.fill=FALSE)
+par(mfrow = c(2, 1))
+qtm(lads_active, fill = c("Walk", "Cycle"))
+```
+
 
 The table below shows the top 10 Local Authorities by active transport prevalence.
 ```{r, echo=FALSE}
@@ -126,43 +174,15 @@ knitr::kable(temp[1:10,])
 #knitr::kable(res_active_la_name %>% arrange(desc(-Cycle,-Walk)) %>% head(n=10))
 ```
 
-The choropleth below shows cycling prevalence across Local Authorities in England
-
-```{r, echo=FALSE, fig.cap="Cycling as a fraction of all school commutes across Local Authorities in England."}
-#par(mfrow = c(1, 2))
-#spplot(lads_active, zcol="Cycle")
-#spplot(lads_active, zcol="Walk")
-
-library(tmap)
-#qtm(lads_active, fill = c("Walk", "Cycle"), free.scales.fill=FALSE)
-par(mfrow = c(2, 1))
-qtm(lads_active, fill = c("Walk", "Cycle"))
-```
-
-Comparison of cycling to work and cycling to school.
-
-```{r, echo=FALSE, fig.cap="Cycling fraction of commutes to work and to school, across Local Authorities in England."}
-par(mfrow=c(2,2))
-qtm(lads_active, fill = "Cycle")
-qtm(lad_pcycle, fill = "pcycle")
-plot(schoolvswork$Cycle, schoolvswork$pcycle, xlab="Cycling commutes to school (%)", ylab="Cycling commutes to work (%)")
-#pairs(~Cycle+pcycle, data=schoolvswork)
-```
-
-# Results
-
-## Area-level results
-
-```{r, echo=FALSE, fig.cap="Illustration of the current level of cycling to school nationally"}
-plot(1:10)
-```
 
 ## School-level results
 
 ## Desire-line level results
 
-```{r, echo=FALSE, fig.cap="Illustration of the current level of cycling to school at the desire line levels in two case study cities (Bradford and Cambridge)."}
-plot(1:10)
+```{r, echo=FALSE, fig.cap="Illustration of the current level of cycling to school at the desire line levels in two case study cities (left: Bradford, right:Cambridge)."}
+par(mfrow=c(1,2))
+plot(las_brad); lines(flow_brad, pch='.', col="blue", cex=5); points(schools_brad, pch='.', col="red", cex=5)
+plot(las_cam); lines(flow_cam, pch='.', col="blue", cex=5); points(schools_cam, pch='.', col="red", cex=5)
 ```
 
 ## Potential for cycling to school at the route network level

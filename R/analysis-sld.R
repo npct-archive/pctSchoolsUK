@@ -74,7 +74,7 @@ sldsec = sldsec[sldsec$Headcount_Pupils >= 100,]
 nrow(sldsec)
 # Get rid of schools for which we have no coordinates
 sldsec = sldsec[!is.na(sldsec$Northing) & !is.na(sldsec$Easting),]
-nrow(sld) # 5 schools removed
+nrow(sldsec) # 5 schools removed
 # locations = ggmap::geocode(sld$LEA11_SchoolName[1:2000])
 # good chance to test the validity of ggmap geocode results
 sum(sldsec$Headcount_FT_Pupils)
@@ -96,4 +96,9 @@ proj4string(sld_sp) = CRS("+init=epsg:27700")
 # saveRDS(s11, "private_data/s11.Rds") # run once so commented
 # saveRDS(sld11, "private_data/sld11.Rds") # run once so commented
 
-
+# Need the full spatial dataframe for later when trying to plot schools and flows for Leeds/a sub-area
+#   sld_sp has already dropped all Primary schools, so when doing spatial subsetting most Leeds LSOAs do not appear
+# sldfull_sp = sld11[!is.na(sld11$Northing) & !is.na(sld11$Easting),]
+# coords_full = cbind(as.numeric(sldfull_sp$Easting), as.numeric(sldfull_sp$Northing))
+# sldfull_sp = SpatialPointsDataFrame(coords = coords_full, data = sldfull_sp)
+# proj4string(sldfull_sp) = CRS("+init=epsg:27700")

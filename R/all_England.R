@@ -1,19 +1,21 @@
 # Aim: subset the data to a region
 
 # Read in and pre-process the data
-source("R/analysis-sld.R")
+setwd("/home/geoif/pct/pctSchoolsUK")
+if(!exists("sld11"))
+  source("R/analysis-sld.R")
 
 # Read in UK Local Authorities, subset Leeds only
 #las = readRDS("../pct-bigdata/las.Rds") ## 2001 LSOAs
-if(!file.exists("las_2011.Rds")){
+if(!file.exists("private_data/las_2011.Rds")){
   # Simplified LSOA boundaries
-  las = shapefile("Lower_Layer_Super_Output_Areas_December_2011_Full_Clipped__Boundaries_in_England_and_Wales_SIMPLIFIED/Lower_Layer_Super_Output_Areas_December_2011_Full_Clipped__Boundaries_in_England_and_Wales.shp")
+  las = shapefile("private_data/Lower_Layer_Super_Output_Areas_December_2011_Full_Clipped__Boundaries_in_England_and_Wales_SIMPLIFIED/Lower_Layer_Super_Output_Areas_December_2011_Full_Clipped__Boundaries_in_England_and_Wales.shp")
   # Full LSOA boundaries
   #las = shapefile("Lower_Layer_Super_Output_Areas_December_2011_Full_Clipped__Boundaries_in_England_and_Wales/Lower_Layer_Super_Output_Areas_December_2011_Full_Clipped__Boundaries_in_England_and_Wales.shp")
   las = spTransform(las, CRS("+init=epsg:4326"))
-  saveRDS(las, "las_2011.Rds")
+  saveRDS(las, "private_data/las_2011.Rds")
 } else{
-  las = readRDS("las_2011.Rds")
+  las = readRDS("private_data/las_2011.Rds")
 }
 
 #sld_test = sld_sp
@@ -41,14 +43,14 @@ if(!file.exists("private_data/sld_england.Rds")){
 
 # Get the centroids for UK LSOAs
 #cents_lsoa = readRDS("../pct-bigdata/cents_lsoa.Rds")
-if(!file.exists("cents_lsoa_2011.Rds")){
-  cents_lsoa = shapefile("lower_layer_super_output_areas_(e+w)_2011_population_weighted_centroids_v2/LSOA_2011_EW_PWC.shp")
+if(!file.exists("private_data/cents_lsoa_2011.Rds")){
+  cents_lsoa = shapefile("private_data/lower_layer_super_output_areas_(e+w)_2011_population_weighted_centroids_v2/LSOA_2011_EW_PWC.shp")
   #cents_lsoa = spTransform(cents_lsoa, CRS("+init=epsg:4326"))
   cents_lsoa = spTransform(cents_lsoa, CRSobj = proj4string(las))
   #proj4string(cents_lsoa) = proj4string(las)
-  saveRDS(cents_lsoa, "cents_lsoa_2011.Rds")
+  saveRDS(cents_lsoa, "private_data/cents_lsoa_2011.Rds")
 } else{
-  cents_lsoa = readRDS("cents_lsoa_2011.Rds")
+  cents_lsoa = readRDS("private_data/cents_lsoa_2011.Rds")
 }
 
 
@@ -85,12 +87,12 @@ names(schools)
 names(cents_lsoa)[names(cents_lsoa)=="LSOA11CD"] <- "LSOA"
 names(s)[names(s)=="LLSOA_SPR11"] <- "LSOA"
 names(s)[names(s)=="URN_SPR11"] <- "URN"
-names(schools)[names(schools)=="LEA11_URN"] <- "URN"
+#names(schools)[names(schools)=="LEA11_URN"] <- "URN"
 
 #names(cents_lsoa)[1] = names(s)[1]
 #names(schools)[2] = names(s)[3]
 
-# Some LSOA centroids are wrong and are in the ocean. Remove the ones not within the Local Authorities
+# Some LSOA centroids are wrong and are in the ocean. Remove the ones not within LSOAs
 cents_lsoa = cents_lsoa[las,]
 nrow(cents_lsoa)
 schools = schools[las,]
@@ -118,14 +120,62 @@ nrow(s)
 s_cut = s[s$TOTAL >= 10,]
 nrow(s_cut)
 
+#plot(las); plot(schools, col="red", pch='.', cex=2, add=T)
+
+if(!file.exists("private_data/england_flows.Rds")){
+  starttime <- proc.time()
+  flow = od2line(flow = s_cut, zones = cents_lsoa, destinations = schools)
+  print(proc.time() - starttime)
+  saveRDS(flow, "private_data/england_flows.Rds")
+} else{
+  flow = readRDS("private_data/england_flows.Rds")
+}
+
+unique(schools$`LA (name)`)
+
+# # Use the spatial dataframe with the full set of schools to do the spatial subsetting
+# # (to get all of Leeds, not just LSOAs where there are Secondary schools)
+# leeds_met_area = c("Leeds", "Wakefield","Kirklees","Calderdale","Bradford","Barnsley","Craven","Harrogate","Selby","York")
+# summary(unique(sldfull_sp$`LA (name)`) %in% leeds_met_area)
+# schools_leeds = sldfull_sp[sldfull_sp$`LA (name)` %in% leeds_met_area, ]
+# #schools_leeds = sldfull_sp[sldfull_sp$`LA (name)`=="Leeds", ]
+# schools_leeds = spTransform(schools_leeds, CRSobj = proj4string(las))
+# las_leeds = las[schools_leeds,]
+# cents_lsoa_leeds = cents_lsoa[schools_leeds,]
+
+#######################################################################
+### JUST BRADFORD
+
+cents_lsoa_brad = cents_lsoa[grepl("Bradford", cents_lsoa$LSOA11NM),]
+las_brad = las[cents_lsoa_brad,]
+schools_brad = schools[las_brad,]
+
+flow_brad = flow[las_brad,]
+plot(las_brad); lines(flow_brad, pch='.', col="blue", cex=5); points(schools_brad, pch='.', col="red", cex=5)
 
 
-starttime <- proc.time()
-flow = od2line(flow = s_cut, zones = cents_lsoa, destinations = schools)
-#flow = flow[flow$TOTAL > 10,]
-proc.time() - starttime
+#######################################################################
+### JUST CAMBRIDGE
 
-plot(las)
+#cents_lsoa_cam = cents_lsoa[grepl("Cambridge", cents_lsoa$LSOA11NM),]  #This is all of Cambridgeshire
+cents_lsoa_cam = cents_lsoa[grepl("\\<Cambridge\\>", cents_lsoa$LSOA11NM),] # This is exclusively Cambridge
+las_cam = las[cents_lsoa_cam,]
+schools_cam = schools[las_cam,]
+
+flow_cam = flow[las_cam,]
+plot(las_cam); lines(flow_cam, pch='.', col="blue", cex=5); points(schools_cam, pch='.', col="red", cex=5)
+
+
+sld11[grepl("Cambridge",sld11$`LA (name)`), c("SchoolName","Phase", "PhaseOfEducation (name)")]
+sld11[grepl("Cambridge",sld11$`LA (name)`) & sld11$Phase=="Secondary", "SchoolName"]
+sld11[grepl("Cambridge",sld11$`LA (name)`) & sld11$`PhaseOfEducation (name)`=="Secondary", "SchoolName"]
+
+
+#starttime <- proc.time()
+#flow = od2line(flow = s_cut, zones = cents_lsoa, destinations = schools)
+#proc.time() - starttime
+
+#plot(las); lines(flow, col = 'blue')  
+
 #points(cents_lsoa)
 #points(schools, col = 'red', pch = 4)
-lines(flow, col = 'blue')
