@@ -1,7 +1,6 @@
 # Aim: subset the data to a region
 
 # Read in and pre-process the data
-setwd("/home/geoif/pct/pctSchoolsUK")
 if(!exists("sld11"))
   source("R/analysis-sld.R")
 

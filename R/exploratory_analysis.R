@@ -1,4 +1,3 @@
-setwd("/home/geoif/pct/pctSchoolsUK")
 source("setup.R")
 
 # read in the data
@@ -214,7 +213,10 @@ lsoa2la = readr::read_csv("private_data/LSOA2LAD_lookup.csv")
 
 # /home/geoif/pct/pctSchoolsUK/private_data/Local_Authority_BoundaryData
 # https://census.edina.ac.uk/bds.html
-lads = shapefile("private_data/Local_Authority_BoundaryData/england_lad_2011.shp")
+# lads = shapefile("private_data/england_lad_2011.shp")
+# lads = rmapshaper::ms_simplify(lads) # simplify the lads (will run faster in future)
+# saveRDS(lads, "../pct-bigdata/england_lad_2011.Rds")
+lads = readRDS("../pct-bigdata/england_lad_2011.Rds")
 lads = spTransform(lads, CRS("+init=epsg:4326"))
 
 s11la = dplyr::left_join(s11, lsoa2la, by=c("LLSOA_SPR11"="LSOA11CD"))

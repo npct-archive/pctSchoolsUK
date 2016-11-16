@@ -9,4 +9,3 @@ s = s11[sel,]
 
 # lsoa_url = "https://files.datapress.com/london/dataset/lsoa-atlas/lsoa-data.xls"
 # download.file(lsoa_url, destfile = "lsoa_boundaries.xls")
-
