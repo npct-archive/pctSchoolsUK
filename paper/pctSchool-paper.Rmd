@@ -31,15 +31,20 @@ output:
 
 ```{r setup, include=FALSE}
 # Run from RStudio when the project pctSchoolsUK.Rproj is open
-#s11 = readRDS("../private_data/s11.Rds")
-#sld11 = readRDS("../private_data/sld11.Rds")
-setwd("/home/geoif/pct/pctSchoolsUK/paper")
-source("../R/exploratory_analysis.R")
-source("R/all_England.R")
+if(file.exists("../private_data/s11ss.Rds")) {
+  run_code = TRUE
+  source("../R/exploratory_analysis.R")
+  source("R/all_England.R")
+} else {
+  run_code = FALSE
+}
 ```
 
 ```{r, echo=FALSE}
 bib = httr::GET("https://www.zotero.org/api/groups/418217/collections/RZSVFK8G/items/top?limit=100&format=bibtex&v=1", httr::write_disk("refs.bib", overwrite = T))
+if(!run_code) {
+  knitr::opts_chunk$set(eval = FALSE)
+}
 ```
 
 # Planning (temporary section for ideas etc - also use GH issues)
@@ -92,15 +97,6 @@ Information on the phase of education (e.g. Primary, Secondary, etc.) was obtain
 After selecting only the schools deemed Secondary schools, and considering only schools with at least 100 pupils, the number of relevant schools (and their corresponding commuting flows data set) is reduced as shown in the table below.
 
 ```{r, echo=FALSE}
-# df_input = readr::read_csv(
-# '"Filtering","Level","N. rows","N. columns","Example var (char)","Mode","Example var (num)","Mean"
-# Pre,School,17183,179,"Type of School","Infant and Junior School 5-11","Headcount Pupils",316
-# Post,School,1534,179,"Type of School","Comprehensive all-through 11-16","Headcount Pupils",951
-# Pre,"OD pair",908034,10,"School Name","-","Total Flow",8.3
-# Post,"OD pair",154754,10,"School Name","-","Total Flow",9.4
-# '
-# )
-
 df_input = readr::read_csv(
 '"Filtering","Level","N. rows","N. columns","Example var (num)","Mean"
 Pre,School,17183,179,"Headcount Pupils",316
@@ -113,6 +109,7 @@ knitr::kable(df_input, caption = "Summary of input datasets provided by the Depa
 ```
 
 Top schools by cycling to school percentage
+
 ```{r, echo=FALSE}
 temp = res_active
 temp[1:10, "Cycle"] = scales::percent(temp[1:10, ]$Cycle/100)
@@ -121,6 +118,7 @@ knitr::kable(temp[1:10,])
 ```
 
 The map below shows the distribution of Secondary schools along with the LSOA boundaries, and the school commuting flows (with at least 10 commuters) from LSOA centroids to the Secondary schools.
+
 ```{r, echo=FALSE, fig.cap="The distribution of Census Secondary-level schools across LSOAs in England."}
 par(mfrow=c(1,2))
 plot(las); points(schools, col="red", pch='.', cex=2)
@@ -206,10 +204,6 @@ The most illuminating finding of our research from a policy perspective is at th
 <!-- Walking to school correlates with overall greater physical activity at other times as well, for male pupils (Commuting to school: Are children who walk more physically active?, Cooper)  -->
 
 <!-- This trend has continued into the 21^st^ Between 1993 and 2003, for example, the proportion of primary school children being driven to school increased from 29% to 41% while the proportion walking and cycling dropped [@cooper_physical_2005]. -->
-
-
-<!-- The data set used consists of `r length(unique(sld11$URN))` -->
-<!-- schools -->
 
 
 References {#references .unnumbered}
