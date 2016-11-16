@@ -3,13 +3,13 @@ title: 'Assessing the potential for uptake of cycling to school: a case study of
 author:
   - name: Robin Lovelace
     email: r.lovelace@leeds.ac.uk 
-    affiliation: University of Leeds
+    affiliation: Institute for Transport Studies (ITS)
     footnote: Corresponding Author
   - name: Ilan Fridman-Rojas
     email: I.FridmanRojas@leeds.ac.uk
     affiliation: University of Leeds
 address:
-  - code: University of Leeds
+  - code: Institute for Transport Studies (ITS)
     address: Institute for Transport Studies (ITS), Lifton Villas, 1-3 Lifton Place, University of Leeds, Leeds, LS2 9JT, United Kingdom 
   - code: University of Leeds
     address: Leeds Institute for Data Analytics, Level 11, Worsley Building Clarendon Way Leeds LS2 9NL, United Kingdom 
@@ -36,7 +36,7 @@ knitr::opts_knit$set(root.dir = "..")
 
 ```{r setup, include=FALSE}
 # Run from RStudio when the project pctSchoolsUK.Rproj is open
-if(file.exists("private_data/s11.Rds")) {
+if(file.exists("DONTRUNprivate_data/s11.Rds")) {
   run_code = TRUE
   source("R/exploratory_analysis.R")
   source("R/all_England.R")
