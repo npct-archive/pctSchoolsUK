@@ -177,7 +177,6 @@ knitr::kable(temp[1:10,])
 #knitr::kable(res_active_la_name %>% arrange(desc(-Cycle,-Walk)) %>% head(n=10))
 ```
 
-
 ## School-level results
 
 ## Desire-line level results
@@ -199,8 +198,15 @@ The most illuminating finding of our research from a policy perspective is at th
 
 # Discussion
 
-# Conclusions
+This paper has provided the first analysis of the potential for modal shift to cycling for secondary school children in England at the desire line level. Building on [@singleton_gis_2014] we find that there is great potential for environmental benefits of this shift. However, the greatest benefits of cycling uptake for the school commute are likely to be health related: for the school children, for the people who breath air along school commute corridors (which will be less congested as a result of the shift away from cars) and for future generations who will benefit from lower driving rates, in terms of air pollution, road safety and more liveable streets.
 
+TODO summarise results here. E.g. how many students currently are driven 5 miles or less? I think we need route distances for this.
+
+A substantial development that we have implemented is mode-specific routing algorithms for all of the desire lines covered in the study area. These reveal that the average trip distance of travel to school, were the 'fastest' cyclable route to be appropriate, would be XX km...
+
+Paragraph saying something about directions for further research.
+
+Paragraph on how this links to policy - e.g. accessibility, expenditure on buses vs cycle paths to school and educational results probably being a bigger benefit than the cost of implementing these things.
 
 <!-- Despite the strength of evidence of the benefits of active travel to school, it has been experiencing a long-term downward trend since at least the 1950s.  -->
 <!-- (Active Transportation to School: Trends Among U.S. Schoolchildren, 1969–2001, McDonald)  -->
