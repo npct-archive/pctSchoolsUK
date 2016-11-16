@@ -149,25 +149,32 @@ cents_lsoa_brad = cents_lsoa[grepl("Bradford", cents_lsoa$LSOA11NM),]
 las_brad = las[cents_lsoa_brad,]
 schools_brad = schools[las_brad,]
 
-flow_brad = flow[las_brad,]
-plot(las_brad); lines(flow_brad, pch='.', col="blue", cex=5); points(schools_brad, pch='.', col="red", cex=5)
+# TODO: fix this - not working!
+# sel_flow_brad = gWithin(flow, las_brad, byid = TRUE)
+# bbox_brad = stplanr::bb2poly(bb = bbox(las_brad))
+# proj4string(bbox_brad) = proj4string(flow)
+# flow_brad = flow[bbox_brad,]
+# plot(las_brad); lines(flow_brad, pch='.', col="blue", cex=5); points(schools_brad, pch='.', col="red", cex=5)
 
 
 #######################################################################
 ### JUST CAMBRIDGE
 
+# TODO: fix - giving this error: > flow_cam = flow[las_cam,]
+# Error in RGEOSBinPredFunc(spgeom1, spgeom2, byid, func) : 
+#   IllegalArgumentException: point array must contain 0 or >1 elements
 #cents_lsoa_cam = cents_lsoa[grepl("Cambridge", cents_lsoa$LSOA11NM),]  #This is all of Cambridgeshire
-cents_lsoa_cam = cents_lsoa[grepl("\\<Cambridge\\>", cents_lsoa$LSOA11NM),] # This is exclusively Cambridge
-las_cam = las[cents_lsoa_cam,]
-schools_cam = schools[las_cam,]
-
-flow_cam = flow[las_cam,]
-plot(las_cam); lines(flow_cam, pch='.', col="blue", cex=5); points(schools_cam, pch='.', col="red", cex=5)
-
-
-sld11[grepl("Cambridge",sld11$`LA (name)`), c("SchoolName","Phase", "PhaseOfEducation (name)")]
-sld11[grepl("Cambridge",sld11$`LA (name)`) & sld11$Phase=="Secondary", "SchoolName"]
-sld11[grepl("Cambridge",sld11$`LA (name)`) & sld11$`PhaseOfEducation (name)`=="Secondary", "SchoolName"]
+# cents_lsoa_cam = cents_lsoa[grepl("\\<Cambridge\\>", cents_lsoa$LSOA11NM),] # This is exclusively Cambridge
+# las_cam = las[cents_lsoa_cam,]
+# schools_cam = schools[las_cam,]
+# 
+# flow_cam = flow[las_cam,]
+# plot(las_cam); lines(flow_cam, pch='.', col="blue", cex=5); points(schools_cam, pch='.', col="red", cex=5)
+# 
+# 
+# sld11[grepl("Cambridge",sld11$`LA (name)`), c("SchoolName","Phase", "PhaseOfEducation (name)")]
+# sld11[grepl("Cambridge",sld11$`LA (name)`) & sld11$Phase=="Secondary", "SchoolName"]
+# sld11[grepl("Cambridge",sld11$`LA (name)`) & sld11$`PhaseOfEducation (name)`=="Secondary", "SchoolName"]
 
 
 #starttime <- proc.time()
