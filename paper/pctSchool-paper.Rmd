@@ -28,12 +28,17 @@ output:
       number_sections: true
 ---
 
+```{r, include=FALSE}
+knitr::opts_knit$set(root.dir = "..")
+```
+
+
 
 ```{r setup, include=FALSE}
 # Run from RStudio when the project pctSchoolsUK.Rproj is open
-if(file.exists("../private_data/s11ss.Rds")) {
+if(file.exists("private_data/s11.Rds")) {
   run_code = TRUE
-  source("../R/exploratory_analysis.R")
+  source("R/exploratory_analysis.R")
   source("R/all_England.R")
 } else {
   run_code = FALSE
