@@ -149,16 +149,105 @@ cents_lsoa_brad = cents_lsoa[grepl("Bradford", cents_lsoa$LSOA11NM),]
 las_brad = las[cents_lsoa_brad,]
 schools_brad = schools[las_brad,]
 
-# TODO: fix this - not working!
-# sel_flow_brad = gWithin(flow, las_brad, byid = TRUE)
-# bbox_brad = stplanr::bb2poly(bb = bbox(las_brad))
-# proj4string(bbox_brad) = proj4string(flow)
-# flow_brad = flow[bbox_brad,]
-# plot(las_brad); lines(flow_brad, pch='.', col="blue", cex=5); points(schools_brad, pch='.', col="red", cex=5)
+# TODO: fix this - not working! # ILAN: This works for me! Weird..
+sel_flow_brad = gWithin(flow, las_brad, byid = TRUE)
+bbox_brad = stplanr::bb2poly(bb = bbox(las_brad))
+proj4string(bbox_brad) = proj4string(flow)
+flow_brad = flow[bbox_brad,]
+flow_brad = flow_brad[las_brad,]
+plot(las_brad); lines(flow_brad, pch='.', col="blue", cex=5); points(schools_brad, pch='.', col="red", cex=5)
 
 
 #######################################################################
 ### JUST CAMBRIDGE
+
+
+cents_lsoa_cam = cents_lsoa[grepl("\\<Cambridge\\>", cents_lsoa$LSOA11NM),]
+las_cam = las[cents_lsoa_cam,]
+schools_cam = schools[las_cam,]
+
+# TODO: fix this - not working! # ILAN: This works for me! Weird..
+sel_flow_cam = gWithin(flow, las_cam, byid = TRUE)
+bbox_cam = stplanr::bb2poly(bb = bbox(las_cam))
+proj4string(bbox_cam) = proj4string(flow)
+flow_cam = flow[bbox_cam,]
+flow_cam = flow_cam[las_cam,]
+
+#plot(las_cam); lines(flow_cam, pch='.', col="blue", cex=5); points(schools_cam, pch='.', col="red", cex=5)
+
+
+######################################################################
+# LEEDS
+
+cents_lsoa_leeds = cents_lsoa[grepl("Leeds", cents_lsoa$LSOA11NM),]
+las_leeds = las[cents_lsoa_leeds,]
+schools_leeds = schools[las_leeds,]
+
+# TODO: fix this - not working! # ILAN: This works for me! Weird..
+sel_flow_leeds = gWithin(flow, las_leeds, byid = TRUE)
+bbox_leeds = stplanr::bb2poly(bb = bbox(las_leeds))
+proj4string(bbox_leeds) = proj4string(flow)
+flow_leeds = flow[bbox_leeds,]
+flow_leeds = flow_leeds[las_leeds,]
+
+#plot(las_leeds); lines(flow_leeds, pch='.', col="blue", cex=5); points(schools_leeds, pch='.', col="red", cex=5)
+
+if(!file.exists("private_data/rf_leeds_schools.Rds") | !file.exists("private_data/rq_leeds_schools.Rds")){
+  fast_routes_leeds = line2route(l = flow_leeds, route_fun = route_cyclestreet, plan = "fastest")
+  quiet_routes_leeds = line2route(l = flow_leeds, route_fun = route_cyclestreet, plan = "quietest")
+  saveRDS(fast_routes_leeds, "private_data/rf_leeds_schools.Rds")
+  saveRDS(quiet_routes_leeds, "private_data/rq_leeds_schools.Rds")
+} else{
+  fast_routes_leeds = readRDS("private_data/rf_leeds_schools.Rds")
+  quiet_routes_leeds = readRDS("private_data/rq_leeds_schools.Rds")
+}
+
+plot(las_leeds); plot(flow_leeds, col="blue", add=T); plot(fast_routes_leeds, col="red", add = T); plot(quiet_routes_leeds, col="green", add = T)
+
+summary(fast_routes_leeds$length)
+summary(quiet_routes_leeds$length)
+
+mean(fast_routes_leeds$length)
+sd(fast_routes_leeds$length)
+IQR(fast_routes_leeds$length)
+
+mean(quiet_routes_leeds$length)
+sd(quiet_routes_leeds$length)
+IQR(quiet_routes_leeds$length)
+
+boxplot(quiet_routes_leeds$length, fast_routes_leeds$length)
+
+violindf1 = data.frame(Type="Quiet", Length=quiet_routes_leeds$length)
+violindf2 = data.frame(Type="Fast", Length=fast_routes_leeds$length)
+violindf = rbind(violindf1, violindf2)
+violindf
+
+# Mode = function(x) {
+#   ux = unique(x)
+#   ux[which.max(tabulate(match(x, ux)))]
+# }
+
+hist(quiet_routes_leeds$length)
+hist(fast_routes_leeds$length)
+
+library(ggplot2)
+ggplot(violindf, aes(Type, Length)) + geom_violin(trim=T, fill="blue", alpha=0.4) + geom_boxplot(width=0.1, outlier.size = 2, outlier.color = "red", outlier.shape = 21) + stat_summary(fun.y=mean, geom="point", shape=18, color="blue", size=3) #+ ylim(0, 20000)#+ stat_summary(fun.data = mean_sdl, geom="pointrange", color="red", fun.args=list(mult=1))#+ stat_summary(fun.y=mean, geom="point")  + stat_summary(fun.y=median, geom="point", shape=23, color="red")#+ geom_hline(aes(yintercept=Mode(quiet_routes_leeds$length)), col="red")
+
+# To plot the distance decay curves we need the route length from e.g. fast_routes_leeds
+#   but we also need the flow numbers from flow_leeds.
+# These two dataframes have the same nrow() and CycleStreets should have processed them 
+#   in order, so just do a cbind() to do this join
+
+decaydf = cbind(flow_leeds, fast_routes_leeds)@data
+decaydf$pcycle = decaydf$WALK/decaydf$TOTAL
+
+ggplot(decaydf, aes(length, pcycle)) + geom_point(alpha=0.5, size=1, shape=21, na.rm = T) + geom_smooth(na.rm = T) + xlim(0,15000)
+
+# data(flowlines)
+# l = flowlines[2:5,]
+# fast_routes = line2route(l = l, route_fun = route_cyclestreet, plan = "fastest")
+# quiet_routes = line2route(l = l, route_fun = route_cyclestreet, plan = "quietest")
+# plot(l); plot(fast_routes, add = T); plot(quiet_routes, add = T)
 
 # TODO: fix - giving this error: > flow_cam = flow[las_cam,]
 # Error in RGEOSBinPredFunc(spgeom1, spgeom2, byid, func) : 

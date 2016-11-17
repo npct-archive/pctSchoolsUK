@@ -36,7 +36,8 @@ knitr::opts_knit$set(root.dir = "..")
 
 ```{r setup, include=FALSE}
 # Run from RStudio when the project pctSchoolsUK.Rproj is open
-if(file.exists("DONTRUNprivate_data/s11.Rds")) {
+if(file.exists("private_data/s11.Rds")) {
+#if(file.exists("DONTRUNprivate_data/s11.Rds")) {
   run_code = TRUE
   source("R/exploratory_analysis.R")
   source("R/all_England.R")
@@ -183,17 +184,27 @@ knitr::kable(temp[1:10,])
 
 ```{r, echo=FALSE, fig.cap="Illustration of the current level of cycling to school at the desire line levels in two case study cities (left: Bradford, right:Cambridge)."}
 par(mfrow=c(1,2))
-# plot(las_brad); lines(flow_brad, pch='.', col="blue", cex=5); points(schools_brad, pch='.', col="red", cex=5)
-# plot(las_cam); lines(flow_cam, pch='.', col="blue", cex=5); points(schools_cam, pch='.', col="red", cex=5)
+plot(las_brad); lines(flow_brad, pch='.', col="blue", cex=5); points(schools_brad, pch='.', col="red", cex=5)
+plot(las_cam); lines(flow_cam, pch='.', col="blue", cex=5); points(schools_cam, pch='.', col="red", cex=5)
 par(mfrow=c(1,1))
 ```
 
 ## Potential for cycling to school at the route network level
 
+
+```{r, echo=FALSE, fig.cap="Illustration of the school commute flows and their route network-level paths for Leeds."}
+plot(las_leeds); plot(flow_leeds, col="blue", add=T); plot(fast_routes_leeds, col="red", add = T); plot(quiet_routes_leeds, col="green", add = T)
+```
+
+```{r, echo=FALSE, fig.cap="The distribution of path lengths (in metres) along the quiet and the fastest route network-level alternatives for the school commutes in the data. The mean is shown with a blue diamond, and the corresponding box plot is shown as well, with outliers displayed as red circles."}
+ggplot(violindf, aes(Type, Length)) + geom_violin(trim=T, fill="blue", alpha=0.4) + geom_boxplot(width=0.1, outlier.size = 2, outlier.color = "red", outlier.shape = 21) + stat_summary(fun.y=mean, geom="point", shape=18, color="blue", size=3)
+```
+
 The most illuminating finding of our research from a policy perspective is at the road network level. Estimates of the number of students who could cycle to school along specific road segments can help planners decide where to invest in new cycle paths that are designed with children in mind.
 
-```{r, echo=FALSE, fig.cap="Illustration of the potential uptake of cycling at the route network level in Leeds."}
 
+```{r, echo=FALSE, fig.cap="The fraction of commuting pupils choosing to cycle to school, as a function of the commute distance (via the fastest route network-level path)."}
+ggplot(decaydf, aes(length, pcycle)) + geom_point(alpha=0.5, size=1, shape=21, na.rm = T) + geom_smooth(na.rm = T) + xlim(0,15000)
 ```
 
 # Discussion
