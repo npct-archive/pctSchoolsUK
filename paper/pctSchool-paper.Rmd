@@ -186,12 +186,12 @@ knitr::kable(temp[1:10,])
 
 ## Desire-line level results
 
-```{r, echo=FALSE, fig.cap="Illustration of the current level of cycling to school at the desire line levels in two case study cities (left: Bradford, right:Cambridge)."}
-par(mfrow=c(1,2))
-plot(las_brad); lines(flow_brad, pch='.', col="blue", cex=5); points(schools_brad, pch='.', col="red", cex=5)
-plot(las_cam); lines(flow_cam, pch='.', col="blue", cex=5); points(schools_cam, pch='.', col="red", cex=5)
-par(mfrow=c(1,1))
-```
+# ```{r, echo=FALSE, fig.cap="Illustration of the current level of cycling to school at the desire line levels in two case study cities (left: Bradford, right:Cambridge)."}
+# par(mfrow=c(1,2))
+# plot(las_brad); lines(flow_brad, pch='.', col="blue", cex=5); points(schools_brad, pch='.', col="red", cex=5)
+# plot(las_cam); lines(flow_cam, pch='.', col="blue", cex=5); points(schools_cam, pch='.', col="red", cex=5)
+# par(mfrow=c(1,1))
+# ```
 
 ## Potential for cycling to school at the route network level
 
@@ -200,7 +200,7 @@ par(mfrow=c(1,1))
 plot(las_leeds); plot(flow_leeds, col="blue", add=T); plot(fast_routes_leeds, col="red", add = T); plot(quiet_routes_leeds, col="green", add = T)
 ```
 
-```{r, echo=FALSE, fig.cap="The distribution of path lengths (in metres) along the quiet and the fastest route network-level alternatives for the school commutes in the data. The mean is shown with a blue diamond, and the corresponding box plot is shown as well, with outliers displayed as red circles."}
+```{r, echo=FALSE, fig.cap="The distribution of path lengths (in metres) along the quiet and the fastest route network-level alternatives for the school commutes in the data. The mean is shown with a blue diamond, and the corresponding box plot is shown as well, with outliers displayed as red circles.", out.width="50%"}
 ggplot(violindf, aes(Type, Length)) + geom_violin(trim=T, fill="blue", alpha=0.4) + geom_boxplot(width=0.1, outlier.size = 2, outlier.color = "red", outlier.shape = 21) + stat_summary(fun.y=mean, geom="point", shape=18, color="blue", size=3)
 ```
 
