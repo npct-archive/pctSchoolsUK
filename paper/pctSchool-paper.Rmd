@@ -14,9 +14,13 @@ address:
   - code: University of Leeds
     address: Leeds Institute for Data Analytics, Level 11, Worsley Building Clarendon Way, University of Leeds, Leeds, LS2 9NL, United Kingdom 
 abstract: |
-  This is the abstract.
-
-  It consists of two paragraphs.
+  Travel to school is the most regular type of travel undertaken by children across the world.
+  This 'school commute' is generally of a shorter distance than commuting to work, especially in areas with high levels of school accessibility.
+  These features of the school commute mean it has great potential health benefits, ensuring children get regular daily exercise.
+  It is not the purpose to quantify the many benefits of active travel to school (there is already overwhelming evidence on this topic).
+  Instead, the paper investigates the potential for modal switch to cycling for the school commute, based on a case study of English data.
+  We find that the potential update of cycling for travel to school is even higher, as a percentage of trips, than the potential for cycling to work.
+  This would have huge knock-on benefits which we hypothesise could be realised world-wide if building safe routes to school becomes a global transport planning priority.
 
 header-includes:
    - \usepackage{amsmath}
