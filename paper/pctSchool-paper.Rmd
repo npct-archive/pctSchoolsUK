@@ -186,12 +186,12 @@ knitr::kable(temp[1:10,])
 
 ## Desire-line level results
 
-# ```{r, echo=FALSE, fig.cap="Illustration of the current level of cycling to school at the desire line levels in two case study cities (left: Bradford, right:Cambridge)."}
-# par(mfrow=c(1,2))
-# plot(las_brad); lines(flow_brad, pch='.', col="blue", cex=5); points(schools_brad, pch='.', col="red", cex=5)
-# plot(las_cam); lines(flow_cam, pch='.', col="blue", cex=5); points(schools_cam, pch='.', col="red", cex=5)
-# par(mfrow=c(1,1))
-# ```
+```{r, echo=FALSE, fig.cap="Illustration of the current level of cycling to school at the desire line levels in two case study cities (left: Bradford, right:Cambridge).", include=FALSE, eval=FALSE}
+par(mfrow=c(1,2))
+plot(las_brad); lines(flow_brad, pch='.', col="blue", cex=5); points(schools_brad, pch='.', col="red", cex=5)
+plot(las_cam); lines(flow_cam, pch='.', col="blue", cex=5); points(schools_cam, pch='.', col="red", cex=5)
+par(mfrow=c(1,1))
+```
 
 ## Potential for cycling to school at the route network level
 
