@@ -200,7 +200,7 @@ knitr::kable(temp[1:10,])
 plot(las_leeds); plot(flow_leeds, col="blue", add=T); plot(fast_routes_leeds, col="red", add = T); plot(quiet_routes_leeds, col="green", add = T)
 ```
 
-```{r, echo=FALSE, fig.cap="The distribution of path lengths (in metres) along the quiet and the fastest route network-level alternatives for the school commutes in the data. The mean is shown with a blue diamond, and the corresponding box plot is shown as well, with outliers displayed as red circles.", out.width="50%"}
+```{r, echo=FALSE, fig.cap="The distribution of path lengths (in metres) along the quiet and the fastest route network-level alternatives for the school commutes in the data. The mean is shown with a blue diamond, and the corresponding box plot is shown as well, with outliers displayed as red circles."}
 ggplot(violindf, aes(Type, Length)) + geom_violin(trim=T, fill="blue", alpha=0.4) + geom_boxplot(width=0.1, outlier.size = 2, outlier.color = "red", outlier.shape = 21) + stat_summary(fun.y=mean, geom="point", shape=18, color="blue", size=3)
 ```
 
