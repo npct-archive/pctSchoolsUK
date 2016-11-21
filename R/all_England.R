@@ -119,11 +119,27 @@ nrow(s)
 s_cut = s[s$TOTAL >= 10,]
 nrow(s_cut)
 
-#plot(las); plot(schools, col="red", pch='.', cex=2, add=T)
+# plot(las); plot(schools, col="red", pch='.', cex=2, add=T)
+# remove year as 1st column
+AcademicYear = schools$AcademicYear
+schools$AcademicYear = NULL
+schools@data = cbind(schools@data, AcademicYear)
+rm(AcademicYear)
+
+# Test matching
+zone_code = s_cut$LSOA
+origin_code = cents_lsoa$LSOA
+dest_code = s_cut$URN
+zone_code_d = schools$URN
+summary(zone_code %in% origin_code)
+summary(dest_code %in% zone_code_d)
+
 
 if(!file.exists("private_data/england_flows.Rds")){
   starttime <- proc.time()
-  flow = od2line(flow = s_cut, zones = cents_lsoa, destinations = schools)
+  flow = od2line(flow = s_cut, zones = cents_lsoa, destinations = schools,
+                 zone_code = "LSOA", origin_code = "LSOA", dest_code = "URN",
+                 zone_code_d = "URN")
   print(proc.time() - starttime)
   saveRDS(flow, "private_data/england_flows.Rds")
 } else{
