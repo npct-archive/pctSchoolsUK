@@ -254,10 +254,38 @@ ggplot(violindf, aes(Type, Length)) + geom_violin(trim=T, fill="blue", alpha=0.4
 # These two dataframes have the same nrow() and CycleStreets should have processed them 
 #   in order, so just do a cbind() to do this join
 
-decaydf = cbind(flow_leeds, fast_routes_leeds)@data
+decaydf = cbind(flow_leeds, fast_routes_leeds)#@data
 decaydf$pcycle = decaydf$WALK/decaydf$TOTAL
 
-ggplot(decaydf, aes(length, pcycle)) + geom_point(alpha=0.5, size=1, shape=21, na.rm = T) + geom_smooth(na.rm = T) + xlim(0,15000)
+ggplot(decaydf@data, aes(length, pcycle)) + geom_point(alpha=0.5, size=1, shape=21, na.rm = T) + geom_smooth(na.rm = T) + xlim(0,15000)
+
+
+######################################################################################
+
+
+distance = decaydf$length / 1000
+gradient = decaydf$av_incline * 100
+
+logit_pcycle = -3.894 + (-0.5872 * distance) + (1.832 * sqrt(distance) ) + (0.007956 * distance^2) + (-0.2872*gradient) 
+                +(0.01784*distance*gradient) + (-0.0977*sqrt(distance)*gradient)
+decaydf$govtarget = boot::inv.logit(logit_pcycle) + decaydf$pcycle
+
+decaydf$govtargetflow = floor(decaydf$govtarget * decaydf$TOTAL)
+
+
+# This looks like way more than a doubling of cycling to me! Something wrong here?
+decaydf[decaydf$govtargetflow > decaydf$CYCLE, c("govtargetflow", "CYCLE")]@data
+sum(decaydf$CYCLE)
+sum(decaydf$govtargetflow)
+
+
+#logit_pcycle_dutch = logit_pcycle + 2.499 -0.07384 * distance
+#decaydf$godutch = boot::inv.logit(logit_pcycle_dutch)
+#decaydf$`Go Dutch` = decaydf$godutch * decaydf$TOTAL
+#lr_nograd = lr
+
+
+
 
 # data(flowlines)
 # l = flowlines[2:5,]
