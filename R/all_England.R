@@ -1,5 +1,6 @@
 # Aim: subset the data to a region
 
+#setwd("/home/geoif/pct/pctSchoolsUK")
 # Read in and pre-process the data
 if(!exists("sld11"))
   source("R/analysis-sld.R")
@@ -194,15 +195,14 @@ flow_cam = flow_cam[las_cam,]
 #####################################################################
 # BASELINE MODEL FITTING FOR ENGLAND
 
-#if(!file.exists("private_data/rf_england_schools.Rds") | !file.exists("private_data/rq_england_schools.Rds")){
-if(!file.exists("private_data/rf_england_schools.Rds")){
-  fast_routes_england = line2route(l = flow, route_fun = route_cyclestreet, plan = "fastest", base_url="http://pct.cyclestreets.net/api/")
-  #quiet_routes_england = line2route(l = flow, route_fun = route_cyclestreet, plan = "quietest", base_url="http://pct.cyclestreets.net/api/")
+if(!file.exists("private_data/rf_england_schools.Rds") | !file.exists("private_data/rq_england_schools.Rds")){
+  fast_routes_england = line2route(l = flow[1:10,], route_fun = route_cyclestreet, plan = "fastest", n_processes = 3)
   saveRDS(fast_routes_england, "private_data/rf_england_schools.Rds")
-  #saveRDS(quiet_routes_england, "private_data/rq_england_schools.Rds")
+  quiet_routes_england = line2route(l = flow[1:10,], route_fun = route_cyclestreet, plan = "quietest", base_url="http://pct.cyclestreets.net/api/", n_processes = 8)
+  saveRDS(quiet_routes_england, "private_data/rq_england_schools.Rds")
 } else{
   fast_routes_england = readRDS("private_data/rf_england_schools.Rds")
-  #quiet_routes_leeds = readRDS("private_data/rq_england_schools.Rds")
+  quiet_routes_leeds = readRDS("private_data/rq_england_schools.Rds")
 }
 
 
@@ -323,44 +323,71 @@ isTRUE(nrow(meltdf) == sum(traindf$TOTAL))
 #   are the dominant features.
 # 
 library(glmnet)
-f = as.formula(CYCLE~distance+sqrt(distance)+I(distance^2)+gradient+distance:gradient+sqrt(distance):gradient)
+f = as.formula(~distance+sqrt(distance)+I(distance^2)+gradient+distance:gradient+sqrt(distance):gradient)
 x = model.matrix(f, meltdf)
+# glmnet has standardize=T by default, so this is not required
 y = as.matrix(meltdf$CYCLE, ncol=1)
 
-fitlasso = glmnet(x, y, family="binomial", alpha=1)
-fitridge = glmnet(x, y, family="binomial", alpha=0)
-fitelastic = glmnet(x, y, family="binomial", alpha=0.5)
 
 #Cross-validation to select LASSO/Ridge/Elastic and do feature selection as well.
-# for(i in seq(0,10,by=5)){
-#   print(paste("Alpha = ", i/10))
-#   assign(paste("fit",i,sep=""), cv.glmnet(x, y, type.measure = "auc", alpha=i/10, family="binomial", nfolds=3))
-# }
+if(!file.exists("private_data/CV_models.Rdata")){
+  fitlasso = glmnet(x, y, family="binomial", alpha=1)
+  fitridge = glmnet(x, y, family="binomial", alpha=0)
+  fitelastic = glmnet(x, y, family="binomial", alpha=0.5)
+  cvmods = c("fitlasso", "fitridge", "fitelastic")
+  for(i in seq(0,10,by=1)){
+    time1 = proc.time()
+    print(paste("Alpha = ", i/10))
+    assign(paste("fit",i,sep=""), cv.glmnet(x, y, type.measure = "auc", alpha=i/10, family="binomial", nfolds=3))
+    print(proc.time() - time1)
+    cvmods = c(cvmods, paste("fit",i,sep=""))
+  }
+  save(list=cvmods, file="private_data/CV_models.Rdata")
+} else{
+  load(file="private_data/CV_models.Rdata")
+}
 
-plot(fitlasso, xvar="lambda", label=T)
+
+#devtools::install_github("cran/plotmo")
+
+#plot(fitlasso, xvar="lambda", label=T)
+plotmo::plot_glmnet(fitlasso)
 plot(fit10, main="LASSO")
 
-plot(fitridge, xvar="lambda", label=T)
+#plot(fitridge, xvar="lambda", label=T)
+plotmo::plot_glmnet(fitridge)
 plot(fit0, main="Ridge")
 
-plot(fitelastic, xvar="lambda", label=T)
-plot(fit6, main="Elastic Net")
+#plot(fitelastic, xvar="lambda", label=T)
+plotmo::plot_glmnet(fitelastic)
+plot(fit5, main="Elastic Net")
 
 
-modellasso = glmnet(x, y, family="binomial", alpha=1)
-print(coef(modellasso))
-plot(modellasso, xvar="lambda", label=TRUE)
+# To get the coefficients fit model with lambda value found by cross-validation
+# traindf$pcycle_pred = predict(fitelastic, s=fit5$lambda.min, xpred, type="response")
+#fitelasticpred = glmnet(x, y, family="binomial", alpha=0.5, lambda=fit5$lambda.min)
+#coef(fitelasticpred)
+
+coef(fitelastic, s=fit5$lambda.min)
+#coef(fitelastic, s=fit5$lambda.1se)
 
 
 ###################################################################################
 
-model = glm(CYCLE~distance+sqrt(distance)+I(distance^2)+gradient+distance:gradient+sqrt(distance):gradient, family=binomial(link='logit'), data=meltdf, na.action = na.omit)
-summary(model)
+# model = glm(CYCLE~distance+sqrt(distance)+I(distance^2)+gradient+distance:gradient+sqrt(distance):gradient, family=binomial(link='logit'), data=meltdf, na.action = na.omit)
+# summary(model)
+# 
+# # H0 : no significant difference between model and observed data (if p> 0.05)
+# ResourceSelection::hoslem.test(meltdf$CYCLE, fitted(model))
+# 
+# traindf$pcycle_pred = predict(model, traindf@data, type="response")  #predict(model, list(wt=xvals), type="response")
 
-# H0 : no significant difference between model and observed data (if p> 0.05)
-ResourceSelection::hoslem.test(meltdf$CYCLE, fitted(model))
-
-traindf$pcycle_pred = predict(model, traindf@data, type="response")  #predict(model, list(wt=xvals), type="response")
+# Predict on the dataframe of flows, not the binary-coded one.
+# Gradient and distance variables are the same for both, so this is fine.
+xpred = model.matrix(f, traindf)
+traindf$pcycle_pred = predict(fitelastic, s=fit5$lambda.min, xpred, type="response")
+#traindf$pcycle_pred = predict(fitelastic, s=fit5$lambda.1se, xpred, type="response")
+#traindf$pcycle_pred = predict(fitelasticpred, xpred, type="response")
 
 
 ggplot(traindf@data, aes(x=distance)) + geom_smooth(aes(y=pcycle, col="red")) + geom_smooth(aes(y=pcycle_pred))
@@ -372,23 +399,29 @@ ggplot(traindf@data, aes(x=gradient)) + geom_point(aes(y=pcycle)) + geom_smooth(
 
 
 # Government scenario
-traindf$govtarget_slc = floor(traindf$CYCLE + (traindf$pcycle_pred*traindf$TOTAL))
-if(nrow(traindf[traindf$govtarget_slc > traindf$TOTAL, ]@data) > 0){
-  sel = traindf$govtarget_slc > traindf$TOTAL
-  traindf$govtarget_slc[sel] = traindf$TOTAL[sel]
+traindf$govtarget_slc = traindf$CYCLE + (traindf$pcycle_pred*traindf$TOTAL)
+# If GovTarget larger than number of commuters in flow, set to total number of commuters in flow
+sel = traindf$govtarget_slc > traindf$TOTAL
+if(sum(sel) > 0){
+  traindf$govtarget_slc[sel,] = traindf$TOTAL[sel,]
 }
 traindf$govtarget_sic = traindf$govtarget_slc - traindf$CYCLE
 range(traindf$govtarget_sic)
 
+#Check that the GovTarget corresponds to a rough doubling of cycling numbers
+sum(traindf$govtarget_slc)
+sum(traindf$CYCLE)
+
 # GoDutch scenario
-traindf$pred_dutch = boot::inv.logit(boot::logit(traindf$pcycle_pred) + 4.838 + (0.9073*traindf$distance)  + (-1.924*sqrt(traindf$distance)))
-traindf$dutch_slc = floor(traindf$pred_dutch*traindf$TOTAL)
-if(nrow(traindf[traindf$dutch_slc > traindf$TOTAL, ]@data) > 0){
-  sel = traindf$dutch_slc > traindf$TOTAL
-  traindf$dutch_slc[sel] = traindf$TOTAL[sel]
+#traindf$pred_dutch = boot::inv.logit(boot::logit(traindf$pcycle_pred) + 4.838 + (0.9073*traindf$distance)  + (-1.924*sqrt(traindf$distance)))
+traindf$pred_dutch = boot::inv.logit(boot::logit(traindf$pcycle_pred) + 3.682 + (0.3044*traindf$distance))
+traindf$dutch_slc = traindf$pred_dutch*traindf$TOTAL
+sel = traindf$dutch_slc > traindf$TOTAL
+if(sum(sel) > 0){
+  traindf$dutch_slc[sel,] = traindf$TOTAL[sel,]
 }
-if(nrow(traindf[traindf$dutch_slc < traindf$CYCLE, ]@data) > 0){
-  sel = traindf$dutch_slc < traindf$CYCLE
+sel = traindf$dutch_slc < traindf$CYCLE
+if(sum(sel) > 0){
   traindf$dutch_slc[sel] = traindf$CYCLE[sel]
 }
 traindf$dutch_sic = traindf$dutch_slc - traindf$CYCLE
@@ -401,9 +434,9 @@ range(traindf$dutch_sic)
 #ggplot(traindf@data, aes(x=distance)) + geom_smooth(aes(y=CYCLE, col="red")) + geom_smooth(aes(y=pcycle_pred*TOTAL, col="blue")) + geom_smooth(aes(y=govtarget_slc, col="green")) + geom_smooth(aes(y=dutch_slc, col="orange"))
 #ggplot(traindf@data, aes(x=distance)) + geom_point(aes(y=CYCLE)) + geom_smooth(aes(y=CYCLE, col="red")) + geom_smooth(aes(y=pcycle_pred*TOTAL, col="blue")) + geom_smooth(aes(y=govtarget_slc, col="green")) + geom_smooth(aes(y=dutch_slc, col="orange"))
 
-traindf$pred_govtarget = traindf$govtarget_slc/
+traindf$pred_govtarget = traindf$govtarget_slc/traindf$TOTAL
 
-ggplotdf = data.frame(Distance=traindf$distance, Gradient=traindf$gradient, Observed=traindf$CYCLE, Model=traindf$pcycle_pred*traindf$TOTAL, GovTarget=traindf$govtarget_slc, GoDutch=traindf$dutch_slc)
+ggplotdf = data.frame(Distance=traindf$distance, Gradient=traindf$gradient, Observed=traindf$pcycle, Model=c(traindf$pcycle_pred), GovTarget=c(traindf$pred_govtarget), GoDutch=c(traindf$pred_dutch))
 meltggplotdistdf = ggplotdf[c("Distance","Observed","GovTarget","GoDutch","Model")]
 meltggplotdistdf = reshape2::melt(meltggplotdistdf, id.vars="Distance")
 meltggplotgraddf = ggplotdf[c("Gradient","Observed","GovTarget","GoDutch","Model")]
