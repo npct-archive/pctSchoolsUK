@@ -281,59 +281,63 @@ traindf = traindf[complete.cases(traindf$CYCLE) & complete.cases(traindf$WALK) &
 #traindf = as.data.frame(traindf)
 #names(traindf) = names(logitdf)
 
-meltdf = data.frame(matrix(NA, nrow=sum(traindf$TOTAL), ncol=7))
-names(meltdf) = c("CYCLE","WALK","CAR","OTHER","UNKNOWN","distance_fast","gradient_fast","qdf")
-jstart = 1
-for(i in 1:nrow(traindf)){
-  blocklen = 0
-  if(traindf@data[i, "CYCLE"] > 0){
-    blocklen = traindf@data[i, "CYCLE"]
-    jend = jstart + blocklen - 1
-    meltdf[jstart:jend, "CYCLE"] = 1
-    meltdf[jstart:jend, "gradient_fast"] = traindf@data[i, "gradient_fast"]
-    meltdf[jstart:jend, "distance_fast"] = traindf@data[i, "distance_fast"]
-    meltdf[jstart:jend, "qdf"] = traindf@data[i, "qdf"]
-    jstart = jend + 1
+if(!file.exists("private_data/meltdf.Rds")){
+  meltdf = data.frame(matrix(NA, nrow=sum(traindf$TOTAL), ncol=8))
+  names(meltdf) = c("CYCLE","WALK","CAR","OTHER","UNKNOWN","distance_fast","gradient_fast","qdf")
+  jstart = 1
+  for(i in 1:nrow(traindf)){
+    blocklen = 0
+    if(traindf@data[i, "CYCLE"] > 0){
+      blocklen = traindf@data[i, "CYCLE"]
+      jend = jstart + blocklen - 1
+      meltdf[jstart:jend, "CYCLE"] = 1
+      meltdf[jstart:jend, "gradient_fast"] = traindf@data[i, "gradient_fast"]
+      meltdf[jstart:jend, "distance_fast"] = traindf@data[i, "distance_fast"]
+      meltdf[jstart:jend, "qdf"] = traindf@data[i, "qdf"]
+      jstart = jend + 1
+    }
+    if(traindf@data[i, "WALK"] > 0){
+      blocklen = traindf@data[i, "WALK"]
+      jend = jstart + blocklen - 1
+      meltdf[jstart:jend, "WALK"] = 1
+      meltdf[jstart:jend, "gradient_fast"] = traindf@data[i, "gradient_fast"]
+      meltdf[jstart:jend, "distance_fast"] = traindf@data[i, "distance_fast"]
+      meltdf[jstart:jend, "qdf"] = traindf@data[i, "qdf"]
+      jstart = jend + 1
+    }
+    if(traindf@data[i, "CAR"] > 0){
+      blocklen = traindf@data[i, "CAR"]
+      jend = jstart + blocklen - 1
+      meltdf[jstart:jend, "CAR"] = 1
+      meltdf[jstart:jend, "gradient_fast"] = traindf@data[i, "gradient_fast"]
+      meltdf[jstart:jend, "distance_fast"] = traindf@data[i, "distance_fast"]
+      meltdf[jstart:jend, "qdf"] = traindf@data[i, "qdf"]
+      jstart = jend + 1
+    }
+    if(traindf@data[i, "OTHER"] > 0){
+      blocklen = traindf@data[i, "OTHER"]
+      jend = jstart + blocklen - 1
+      meltdf[jstart:jend, "OTHER"] = 1
+      meltdf[jstart:jend, "gradient_fast"] = traindf@data[i, "gradient_fast"]
+      meltdf[jstart:jend, "distance_fast"] = traindf@data[i, "distance_fast"]
+      meltdf[jstart:jend, "qdf"] = traindf@data[i, "qdf"]
+      jstart = jend + 1
+    }
+    if(traindf@data[i, "UNKNOWN"] > 0){
+      blocklen = traindf@data[i, "UNKNOWN"]
+      jend = jstart + blocklen - 1
+      meltdf[jstart:jend, "UNKNOWN"] = 1
+      meltdf[jstart:jend, "gradient_fast"] = traindf@data[i, "gradient_fast"]
+      meltdf[jstart:jend, "distance_fast"] = traindf@data[i, "distance_fast"]
+      meltdf[jstart:jend, "qdf"] = traindf@data[i, "qdf"]
+      jstart = jend + 1
+    }
   }
-  if(traindf@data[i, "WALK"] > 0){
-    blocklen = traindf@data[i, "WALK"]
-    jend = jstart + blocklen - 1
-    meltdf[jstart:jend, "WALK"] = 1
-    meltdf[jstart:jend, "gradient_fast"] = traindf@data[i, "gradient_fast"]
-    meltdf[jstart:jend, "distance_fast"] = traindf@data[i, "distance_fast"]
-    meltdf[jstart:jend, "qdf"] = traindf@data[i, "qdf"]
-    jstart = jend + 1
-  }
-  if(traindf@data[i, "CAR"] > 0){
-    blocklen = traindf@data[i, "CAR"]
-    jend = jstart + blocklen - 1
-    meltdf[jstart:jend, "CAR"] = 1
-    meltdf[jstart:jend, "gradient_fast"] = traindf@data[i, "gradient_fast"]
-    meltdf[jstart:jend, "distance_fast"] = traindf@data[i, "distance_fast"]
-    meltdf[jstart:jend, "qdf"] = traindf@data[i, "qdf"]
-    jstart = jend + 1
-  }
-  if(traindf@data[i, "OTHER"] > 0){
-    blocklen = traindf@data[i, "OTHER"]
-    jend = jstart + blocklen - 1
-    meltdf[jstart:jend, "OTHER"] = 1
-    meltdf[jstart:jend, "gradient_fast"] = traindf@data[i, "gradient_fast"]
-    meltdf[jstart:jend, "distance_fast"] = traindf@data[i, "distance_fast"]
-    meltdf[jstart:jend, "qdf"] = traindf@data[i, "qdf"]
-    jstart = jend + 1
-  }
-  if(traindf@data[i, "UNKNOWN"] > 0){
-    blocklen = traindf@data[i, "UNKNOWN"]
-    jend = jstart + blocklen - 1
-    meltdf[jstart:jend, "UNKNOWN"] = 1
-    meltdf[jstart:jend, "gradient_fast"] = traindf@data[i, "gradient_fast"]
-    meltdf[jstart:jend, "distance_fast"] = traindf@data[i, "distance_fast"]
-    meltdf[jstart:jend, "qdf"] = traindf@data[i, "qdf"]
-    jstart = jend + 1
-  }
+  meltdf[is.na(meltdf)] = 0
+  saveRDS(meltdf, "private_data/meltdf.Rds")
+  } else{
+    meltdf = readRDS("private_data/meltdf.Rds")
 }
-
-meltdf[is.na(meltdf)] = 0
 
 isTRUE(sum(meltdf[!is.na(meltdf$CYCLE), "CYCLE"]) == sum(traindf$CYCLE))
 isTRUE(sum(meltdf[!is.na(meltdf$WALK), "WALK"]) == sum(traindf$WALK))
@@ -355,17 +359,17 @@ y = as.matrix(meltdf$CYCLE, ncol=1)
 
 
 #Cross-validation to select LASSO/Ridge/Elastic and do feature selection as well.
-library(doParallel)
-nodes <- detectCores()
-cl <- makeCluster(nodes)
-registerDoParallel(cl)
+#library(doParallel)
+#nodes <- detectCores()
+#cl <- makeCluster(nodes)
+#registerDoParallel(cl)
 if(!file.exists("private_data/CV_models.Rdata")){
   fitlasso = glmnet(x, y, family="binomial", alpha=1)
   fitridge = glmnet(x, y, family="binomial", alpha=0)
   fitelastic = glmnet(x, y, family="binomial", alpha=0.5)
   cvmods = c("fitlasso", "fitridge", "fitelastic")
-  foreach(i=seq(0,10,by=1), .packages = "glmnet") %dopar% {
-  #for(i in seq(0,10,by=1)){
+  #foreach(i=seq(0,10,by=1), .packages = "glmnet") %dopar% {
+  for(i in seq(0,10,by=1)){
     time1 = proc.time()
     print(paste("Alpha = ", i/10))
     assign(paste("fit",i,sep=""), cv.glmnet(x, y, type.measure = "auc", alpha=i/10, family="binomial", nfolds=3))
@@ -376,7 +380,7 @@ if(!file.exists("private_data/CV_models.Rdata")){
 } else{
   load(file="private_data/CV_models.Rdata")
 }
-stopCluster(cl)
+#stopCluster(cl)
 
 #devtools::install_github("cran/plotmo")
 
@@ -393,11 +397,8 @@ plotmo::plot_glmnet(fitelastic)
 plot(fit5, main="Elastic Net")
 
 
-# To get the coefficients fit model with lambda value found by cross-validation
-# traindf$pcycle_pred = predict(fitelastic, s=fit5$lambda.min, xpred, type="response")
-#fitelasticpred = glmnet(x, y, family="binomial", alpha=0.5, lambda=fit5$lambda.min)
-#coef(fitelasticpred)
 
+# To get the coefficients fit model with lambda value found by cross-validation
 coef(fitelastic, s=fit5$lambda.min)
 #coef(fitelastic, s=fit5$lambda.1se)
 

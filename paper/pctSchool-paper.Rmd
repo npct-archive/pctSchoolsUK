@@ -129,39 +129,39 @@ knitr::kable(temp[1:10,])
 The map below shows the distribution of Secondary schools along with the LSOA boundaries, and the school commuting flows (with at least 10 commuters) from LSOA centroids to the Secondary schools.
 
 ```{r, echo=FALSE, include=FALSE}
-if(!file.exists("paper/figures/schools_england.pdf") | !file.exists("paper/figures/flows_england.pdf")){
-  pdf(file = "paper/figures/schools_england.pdf")
+if(!file.exists("paper/figures/schools_england.png") | !file.exists("paper/figures/flows_england.png")){
+  png(file = "paper/figures/schools_england.png")
   plot(las); points(schools, col="red", pch='.', cex=2)
   dev.off()
-  pdf(file = "paper/figures/flows_england.pdf")
+  png(file = "paper/figures/flows_england.png")
   plot(las); lines(flow, col = 'blue')
   dev.off()
 }
 ```
-!["The spatial distribution of schools in the dataset."](figures/schools_england.pdf)   !["The nationwide school commute flows containing at least 10 pupils."](figures/flows_england.pdf)
+!["The spatial distribution of schools in the dataset."](figures/schools_england.png)   !["The nationwide school commute flows containing at least 10 pupils."](figures/flows_england.png)
 
 Comparison of cycling to work and cycling to school.
 
 ```{r, echo=FALSE, include=FALSE}
-if(!file.exists("paper/figures/pcycle_schools.pdf") | !file.exists("paper/figures/pcycle_work.pdf")){
-  #pdf(file="paper/figures/pcycle_schools.pdf")
+if(!file.exists("paper/figures/pcycle_schools.png") | !file.exists("paper/figures/pcycle_work.png")){
+  #png(file="paper/figures/pcycle_schools.png")
   #qtm(lads_active, fill = "Cycle")
   #dev.off()
   
   pcycle_schools = qtm(lads_active, fill = "Cycle")
-  save_tmap(pcycle_schools, "paper/figures/pcycle_schools.pdf")
+  save_tmap(pcycle_schools, "paper/figures/pcycle_schools.png")
   #system("gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/screen -dNOPAUSE -dQUIET -dBATCH -sOutputFile=paper/figures/pcycle_schools_reduced.pdf paper/figures/pcycle_schools.pdf")
   
-  #pdf(file = "paper/figures/pcycle_work.pdf")
+  #png(file = "paper/figures/pcycle_work.png")
   #qtm(lad_pcycle, fill = "pcycle")
   #dev.off()
   pcycle_work = qtm(lad_pcycle, fill = "pcycle")
-  save_tmap(pcycle_work, "paper/figures/pcycle_work.pdf")
+  save_tmap(pcycle_work, "paper/figures/pcycle_work.png")
   
   #plot(schoolvswork$Cycle, schoolvswork$pcycle, xlab="Cycling commutes to school (%)", ylab="Cycling commutes to work (%)")
 }
 ```
-![Choropleth showing the proportion of pupils cycling to school across England.](figures/pcycle_schools.pdf)   ![Choropleth showing the proportion of people cycling to work across England.](figures/pcycle_work.pdf)
+![Choropleth showing the proportion of pupils cycling to school across England.](figures/pcycle_schools.png)   ![Choropleth showing the proportion of people cycling to work across England.](figures/pcycle_work.png)
 
 # Results
 
@@ -171,15 +171,15 @@ The choropleth below shows cycling prevalence across Local Authorities in Englan
 
 ```{r, echo=FALSE, include=FALSE}
 #qtm(lads_active, fill = c("Walk", "Cycle"), free.scales.fill=FALSE)
-if(!file.exists("paper/figures/active_choropleth.pdf")){
+if(!file.exists("paper/figures/active_choropleth.png")){
   #pdf(file="paper/figures/active_choropleth.pdf")
   #qtm(lads_active, fill = c("Walk", "Cycle"))
   #dev.off()
   active_choropleth = qtm(lads_active, fill = c("Walk", "Cycle"))
-  save_tmap(active_choropleth, "paper/figures/active_choropleth.pdf")
+  save_tmap(active_choropleth, "paper/figures/active_choropleth.png")
 }
 ```
-![Cycling as a fraction of all school commutes across Local Authorities in England.](figures/active_choropleth.pdf)
+![Cycling as a fraction of all school commutes across Local Authorities in England.](figures/active_choropleth.png)
 
 The table below shows the top 10 Local Authorities by active transport prevalence.
 ```{r, echo=FALSE}
@@ -204,24 +204,28 @@ knitr::kable(temp[1:10,])
 
 ## Desire-line level results
 
+<!--
 ```{r, echo=FALSE, fig.cap="Illustration of the current level of cycling to school at the desire line levels in two case study cities (left: Bradford, right:Cambridge).", include=FALSE, eval=FALSE}
 par(mfrow=c(1,2))
 plot(las_brad); lines(flow_brad, pch='.', col="blue", cex=5); points(schools_brad, pch='.', col="red", cex=5)
 plot(las_cam); lines(flow_cam, pch='.', col="blue", cex=5); points(schools_cam, pch='.', col="red", cex=5)
 par(mfrow=c(1,1))
 ```
+-->
 
 ## Potential for cycling to school at the route network level
 
-
+<!--
 ```{r, echo=FALSE, include=FALSE}
-if(!file.exists("paper/figures/routes_leeds.pdf")){
-  pdf(file = "paper/figures/routes_leeds.pdf")
+if(!file.exists("paper/figures/routes_leeds.png")){
+  png(file = "paper/figures/routes_leeds.png")
   plot(las_leeds); plot(flow_leeds, col="blue", add=T); plot(fast_routes_leeds, col="red", add = T); plot(quiet_routes_leeds, col="green", add = T)
   dev.off()
   }
 ```
-![The desire line flows and fastest and quiet route network-level paths for school commutes in Leeds.](figures/routes_leeds.pdf)
+![The desire line flows and fastest and quiet route network-level paths for school commutes in Leeds.](figures/routes_leeds.png)
+-->
+
 
 ```{r, echo=FALSE, fig.cap="The distribution of path lengths (in metres) along the quiet and the fastest route network-level alternatives for the school commutes in the data. The mean is shown with a blue diamond, and the corresponding box plot is shown as well, with outliers displayed as red circles."}
 ggplot(violindf, aes(Type, Length)) + geom_violin(trim=T, fill="blue", alpha=0.4) + geom_boxplot(width=0.1, outlier.size = 2, outlier.color = "red", outlier.shape = 21) + stat_summary(fun.y=mean, geom="point", shape=18, color="blue", size=3)
@@ -230,8 +234,10 @@ ggplot(violindf, aes(Type, Length)) + geom_violin(trim=T, fill="blue", alpha=0.4
 The most illuminating finding of our research from a policy perspective is at the road network level. Estimates of the number of students who could cycle to school along specific road segments can help planners decide where to invest in new cycle paths that are designed with children in mind.
 
 
-```{r, echo=FALSE, fig.cap="The fraction of commuting pupils choosing to cycle to school, as a function of the commute distance (via the fastest route network-level path)."}
-ggplot(decaydf@data, aes(length, pcycle)) + geom_point(alpha=0.5, size=1, shape=21, na.rm = T) + geom_smooth(na.rm = T) + xlim(0,15000)
+```{r, echo=FALSE, fig.cap="The fraction of commuting pupils choosing to cycle to school, as a function of the commute distance (via the fastest route network-level path) and the gradient of the path."}
+ggplot(meltggplotdistdf, aes(x=Distance, y=value, color=variable)) + geom_smooth()
+ggplot(meltggplotgraddf, aes(x=Gradient, y=value, color=variable)) + geom_smooth()
+#ggplot(meltggplotdistdf, aes(distance, pcycle)) + geom_point(alpha=0.5, size=1, shape=21, na.rm = T) + geom_smooth(na.rm = T) + xlim(0,15000)
 ```
 
 # Discussion
