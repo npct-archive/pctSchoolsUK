@@ -159,38 +159,38 @@ unique(schools$`LA (name)`)
 # las_leeds = las[schools_leeds,]
 # cents_lsoa_leeds = cents_lsoa[schools_leeds,]
 
-#######################################################################
-### JUST BRADFORD
-
-cents_lsoa_brad = cents_lsoa[grepl("Bradford", cents_lsoa$LSOA11NM),]
-las_brad = las[cents_lsoa_brad,]
-schools_brad = schools[las_brad,]
-
-# TODO: fix this - not working! # ILAN: This works for me! Weird..
-sel_flow_brad = gWithin(flow, las_brad, byid = TRUE)
-bbox_brad = stplanr::bb2poly(bb = bbox(las_brad))
-proj4string(bbox_brad) = proj4string(flow)
-flow_brad = flow[bbox_brad,]
-flow_brad = flow_brad[las_brad,]
-plot(las_brad); lines(flow_brad, pch='.', col="blue", cex=5); points(schools_brad, pch='.', col="red", cex=5)
-
-
-#######################################################################
-### JUST CAMBRIDGE
-
-
-cents_lsoa_cam = cents_lsoa[grepl("\\<Cambridge\\>", cents_lsoa$LSOA11NM),]
-las_cam = las[cents_lsoa_cam,]
-schools_cam = schools[las_cam,]
-
-# TODO: fix this - not working! # ILAN: This works for me! Weird..
-sel_flow_cam = gWithin(flow, las_cam, byid = TRUE)
-bbox_cam = stplanr::bb2poly(bb = bbox(las_cam))
-proj4string(bbox_cam) = proj4string(flow)
-flow_cam = flow[bbox_cam,]
-flow_cam = flow_cam[las_cam,]
-
-#plot(las_cam); lines(flow_cam, pch='.', col="blue", cex=5); points(schools_cam, pch='.', col="red", cex=5)
+# #######################################################################
+# ### JUST BRADFORD
+# 
+# cents_lsoa_brad = cents_lsoa[grepl("Bradford", cents_lsoa$LSOA11NM),]
+# las_brad = las[cents_lsoa_brad,]
+# schools_brad = schools[las_brad,]
+# 
+# # TODO: fix this - not working! # ILAN: This works for me! Weird..
+# sel_flow_brad = gWithin(flow, las_brad, byid = TRUE)
+# bbox_brad = stplanr::bb2poly(bb = bbox(las_brad))
+# proj4string(bbox_brad) = proj4string(flow)
+# flow_brad = flow[bbox_brad,]
+# flow_brad = flow_brad[las_brad,]
+# plot(las_brad); lines(flow_brad, pch='.', col="blue", cex=5); points(schools_brad, pch='.', col="red", cex=5)
+# 
+# 
+# #######################################################################
+# ### JUST CAMBRIDGE
+# 
+# 
+# cents_lsoa_cam = cents_lsoa[grepl("\\<Cambridge\\>", cents_lsoa$LSOA11NM),]
+# las_cam = las[cents_lsoa_cam,]
+# schools_cam = schools[las_cam,]
+# 
+# # TODO: fix this - not working! # ILAN: This works for me! Weird..
+# sel_flow_cam = gWithin(flow, las_cam, byid = TRUE)
+# bbox_cam = stplanr::bb2poly(bb = bbox(las_cam))
+# proj4string(bbox_cam) = proj4string(flow)
+# flow_cam = flow[bbox_cam,]
+# flow_cam = flow_cam[las_cam,]
+# 
+# #plot(las_cam); lines(flow_cam, pch='.', col="blue", cex=5); points(schools_cam, pch='.', col="red", cex=5)
 
 #####################################################################
 # BASELINE MODEL FITTING FOR ENGLAND
@@ -386,14 +386,17 @@ if(!file.exists("private_data/CV_models.Rdata")){
 
 #plot(fitlasso, xvar="lambda", label=T)
 plotmo::plot_glmnet(fitlasso)
+plot(fitlasso, xvar="dev")
 plot(fit10, main="LASSO")
 
 #plot(fitridge, xvar="lambda", label=T)
 plotmo::plot_glmnet(fitridge)
+plot(fitridge, xvar="dev")
 plot(fit0, main="Ridge")
 
 #plot(fitelastic, xvar="lambda", label=T)
 plotmo::plot_glmnet(fitelastic)
+plot(fitridge, xvar="dev")
 plot(fit5, main="Elastic Net")
 
 
