@@ -1,20 +1,20 @@
 ---
 title: 'Assessing the potential for uptake of cycling to school: a case study of England'
 author:
+- affiliation: University of Leeds
+  email: I.FridmanRojas@leeds.ac.uk
+  name: Ilan Fridman Rojas
 - affiliation: Institute for Transport Studies (ITS)
   email: r.lovelace@leeds.ac.uk
   footnote: Corresponding Author
   name: Robin Lovelace
-- affiliation: University of Leeds
-  email: I.FridmanRojas@leeds.ac.uk
-  name: Ilan Fridman-Rojas
 address:
-- address: Institute for Transport Studies (ITS), Lifton Villas, 1-3 Lifton Place,
-    University of Leeds, Leeds, LS2 9JT, United Kingdom
-  code: Institute for Transport Studies (ITS)
 - address: Leeds Institute for Data Analytics, Level 11, Worsley Building Clarendon
     Way, University of Leeds, Leeds, LS2 9NL, United Kingdom
   code: University of Leeds
+- address: Institute for Transport Studies (ITS), Lifton Villas, 1-3 Lifton Place,
+    University of Leeds, Leeds, LS2 9JT, United Kingdom
+  code: Institute for Transport Studies (ITS)
 output: pdf_document
 bibliography: refs.bib
 abstract: |
@@ -201,20 +201,53 @@ knitr::kable(temp[1:10,])
 
 ## Modelling
 
-Following the model fitting and uptake scenario modelling in [@lovelace_propensity_2016-2], we have fit an (elastic net) regularised logistic regression model (INCLUDE THE ELASTIC NET PENALY TERMS) to the school commuting data, obtaining the fits shown in (FIGURES), with a model and regression coefficients as follows
+Following the model fitting and uptake scenario modelling in [@lovelace_propensity_2016-2], we have fit an (elastic net) regularised logistic regression model to the school commuting data, obtaining the fits shown in (FIGURES), with a model and regression coefficients as follows
 
 $$
 P(y_i = 1) = \mathrm{logit}^{-1} \left( \beta_1 d_i +\beta_2 d_i^{1/2} + \beta_3 d_i^2 + \beta_4 g_i + \beta_5 d_i g_i + \beta_6 d_i^{1/2} g_i + \beta_7 d_i^{1/3} + \beta_8 q_i \right)
 $$
-where $y_i$ is a binary-valued response equal to 1 when the pupil performed his/her school commute by cycling, $d_i$ is the route length in kilometres, $g_i$ is the gradient of the route measured in (UNITS), and $q_i$ is the quietness diversion factor (the ratio of the length of the quiet route divided by the length of the fast route).
+with the $L_1$ and $L_2$ regularisation terms equally weighted and included in the optimisation, and where $y_i$ is a binary-valued response equal to 1 when the pupil performed his/her school commute by cycling, $d_i$ is the route length in kilometres, $g_i$ is the gradient of the route measured in (UNITS), and $q_i$ is the quietness diversion factor (the ratio of the length of the quiet route divided by the length of the fast route).
 
-This model provides a baseline probability for cycling for a given route distance, gradient, and quietness diversion factor, as shown in the figures below
+This model provides a baseline probability for cycling for a given route distance and gradient, as shown in the figures below
 
 ```{r, echo=FALSE, fig.cap="The fraction of commuting pupils choosing to cycle to school, as a function of the commute distance (via the fastest route network-level path) and the gradient of the path.", fig.align='center'}
+par(mfrow=c(1,2))
+ggplot(traindf@data, aes(x=distance_fast)) + geom_smooth(aes(y=pcycle, col="red")) + geom_smooth(aes(y=pcycle_pred))
+ggplot(traindf@data, aes(x=gradient_fast)) + geom_smooth(aes(y=pcycle, col="red")) + geom_smooth(aes(y=pcycle_pred))
+```
+
+The model fit along with the data points are shown below
+
+```{r, echo=FALSE, fig.cap="The modelling fit to cycling prevalence, as a function of the fastest route network-level commute distance and the gradient of the path.", fig.align='center'}
+par(mfrow=c(1,2))
+ggplot(traindf@data, aes(x=distance_fast)) + geom_point(aes(y=pcycle)) + geom_smooth(aes(y=pcycle, col="red")) + geom_smooth(aes(y=pcycle_pred))
+ggplot(traindf@data, aes(x=gradient_fast)) + geom_point(aes(y=pcycle)) + geom_smooth(aes(y=pcycle, col="red")) + geom_smooth(aes(y=pcycle_pred))
+```
+
+The residuals of the model fit (SEE FIGURE BELOW) show that at low distances and gradients the model is missing further covariates to account for a significant fraction of the variance, with the covariates included becoming dominant and the model arguably performing well at high distance and high gradient
+
+```{r, echo=FALSE, fig.cap="The model residuals as a function of the fastest route network-level commute distance and the gradient of the path.", fig.align='center'}
+par(mfrow=c(1,2))
+ggplot(dist_residuals, aes(x=Distance, y=Residual)) + geom_point() + geom_hline(yintercept = 0, col="red") 
+ggplot(grad_residuals, aes(x=Gradient, y=Residual)) + geom_point() + geom_hline(yintercept = 0, col="red") 
+```
+
+The large, asymmetric and heteroscedastic residuals at low distances and gradients are however not a source of concern as we do not seek high accuracy individual-level predictions accounting for as much variance as possible without overfitting, but rather a model of baseline cycling probabilities for the dominant traits of potential route network-level paths. For this purpose the model fit is appropriate and sufficient.
+
+
+### Uptake Scenarios
+
+We have modelled two potential uptake scenarios: the UK Government Target of doubling the number of cycling 'stages' (parts of trips made by bicycle) by 2025, and the Go Dutch scenario under which cycling prevalences in the UK rise to the levels observed in the National Travel Survey (NTS) for Holland in (YEAR).
+
+Incorporating these two scenarios into the logistic regression model, the following uptake distance (and gradient) decay curves can be obtained
+
+```{r, echo=FALSE, fig.cap="The fraction of commuting pupils choosing to cycle to school observed, the model fit to the data, and the Government Target and Go Dutch scenario projections, as a function of the fastest route network commute distance and the gradient of the path.", fig.align='center'}
+par(mfrow=c(1,2))
 ggplot(meltggplotdistdf, aes(x=Distance, y=value, color=variable)) + geom_smooth()
 ggplot(meltggplotgraddf, aes(x=Gradient, y=value, color=variable)) + geom_smooth()
 #ggplot(meltggplotdistdf, aes(distance, pcycle)) + geom_point(alpha=0.5, size=1, shape=21, na.rm = T) + geom_smooth(na.rm = T) + xlim(0,15000)
 ```
+
 
 
 
