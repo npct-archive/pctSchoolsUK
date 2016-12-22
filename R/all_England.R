@@ -439,12 +439,10 @@ traindf$pcycle_pred = predict(fitelastic, s=fit5$lambda.min, xpred, type="respon
 #traindf$pcycle_pred = predict(fitelasticpred, xpred, type="response")
 
 
-dist_residuals = data.frame(Distance=traindf$distance_fast, Residual=c(traindf$pcycle-traindf$pcycle_pred))
-ggplot(dist_residuals, aes(x=Distance, y=Residual)) + geom_point() + geom_hline(yintercept = 0, col="red") 
-
-grad_residuals = data.frame(Gradient=traindf$gradient_fast, Residual=c(traindf$pcycle-traindf$pcycle_pred))
-ggplot(grad_residuals, aes(x=Gradient, y=Residual)) + geom_point() + geom_hline(yintercept = 0, col="red") 
-
+# Frank Harrell discourages residual plots for logistic regression(!!)
+# https://stats.stackexchange.com/questions/45050/diagnostics-for-logistic-regression/70583#70583
+#residuals = data.frame(Predicted=c(traindf$pcycle_pred), Residual=c(traindf$pcycle-traindf$pcycle_pred))
+#ggplot(residuals, aes(x=Predicted, y=Residual)) + geom_point() + geom_hline(yintercept = 0, col="red") + stat_smooth(method="lm", linetype=2, se=FALSE)
 
 
 ggplot(traindf@data, aes(x=distance_fast)) + geom_smooth(aes(y=pcycle, col="red")) + geom_smooth(aes(y=pcycle_pred))

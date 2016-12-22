@@ -224,15 +224,17 @@ ggplot(traindf@data, aes(x=distance_fast)) + geom_point(aes(y=pcycle)) + geom_sm
 ggplot(traindf@data, aes(x=gradient_fast)) + geom_point(aes(y=pcycle)) + geom_smooth(aes(y=pcycle, col="red")) + geom_smooth(aes(y=pcycle_pred))
 ```
 
-The residuals of the model fit (SEE FIGURE BELOW) show that at low distances and gradients the model is missing further covariates to account for a significant fraction of the variance, with the covariates included becoming dominant and the model arguably performing well at high distance and high gradient
 
-```{r, echo=FALSE, fig.cap="The model residuals as a function of the fastest route network-level commute distance and the gradient of the path.", fig.align='center'}
-par(mfrow=c(1,2))
-ggplot(dist_residuals, aes(x=Distance, y=Residual)) + geom_point() + geom_hline(yintercept = 0, col="red") 
-ggplot(grad_residuals, aes(x=Gradient, y=Residual)) + geom_point() + geom_hline(yintercept = 0, col="red") 
-```
+<!-- Frank Harrell discourages residual plots for logistic regression(!!). So I have omitted this part for now. -->
+<!-- https://stats.stackexchange.com/questions/45050/diagnostics-for-logistic-regression/70583#70583 -->
 
-The large, asymmetric and heteroscedastic residuals at low distances and gradients are however not a source of concern as we do not seek high accuracy individual-level predictions accounting for as much variance as possible without overfitting, but rather a model of baseline cycling probabilities for the dominant traits of potential route network-level paths. For this purpose the model fit is appropriate and sufficient.
+<!-- The residuals of the model fit (SEE FIGURE BELOW) show that at low distances and gradients the model is missing further covariates to account for a significant fraction of the variance, with the covariates included becoming dominant and the model arguably performing well at high distance and high gradient -->
+
+<!-- ```{r, echo=FALSE, fig.cap="The model residuals as a function of the fastest route network-level commute distance and the gradient of the path.", fig.align='center'} -->
+<!-- ggplot(residuals, aes(x=Predicted, y=Residual)) + geom_point() + geom_hline(yintercept = 0, col="red")  -->
+<!-- ``` -->
+
+<!-- The large, asymmetric and heteroscedastic residuals at low distances and gradients are however not a source of concern as we do not seek high accuracy individual-level predictions accounting for as much variance as possible without overfitting, but rather a model of baseline cycling probabilities for the dominant traits of potential route network-level paths. For this purpose the model fit is appropriate and sufficient. -->
 
 
 ### Uptake Scenarios
