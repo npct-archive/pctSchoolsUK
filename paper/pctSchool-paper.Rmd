@@ -46,7 +46,7 @@ if(file.exists("private_data/s11.Rds")) {
 ```
 
 ```{r, echo=FALSE}
-bib = httr::GET("https://www.zotero.org/api/groups/418217/collections/RZSVFK8G/items/top?limit=100&format=bibtex&v=1", httr::write_disk("refs.bib", overwrite = T))
+bib = httr::GET("https://www.zotero.org/api/groups/418217/collections/RZSVFK8G/items/top?limit=100&format=bibtex&v=1", httr::write_disk("paper/refs.bib", overwrite = T))
 if(!run_code) {
   knitr::opts_chunk$set(eval = FALSE)
 }
