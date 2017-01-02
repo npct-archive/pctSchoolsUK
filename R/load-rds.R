@@ -1,0 +1,5 @@
+f = list.files(path = "pctSchoolsUK-data/", full.names = TRUE)
+cents_lsoa = readRDS("pctSchoolsUK-data/cents_lsoa_2011.Rds")
+flow = readRDS("pctSchoolsUK-data/england_flows.Rds")
+las = readRDS("pctSchoolsUK-data/las_2011.Rds")
+schools = readRDS("pctSchoolsUK-data/sld_england.Rds")
