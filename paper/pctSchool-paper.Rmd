@@ -239,7 +239,7 @@ ggplot(traindf@data, aes(x=gradient_fast)) + geom_point(aes(y=pcycle)) + geom_sm
 
 ### Uptake Scenarios
 
-We have modelled two potential uptake scenarios: the UK Government Target of doubling the number of cycling 'stages' (parts of trips made by bicycle) by 2025, and the Go Dutch scenario under which cycling prevalences in the UK rise to the levels observed in the National Travel Survey (NTS) for Holland in (YEAR).
+We modelled two potential uptake scenarios: the UK Government Target of doubling the number of cycling 'stages' (parts of trips made by bicycle) by 2025, and the Go Dutch scenario, based on levels of cycling to school by distance observed in the Dutch travel survey (OViN).
 
 Incorporating these two scenarios into the logistic regression model, the following uptake distance (and gradient) decay curves can be obtained
 
