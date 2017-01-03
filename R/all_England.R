@@ -195,6 +195,7 @@ unique(schools$`LA (name)`)
 #####################################################################
 # BASELINE MODEL FITTING FOR ENGLAND
 
+# See ?stplanr::route_cyclestreet for methods to save and use Cyclestreets API key
 if(!file.exists("private_data/rf_england_schools.Rds") | !file.exists("private_data/rq_england_schools.Rds")){
   # , base_url="http://pct.cyclestreets.net/api/"
   fast_routes_england = line2route(l = flow, route_fun = route_cyclestreet, plan = "fastest", n_processes = 10, base_url="http://pct.cyclestreets.net/api/")
@@ -259,8 +260,8 @@ englandrf$qdf = englandrf$distance_quiet/englandrf$distance_fast
 englandrf = englandrf[englandrf$distance_fast <= 15, ]
 
 #install.packages("Amelia")
-library(Amelia)
-missmap(englandrf@data)
+#library(Amelia)
+#missmap(englandrf@data)
 
 dropcols = c("error_quiet","error_fast")
 englandrf = englandrf[, !(names(englandrf) %in% dropcols)]
@@ -351,6 +352,14 @@ isTRUE(nrow(meltdf) == sum(traindf$TOTAL))
 #   therefore no regularisation is really required. LASSO suggested sqrt(distance_fast) and distance_fast^2
 #   are the dominant features.
 # 
+
+pkgs = c("glmnet")
+to_install = !pkgs %in% installed.packages()
+if(sum(to_install) > 0){
+  install.packages(pkgs[to_install])
+}
+lapply(X = pkgs, FUN = library, character.only = T)
+
 library(glmnet)
 f = as.formula(~distance_fast+sqrt(distance_fast)+I(distance_fast^2)+gradient_fast+distance_fast:gradient_fast+sqrt(distance_fast):gradient_fast+qdf+I(distance_fast^(1/3)))
 x = model.matrix(f, meltdf)

@@ -124,6 +124,7 @@ knitr::kable(df_input, caption = "Summary of input datasets provided by the Depa
 The map below shows the distribution of Secondary schools along with the LSOA boundaries, and the school commuting flows (with at least 10 commuters) from LSOA centroids to the Secondary schools.
 
 ```{r, echo=FALSE, include=FALSE}
+ifelse(!dir.exists(file.path("paper", "figures")), dir.create(file.path("paper", "figures")), FALSE)
 if(!file.exists("paper/figures/schools_england.png")){
   png(file = "paper/figures/schools_england.png")
   plot(las); points(schools, col="red", pch='.', cex=2)
