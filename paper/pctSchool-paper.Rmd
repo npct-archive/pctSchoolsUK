@@ -15,7 +15,8 @@ address:
 - address: Institute for Transport Studies (ITS), Lifton Villas, 1-3 Lifton Place,
     University of Leeds, Leeds, LS2 9JT, United Kingdom
   code: Institute for Transport Studies (ITS)
-output: pdf_document
+output: bookdown::pdf_document2
+documentclass: elsarticle
 bibliography: refs.bib
 abstract: |
   Travel to school is the most regular type of travel undertaken by children across the world.
@@ -26,6 +27,9 @@ abstract: |
   We find that the potential update of cycling for travel to school is even higher, as a percentage of trips, than the potential for cycling to work.
   This would have huge knock-on benefits which we hypothesise could be realised world-wide if building safe routes to school becomes a global transport planning priority.
 ---
+
+<!-- devtools::install_github("rstudio/bookdown") -->
+<!-- https://askubuntu.com/questions/794671/upgrading-tex-live-from-2015-to-2016-on-ubuntu-16-04-lts -->
 
 ```{r, include=FALSE}
 knitr::opts_knit$set(root.dir = "..")
@@ -123,10 +127,6 @@ knitr::kable(df_input, caption = "Summary of input datasets provided by the Depa
 <!-- ``` -->
 
 
-
-
-The map in figure \@ref(fig:schoollocations) shows the distribution of Secondary schools along with the LSOA boundaries, and the school commuting flows (with at least 10 commuters) from LSOA centroids to the Secondary schools.
-
 ```{r , echo=FALSE, include=FALSE}
 ifelse(!dir.exists(file.path("paper", "figures")), dir.create(file.path("paper", "figures")), FALSE)
 if(!file.exists("paper/figures/schools_england.png")){
@@ -136,12 +136,15 @@ if(!file.exists("paper/figures/schools_england.png")){
 }
 ```
 
-
 <!-- !["The spatial distribution of schools in the dataset."](figures/schools_england.png)   !["The nationwide school commute flows containing at least 10 pupils."](figures/flows_england.png) -->
 
 ```{r schoollocations, echo=FALSE, out.width="49%", fig.show='hold', fig.cap="The distribution of all Secondary-level schools with at least 100 pupils in England", fig.align='center'}
 knitr::include_graphics("figures/schools_england.png")
 ```
+
+
+The map in figure \@ref(fig:schoollocations) shows the distribution of Secondary schools along with the LSOA boundaries, and the school commuting flows (with at least 10 commuters) from LSOA centroids to the Secondary schools.
+
 
 Comparison of cycling to work and cycling to school.
 
