@@ -47,8 +47,9 @@ if(file.exists("private_data/s11.Rds")) {
 
 ```{r, echo=FALSE}
 bib = httr::GET("https://www.zotero.org/api/groups/418217/collections/RZSVFK8G/items/top?limit=100&format=bibtex&v=1", httr::write_disk("paper/refs.bib", overwrite = T))
+knitr::opts_chunk$set(warning=FALSE, message=FALSE, out.extra = "")
 if(!run_code) {
-  knitr::opts_chunk$set(eval = FALSE)
+  knitr::opts_chunk$set(eval = FALSE, warning=FALSE, message=FALSE)
 }
 ```
 
@@ -98,9 +99,9 @@ decision to remove this field from the School Census came as a surprise to many 
 ]
 Information on the phase of education (e.g. Primary, Secondary, etc.) was obtained from a Freedom of Information request made by someone unrelated to this work, fulfilled by the Department for Education, and [made available online](https://www.whatdotheyknow.com/request/list_of_all_schools_in_england_w).
 
-After selecting only the schools deemed Secondary schools, and considering only schools with at least 100 pupils, the number of relevant schools (and their corresponding commuting flows data set) is reduced as shown in the table below.
+After selecting only the schools deemed Secondary schools, and considering only schools with at least 100 pupils, the number of relevant schools (and their corresponding commuting flows data set) is reduced as shown in table \@ref("fig:filteringtable").
 
-```{r, echo=FALSE}
+```{r filteringtable, echo=FALSE}
 df_input = readr::read_csv(
 '"Filtering","Level","N. rows","N. columns","Example var (num)","Mean"
 Pre,School,17183,179,"Headcount Pupils",316
@@ -121,9 +122,12 @@ knitr::kable(df_input, caption = "Summary of input datasets provided by the Depa
 <!-- knitr::kable(temp[1:10,]) -->
 <!-- ``` -->
 
-The map below shows the distribution of Secondary schools along with the LSOA boundaries, and the school commuting flows (with at least 10 commuters) from LSOA centroids to the Secondary schools.
 
-```{r, echo=FALSE, include=FALSE}
+
+
+The map in figure \@ref(fig:schoollocations) shows the distribution of Secondary schools along with the LSOA boundaries, and the school commuting flows (with at least 10 commuters) from LSOA centroids to the Secondary schools.
+
+```{r , echo=FALSE, include=FALSE}
 ifelse(!dir.exists(file.path("paper", "figures")), dir.create(file.path("paper", "figures")), FALSE)
 if(!file.exists("paper/figures/schools_england.png")){
   png(file = "paper/figures/schools_england.png")
@@ -131,9 +135,11 @@ if(!file.exists("paper/figures/schools_england.png")){
   dev.off()
 }
 ```
+
+
 <!-- !["The spatial distribution of schools in the dataset."](figures/schools_england.png)   !["The nationwide school commute flows containing at least 10 pupils."](figures/flows_england.png) -->
 
-```{r, echo=FALSE, out.width="50%", fig.show='hold', fig.cap="The distribution of all Secondary-level schools with at least 100 pupils in England", fig.align='center'}
+```{r schoollocations, echo=FALSE, out.width="49%", fig.show='hold', fig.cap="The distribution of all Secondary-level schools with at least 100 pupils in England", fig.align='center'}
 knitr::include_graphics("figures/schools_england.png")
 ```
 
@@ -153,7 +159,7 @@ if(!file.exists("paper/figures/pcycle_schools.png") | !file.exists("paper/figure
 ```
 <!--![Choropleth showing the proportion of pupils cycling to school across England.](figures/pcycle_schools.png)   ![Choropleth showing the proportion of people cycling to work across England.](figures/pcycle_work.png) -->
 
-```{r, echo=FALSE, out.width="50%", fig.show='hold', fig.cap="The observed cycling prevalence fractions for school commutes, and for work commutes (the latter were obtained from the 2011 Census).", fig.align='center'}
+```{r, echo=FALSE, out.width="49%", fig.show='hold', fig.cap="The observed cycling prevalence fractions for school commutes, and for work commutes (the latter were obtained from the 2011 Census).", fig.align='center'}
 knitr::include_graphics(c("figures/pcycle_schools.png", "figures/pcycle_work.png"))
 ```
 
@@ -175,7 +181,7 @@ if(!file.exists("paper/figures/active_choropleth.png")){
 }
 ```
 <!--![Cycling as a fraction of all school commutes across Local Authorities in England.](figures/active_choropleth.png) -->
-```{r, echo=FALSE, out.width="50%", fig.show='hold', fig.cap="Choropleth showing the prevalence of walking (left) and cycling (right) as a fraction of total commuting for school commutes in England.", fig.align='center'}
+```{r, echo=FALSE, out.width="49%", fig.show='hold', fig.cap="Choropleth showing the prevalence of walking (left) and cycling (right) as a fraction of total commuting for school commutes in England.", fig.align='center'}
 knitr::include_graphics("figures/active_choropleth.png")
 ```
 
@@ -211,16 +217,16 @@ with the $L_1$ and $L_2$ regularisation terms equally weighted and included in t
 
 This model provides a baseline probability for cycling for a given route distance and gradient, as shown in the figures below
 
-```{r, echo=FALSE, fig.cap="The fraction of commuting pupils choosing to cycle to school, as a function of the commute distance (via the fastest route network-level path) and the gradient of the path.", fig.align='center'}
-par(mfrow=c(1,2))
+```{r, echo=FALSE, fig.cap="The fraction of commuting pupils choosing to cycle to school, as a function of the commute distance (via the fastest route network-level path) and the gradient of the path.", fig.align='center', out.width="49%", fig.show='hold'}
+#par(mfrow=c(1,2))
 ggplot(traindf@data, aes(x=distance_fast)) + geom_smooth(aes(y=pcycle, col="red")) + geom_smooth(aes(y=pcycle_pred))
 ggplot(traindf@data, aes(x=gradient_fast)) + geom_smooth(aes(y=pcycle, col="red")) + geom_smooth(aes(y=pcycle_pred))
 ```
 
 The model fit along with the data points are shown below
 
-```{r, echo=FALSE, fig.cap="The modelling fit to cycling prevalence, as a function of the fastest route network-level commute distance and the gradient of the path.", fig.align='center'}
-par(mfrow=c(1,2))
+```{r, echo=FALSE, fig.cap="The modelling fit to cycling prevalence, as a function of the fastest route network-level commute distance and the gradient of the path.", fig.align='center', out.width="49%", fig.show='hold'}
+#par(mfrow=c(1,2))
 ggplot(traindf@data, aes(x=distance_fast)) + geom_point(aes(y=pcycle)) + geom_smooth(aes(y=pcycle, col="red")) + geom_smooth(aes(y=pcycle_pred))
 ggplot(traindf@data, aes(x=gradient_fast)) + geom_point(aes(y=pcycle)) + geom_smooth(aes(y=pcycle, col="red")) + geom_smooth(aes(y=pcycle_pred))
 ```
@@ -244,8 +250,8 @@ We modelled two potential uptake scenarios: the UK Government Target of doubling
 
 Incorporating these two scenarios into the logistic regression model, the following uptake distance (and gradient) decay curves can be obtained
 
-```{r, echo=FALSE, fig.cap="The fraction of commuting pupils choosing to cycle to school observed, the model fit to the data, and the Government Target and Go Dutch scenario projections, as a function of the fastest route network commute distance and the gradient of the path.", fig.align='center'}
-par(mfrow=c(1,2))
+```{r, echo=FALSE, fig.cap="The fraction of commuting pupils choosing to cycle to school observed, the model fit to the data, and the Government Target and Go Dutch scenario projections, as a function of the fastest route network commute distance and the gradient of the path.", fig.align='center', out.width="49%", fig.show='hold'}
+#par(mfrow=c(1,2))
 ggplot(meltggplotdistdf, aes(x=Distance, y=value, color=variable)) + geom_smooth()
 ggplot(meltggplotgraddf, aes(x=Gradient, y=value, color=variable)) + geom_smooth()
 #ggplot(meltggplotdistdf, aes(distance, pcycle)) + geom_point(alpha=0.5, size=1, shape=21, na.rm = T) + geom_smooth(na.rm = T) + xlim(0,15000)
@@ -260,7 +266,7 @@ ggplot(meltggplotgraddf, aes(x=Gradient, y=value, color=variable)) + geom_smooth
 
 The desire-line level school commuting flows between LSOAs and Secondary schools in England is shown in the figure \@ref("fig:flows_england").
 
-```{r, echo=FALSE, include=FALSE}
+```{r flows_england, echo=FALSE, include=FALSE}
 if(!file.exists("paper/figures/flows_england.png")){
   png(file = "paper/figures/flows_england.png")
   plot(las); lines(flow, col = 'blue')
@@ -268,7 +274,7 @@ if(!file.exists("paper/figures/flows_england.png")){
 }
 ```
 
-```{r, echo=FALSE, out.width="50%", fig.show='hold', fig.cap="The desire-line level school commuting flows between LSOA centroids and Secondary schools in England.", fig.align='center', fig.lp="flows_england"}
+```{r, echo=FALSE, out.width="49%", fig.show='hold', fig.cap="The desire-line level school commuting flows between LSOA centroids and Secondary schools in England.", fig.align='center', fig.lp="flows_england"}
 knitr::include_graphics("figures/flows_england.png")
 ```
 
@@ -295,7 +301,7 @@ knitr::include_graphics("figures/flows_england.png")
 
 Using the [Cyclestreets](https://www.cyclestreets.net) API, for each origin-destination pair we have retrieved the quiet and fastest route network-level paths between all the relevant LSOA centroids and Secondary schools.
 
-```{r, echo=FALSE, fig.cap="The distribution of path lengths (in metres) along the quiet and the fastest route network-level alternatives for the school commutes in the data. The mean is shown with a blue diamond, and the corresponding box plot is shown as well, with outliers displayed as red circles.", fig.align='center', message=FALSE}
+```{r, echo=FALSE, fig.cap="The distribution of path lengths (in metres) along the quiet and the fastest route network-level alternatives for the school commutes in the data. The mean is shown with a blue diamond, and the corresponding box plot is shown as well, with outliers displayed as red circles.", fig.align='center', message=FALSE, out.width="49%"}
 ggplot(violindf, aes(Type, Length)) + geom_violin(trim=T, fill="blue", alpha=0.4) + geom_boxplot(width=0.1, outlier.size = 2, outlier.color = "red", outlier.shape = 21) + stat_summary(fun.y=mean, geom="point", shape=18, color="blue", size=3)
 ```
 
