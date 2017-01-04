@@ -1,31 +1,30 @@
 ---
 title: 'Assessing the potential for uptake of cycling to school: a case study of England'
-author:
-- affiliation: University of Leeds
-  email: I.FridmanRojas@leeds.ac.uk
-  name: Ilan Fridman Rojas
-- affiliation: Institute for Transport Studies (ITS)
-  email: r.lovelace@leeds.ac.uk
-  footnote: Corresponding Author
-  name: Robin Lovelace
-address:
-- address: Leeds Institute for Data Analytics, Level 11, Worsley Building Clarendon
-    Way, University of Leeds, Leeds, LS2 9NL, United Kingdom
-  code: University of Leeds
-- address: Institute for Transport Studies (ITS), Lifton Villas, 1-3 Lifton Place,
-    University of Leeds, Leeds, LS2 9JT, United Kingdom
-  code: Institute for Transport Studies (ITS)
+# author:
+# - affiliation: University of Leeds
+#   email: I.FridmanRojas@leeds.ac.uk
+#   name: Ilan Fridman Rojas
+# - affiliation: Institute for Transport Studies (ITS)
+#   email: r.lovelace@leeds.ac.uk
+#   footnote: Corresponding Author
+#   name: Robin Lovelace
+# address:
+# - address: Leeds Institute for Data Analytics, Level 11, Worsley Building Clarendon
+#     Way, University of Leeds, Leeds, LS2 9NL, United Kingdom
+#   code: University of Leeds
+# - address: Institute for Transport Studies (ITS), Lifton Villas, 1-3 Lifton Place,
+#     University of Leeds, Leeds, LS2 9JT, United Kingdom
+#   code: Institute for Transport Studies (ITS)
 output: bookdown::pdf_document2
-documentclass: elsarticle
 bibliography: refs.bib
-abstract: |
-  Travel to school is the most regular type of travel undertaken by children across the world.
-  This 'school commute' is generally of a shorter distance than commuting to work, especially in areas with high levels of school accessibility.
-  These features of the school commute mean it has great potential health benefits, ensuring children get regular daily exercise.
-  It is not the purpose to quantify the many benefits of active travel to school (there is already overwhelming evidence on this topic).
-  Instead, this paper investigates the potential for modal switch to cycling for the school commute, based on a case study of English data.
-  We find that the potential update of cycling for travel to school is even higher, as a percentage of trips, than the potential for cycling to work.
-  This would have huge knock-on benefits which we hypothesise could be realised world-wide if building safe routes to school becomes a global transport planning priority.
+# abstract: |
+#   Travel to school is the most regular type of travel undertaken by children across the world.
+#   This 'school commute' is generally of a shorter distance than commuting to work, especially in areas with high levels of school accessibility.
+#   These features of the school commute mean it has great potential health benefits, ensuring children get regular daily exercise.
+#   It is not the purpose to quantify the many benefits of active travel to school (there is already overwhelming evidence on this topic).
+#   Instead, this paper investigates the potential for modal switch to cycling for the school commute, based on a case study of English data.
+#   We find that the potential update of cycling for travel to school is even higher, as a percentage of trips, than the potential for cycling to work.
+#   This would have huge knock-on benefits which we hypothesise could be realised world-wide if building safe routes to school becomes a global transport planning priority.
 ---
 
 <!-- devtools::install_github("rstudio/bookdown") -->
@@ -39,14 +38,13 @@ knitr::opts_knit$set(root.dir = "..")
 
 ```{r setup, include=FALSE}
 # Run from RStudio when the project pctSchoolsUK.Rproj is open
-if(file.exists("private_data/s11.Rds")) {
-#if(file.exists("DONTRUNprivate_data/s11.Rds")) {
-  run_code = TRUE
-  source("R/exploratory_analysis.R")
-  source("R/all_England.R")
-} else {
-  run_code = FALSE
-}  
+run_code = FALSE # should the code run?
+if (file.exists("private_data/s11.Rds")) {
+  if (run_code) {
+    source("R/exploratory_analysis.R")
+    source("R/all_England.R")
+  }
+}
 ```
 
 ```{r, echo=FALSE}
@@ -103,9 +101,9 @@ decision to remove this field from the School Census came as a surprise to many 
 ]
 Information on the phase of education (e.g. Primary, Secondary, etc.) was obtained from a Freedom of Information request made by someone unrelated to this work, fulfilled by the Department for Education, and [made available online](https://www.whatdotheyknow.com/request/list_of_all_schools_in_england_w).
 
-After selecting only the schools deemed Secondary schools, and considering only schools with at least 100 pupils, the number of relevant schools (and their corresponding commuting flows data set) is reduced as shown in table \@ref("fig:filteringtable").
+After selecting only the schools deemed Secondary schools, and considering only schools with at least 100 pupils, the number of relevant schools (and their corresponding commuting flows data set) is reduced as shown in table \@ref(tab:filteringtable).
 
-```{r filteringtable, echo=FALSE}
+```{r filteringtable, echo=FALSE, eval=TRUE}
 df_input = readr::read_csv(
 '"Filtering","Level","N. rows","N. columns","Example var (num)","Mean"
 Pre,School,17183,179,"Headcount Pupils",316
@@ -129,19 +127,18 @@ knitr::kable(df_input, caption = "Summary of input datasets provided by the Depa
 
 ```{r , echo=FALSE, include=FALSE}
 ifelse(!dir.exists(file.path("paper", "figures")), dir.create(file.path("paper", "figures")), FALSE)
-if(!file.exists("paper/figures/schools_england.png")){
-  png(file = "paper/figures/schools_england.png")
+if(!file.exists("paper/figures/schoolsEngland.png")){
+  png(file = "paper/figures/schoolsEngland.png")
   plot(las); points(schools, col="red", pch='.', cex=2)
   dev.off()
 }
 ```
 
-<!-- !["The spatial distribution of schools in the dataset."](figures/schools_england.png)   !["The nationwide school commute flows containing at least 10 pupils."](figures/flows_england.png) -->
+<!-- !["The spatial distribution of schools in the dataset."](figures/schoolsEngland.png)   !["The nationwide school commute flows containing at least 10 pupils."](figures/flowsEngland.png) -->
 
-```{r schoollocations, echo=FALSE, out.width="49%", fig.show='hold', fig.cap="The distribution of all Secondary-level schools with at least 100 pupils in England", fig.align='center'}
-knitr::include_graphics("figures/schools_england.png")
+```{r schoollocations, echo=FALSE, out.width="49%", fig.show='hold', fig.cap="The distribution of all Secondary-level schools with at least 100 pupils in England", fig.align='center', eval=TRUE}
+knitr::include_graphics("figures/schoolsEngland.png")
 ```
-
 
 The map in figure \@ref(fig:schoollocations) shows the distribution of Secondary schools along with the LSOA boundaries, and the school commuting flows (with at least 10 commuters) from LSOA centroids to the Secondary schools.
 
@@ -162,7 +159,7 @@ if(!file.exists("paper/figures/pcycle_schools.png") | !file.exists("paper/figure
 ```
 <!--![Choropleth showing the proportion of pupils cycling to school across England.](figures/pcycle_schools.png)   ![Choropleth showing the proportion of people cycling to work across England.](figures/pcycle_work.png) -->
 
-```{r, echo=FALSE, out.width="49%", fig.show='hold', fig.cap="The observed cycling prevalence fractions for school commutes, and for work commutes (the latter were obtained from the 2011 Census).", fig.align='center'}
+```{r, echo=FALSE, out.width="49%", fig.show='hold', fig.cap="The observed cycling prevalence fractions for school commutes, and for work commutes (the latter were obtained from the 2011 Census).", fig.align='center', eval=TRUE}
 knitr::include_graphics(c("figures/pcycle_schools.png", "figures/pcycle_work.png"))
 ```
 
@@ -184,7 +181,7 @@ if(!file.exists("paper/figures/active_choropleth.png")){
 }
 ```
 <!--![Cycling as a fraction of all school commutes across Local Authorities in England.](figures/active_choropleth.png) -->
-```{r, echo=FALSE, out.width="49%", fig.show='hold', fig.cap="Choropleth showing the prevalence of walking (left) and cycling (right) as a fraction of total commuting for school commutes in England.", fig.align='center'}
+```{r, echo=FALSE, out.width="49%", fig.show='hold', fig.cap="Choropleth showing the prevalence of walking (left) and cycling (right) as a fraction of total commuting for school commutes in England.", fig.align='center', eval=TRUE}
 knitr::include_graphics("figures/active_choropleth.png")
 ```
 
@@ -267,18 +264,18 @@ ggplot(meltggplotgraddf, aes(x=Gradient, y=value, color=variable)) + geom_smooth
 
 ## Desire-line level results
 
-The desire-line level school commuting flows between LSOAs and Secondary schools in England is shown in the figure \@ref("fig:flows_england").
+The desire-line level school commuting flows between LSOAs and Secondary schools in England is shown in the figure \@ref(fig:flowsEngland).
 
-```{r flows_england, echo=FALSE, include=FALSE}
-if(!file.exists("paper/figures/flows_england.png")){
-  png(file = "paper/figures/flows_england.png")
+```{r, echo=FALSE, include=FALSE}
+if(!file.exists("paper/figures/flowsEngland.png")){
+  png(file = "paper/figures/flowsEngland.png")
   plot(las); lines(flow, col = 'blue')
   dev.off()
 }
 ```
 
-```{r, echo=FALSE, out.width="49%", fig.show='hold', fig.cap="The desire-line level school commuting flows between LSOA centroids and Secondary schools in England.", fig.align='center', fig.lp="flows_england"}
-knitr::include_graphics("figures/flows_england.png")
+```{r flowsEngland, echo=FALSE, out.width="49%", fig.show='hold', fig.cap="The desire-line level school commuting flows between LSOA centroids and Secondary schools in England.", fig.align='center', eval=TRUE}
+knitr::include_graphics("figures/flowsEngland.png")
 ```
 
 

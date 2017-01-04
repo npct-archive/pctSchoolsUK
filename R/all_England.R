@@ -351,14 +351,6 @@ isTRUE(nrow(meltdf) == sum(traindf$TOTAL))
 # Regularisation methods explored. Best performance was acheived for models with very small lambda,
 #   therefore no regularisation is really required. LASSO suggested sqrt(distance_fast) and distance_fast^2
 #   are the dominant features.
-# 
-
-pkgs = c("glmnet")
-to_install = !pkgs %in% installed.packages()
-if(sum(to_install) > 0){
-  install.packages(pkgs[to_install])
-}
-lapply(X = pkgs, FUN = library, character.only = T)
 
 library(glmnet)
 f = as.formula(~distance_fast+sqrt(distance_fast)+I(distance_fast^2)+gradient_fast+distance_fast:gradient_fast+sqrt(distance_fast):gradient_fast+qdf+I(distance_fast^(1/3)))
