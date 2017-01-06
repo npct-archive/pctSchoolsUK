@@ -6,4 +6,4 @@ if(sum(to_install) > 0){
   install.packages(pkgs[to_install])
 }
 lapply(X = pkgs, FUN = library, character.only = T)
-#library(pkgs)
+# library(pkgs)
