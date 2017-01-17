@@ -2,15 +2,23 @@
 
 source("setup.R")
 
-rf = readRDS("private_data/leeds_rf.Rds")
-rq = readRDS("private_data/leeds_rq.Rds")
-schools = readRDS("private_data/sld_leeds.Rds")
-las = readRDS("private_data/leeds_rq.Rds")
-l = readRDS("private_data/leeds_uptakes.Rds")
-rf@data = cbind(l@data, rf@data)
 
+rf = readRDS("private_data/rf_leeds_schools.Rds")
+rq = readRDS("private_data/rq_leeds_schools.Rds")
+schools = readRDS("private_data/sld_leeds.Rds")
+las = readRDS("private_data/las_2011.Rds")
+cents_lsoa = readRDS("private_data/cents_lsoa_2011.Rds")
+cents_lsoa_leeds = cents_lsoa[grepl("Leeds", cents_lsoa$LSOA11NM),]
+las_leeds = las[cents_lsoa_leeds,]
+l = readRDS("private_data/Data_to_be_subset_for_Shiny_app.Rds")
+# rf@data = cbind(l@data, rf@data)
+
+rf$bicycle = round(runif(n = nrow(rf), min = 0, max = 3))
+rf$govtarget_slc = rf$bicycle * 2
+rf$dutch_slc = rf$bicycle * 10
 # rf = rf[rf$TOTAL > 5,] # cut at 5 for fast processing
-# rnet = overline(sldf = rf, attrib = "bicycle", fun = sum)
+proj4string(rf)
+rnet_bicycle = overline(sldf = rf, attrib = "bicycle", fun = sum)
 # plot(rnet, lwd = rnet$bicycle / mean(rnet$bicycle))
 # rnet = rnet[rnet$bicycle > 5,] # cut if needs be
 

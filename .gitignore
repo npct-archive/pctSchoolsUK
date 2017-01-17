@@ -1,7 +1,7 @@
 .Rproj.user
 .Rhistory
 .RData
-private_data
+private_data*
 *.pdf
 *.tex
 datapackage.zip
