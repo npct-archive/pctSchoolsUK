@@ -2,7 +2,8 @@ source("setup.R")
 
 # read in the data
 if(!exists("sld11"))
-  source("R/analysis-sld.R")
+  source("R/preprocess-data.R")
+  #source("R/analysis-sld.R")
 
 # s11 contains the 2011 flows (origin-destination)
 # sld11 contains the information on the schools (destinations) for 2011

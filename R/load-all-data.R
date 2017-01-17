@@ -5,9 +5,16 @@ list.files() # what's there
 # Load the data on the schools, each identified by a "URN" code
 # Verify that each school has only one entry:
 # length(unique(sld11$LEA11_URN)) == nrow(sld11)
-sld15 = readr::read_tsv(file = "SLD_CENSUS_2015.txt")
-names(sld15)
-head(sld15) # look at the data
+
+# WE DON'T USE THE 2015 OR 2010 DATA
+# 2015 DOESN'T CONTAIN FLOWS, 2010 IS OLDER THAN 2011
+#sld15 = readr::read_tsv(file = "SLD_CENSUS_2015.txt")
+#names(sld15)
+#head(sld15) # look at the data
+#s10 = readr::read_tsv(file = "Spring_Census_2010.txt")
+#names(s10)
+#head(s10)
+
 sld11 = readr::read_tsv(file = "SLD_CENSUS_2011.txt")
 names(sld11)
 head(sld11)
@@ -16,9 +23,7 @@ head(sld11)
 s11 = readr::read_tsv(file = "Spring_Census_2011.txt")
 names(s11)
 head(s11)
-s10 = readr::read_tsv(file = "Spring_Census_2010.txt")
-names(s10)
-head(s10)
+
 setwd(old) # go back to working directory
 
 # The "s" flows df and the "sld" schools data frames can be joined by each school's URN

@@ -3,151 +3,9 @@
 #setwd("/home/geoif/pct/pctSchoolsUK")
 # Read in and pre-process the data
 if(!exists("sld11"))
-  source("R/analysis-sld.R")
+  source("R/preprocess-data.R")
+  #source("R/analysis-sld.R")
 
-# Read in UK Local Authorities, subset Leeds only
-#las = readRDS("../pct-bigdata/las.Rds") ## 2001 LSOAs
-if(!file.exists("private_data/las_2011.Rds")){
-  # Simplified LSOA boundaries
-  las = shapefile("private_data/Lower_Layer_Super_Output_Areas_December_2011_Full_Clipped__Boundaries_in_England_and_Wales_SIMPLIFIED/Lower_Layer_Super_Output_Areas_December_2011_Full_Clipped__Boundaries_in_England_and_Wales.shp")
-  # Full LSOA boundaries
-  #las = shapefile("Lower_Layer_Super_Output_Areas_December_2011_Full_Clipped__Boundaries_in_England_and_Wales/Lower_Layer_Super_Output_Areas_December_2011_Full_Clipped__Boundaries_in_England_and_Wales.shp")
-  las = spTransform(las, CRS("+init=epsg:4326"))
-  saveRDS(las, "private_data/las_2011.Rds")
-} else{
-  las = readRDS("private_data/las_2011.Rds")
-}
-
-#sld_test = sld_sp
-#sld_test@coords = sld_sp[(sld_sp@coords[,1] != 654558) & (sld_sp@coords[,2] != 653613),]
-
-#leeds_la = las[las$NAME == "Leeds",]
-#plot(leeds_la)
-#plot(las)
-# Match CRS of spatial data to that of Local Authorities data
-#proj4string(sld_sp) = CRS("+init=epsg:27700")
-#proj4string(sld_sp) = proj4string(las)
-#sld_sp = spTransform(sld_sp, CRSobj = proj4string(las))
-# Subset schools data to Leeds
-#schools = sld_sp[leeds_la,]
-#points(schools)
-
-#schools = spTransform(schools, CRSobj = )
-if(!file.exists("private_data/sld_england.Rds")){
-  schools = spTransform(sld_sp, CRSobj = proj4string(las))
-  saveRDS(schools, "private_data/sld_england.Rds")
-} else{
-  schools = readRDS("private_data/sld_england.Rds")
-}
-# subset all ods that go to these schools
-
-# Get the centroids for UK LSOAs
-#cents_lsoa = readRDS("../pct-bigdata/cents_lsoa.Rds")
-if(!file.exists("private_data/cents_lsoa_2011.Rds")){
-  cents_lsoa = shapefile("private_data/lower_layer_super_output_areas_(e+w)_2011_population_weighted_centroids_v2/LSOA_2011_EW_PWC.shp")
-  #cents_lsoa = spTransform(cents_lsoa, CRS("+init=epsg:4326"))
-  cents_lsoa = spTransform(cents_lsoa, CRSobj = proj4string(las))
-  #proj4string(cents_lsoa) = proj4string(las)
-  saveRDS(cents_lsoa, "private_data/cents_lsoa_2011.Rds")
-} else{
-  cents_lsoa = readRDS("private_data/cents_lsoa_2011.Rds")
-}
-
-
-# Match CRS of LSOAs to be consistent with las and schools
-
-#plot(cents_lsoa)
-#bbox(cents_lsoa)
-
-
-#Subset centroids of LSOAs to Leeds only
-#cents_lsoa = cents_lsoa[leeds_la,]
-
-# subset the flow (Origin-Destination) data
-# select only LSOA centroids in the Leeds-only centroid data
-#sel_od = s11$LLSOA_SPR11 %in% cents_lsoa$LSOA11CD
-#s = s11[sel_od,]
-
-nrow(s11)
-s = s11[!is.na(s11$LLSOA_SPR11),] # drop flows with no LSOA data
-nrow(s)
-s = s[s$URN_SPR11 %in% schools$URN,] # drop flows with no school data
-nrow(s)
-
-# we want to plot LSOA centroid --> school desire lines
-# the stplanr::od2line() function needs matching column titles to join
-# between the zones (origins), flows (origin-destination), and destination columns
-# If no matching column names are found origin is matched to first column of flows
-# and destination is matched to second column of flows.
-# Rearrage our dataframes to match this
-# origins (LSOAs) matched to flows on LSOA, flows matched to destinations (schools) on URN
-names(cents_lsoa)
-names(s)
-names(schools)
-names(cents_lsoa)[names(cents_lsoa)=="LSOA11CD"] <- "LSOA"
-names(s)[names(s)=="LLSOA_SPR11"] <- "LSOA"
-names(s)[names(s)=="URN_SPR11"] <- "URN"
-#names(schools)[names(schools)=="LEA11_URN"] <- "URN"
-
-#names(cents_lsoa)[1] = names(s)[1]
-#names(schools)[2] = names(s)[3]
-
-# Some LSOA centroids are wrong and are in the ocean. Remove the ones not within LSOAs
-cents_lsoa = cents_lsoa[las,]
-nrow(cents_lsoa)
-schools = schools[las,]
-nrow(schools[las,])
-
-summary(s$LSOA %in% cents_lsoa$LSOA)
-summary(s$URN %in% schools$URN)
-
-s = s[s$LSOA %in% cents_lsoa$LSOA,]
-s = s[s$URN %in% schools$URN,]
-
-#nrow(cents_lsoa)
-#nrow(schools)
-#cents_lsoa = cents_lsoa[cents_lsoa$LSOA %in% s$LSOA,]
-#schools = schools[schools$URN %in% s$URN,]
-#nrow(cents_lsoa)
-#nrow(schools)
-
-#plot(las)
-#points(cents_lsoa)
-#points(schools, col = 'red', pch = 4)
-
-summary(s$TOTAL)
-nrow(s)
-s_cut = s[s$TOTAL >= 10,]
-nrow(s_cut)
-
-# plot(las); plot(schools, col="red", pch='.', cex=2, add=T)
-# remove year as 1st column
-AcademicYear = schools$AcademicYear
-schools$AcademicYear = NULL
-schools@data = cbind(schools@data, AcademicYear)
-rm(AcademicYear)
-
-# Test matching
-zone_code = s_cut$LSOA
-origin_code = cents_lsoa$LSOA
-dest_code = s_cut$URN
-zone_code_d = schools$URN
-summary(zone_code %in% origin_code)
-summary(dest_code %in% zone_code_d)
-
-
-if(!file.exists("private_data/england_flows.Rds")){
-  starttime <- proc.time()
-  flow = od2line(flow = s_cut, zones = cents_lsoa, destinations = schools,
-                 zone_code = "LSOA", origin_code = "LSOA", dest_code = "URN",
-                 zone_code_d = "URN")
-  print(proc.time() - starttime)
-  saveRDS(flow, "private_data/england_flows.Rds")
-} else{
-  flow = readRDS("private_data/england_flows.Rds")
-}
-
-unique(schools$`LA (name)`)
 
 # # Use the spatial dataframe with the full set of schools to do the spatial subsetting
 # # (to get all of Leeds, not just LSOAs where there are Secondary schools)
@@ -233,8 +91,8 @@ violindf = rbind(violindf1, violindf2)
 #   ux[which.max(tabulate(match(x, ux)))]
 # }
 
-hist(quiet_routes_england$length)
-hist(fast_routes_england$length)
+#hist(quiet_routes_england$length)
+#hist(fast_routes_england$length)
 
 library(ggplot2)
 ggplot(violindf, aes(x=Type, y=Length)) + geom_violin(trim=T, fill="blue", alpha=0.4) + geom_boxplot(width=0.1, outlier.size = 2, outlier.color = "red", outlier.shape = 21) + stat_summary(fun.y=mean, geom="point", shape=18, color="blue", size=3) #+ ylim(0, 20000)#+ stat_summary(fun.data = mean_sdl, geom="pointrange", color="red", fun.args=list(mult=1))#+ stat_summary(fun.y=mean, geom="point")  + stat_summary(fun.y=median, geom="point", shape=23, color="red")#+ geom_hline(aes(yintercept=Mode(quiet_routes_england$length)), col="red")
@@ -243,46 +101,74 @@ names(fast_routes_england) = paste(names(fast_routes_england),"fast", sep = "_")
 names(quiet_routes_england) = paste(names(quiet_routes_england),"quiet", sep = "_")
 
 englandrf = cbind(flow, fast_routes_england, quiet_routes_england)#@data
+
 englandrf$pcycle = englandrf$CYCLE/englandrf$TOTAL
 
-
-#library(ggplot2)
-ggplot(englandrf@data, aes(length_fast, pcycle)) + geom_point(alpha=0.5, size=1, shape=21, na.rm = T) + geom_smooth(na.rm = T) + xlim(0,15000)
-ggplot(englandrf@data, aes(length_quiet, pcycle)) + geom_point(alpha=0.5, size=1, shape=21, na.rm = T) + geom_smooth(na.rm = T) + xlim(0,15000)
 
 englandrf$distance_fast = englandrf$length_fast / 1000
 englandrf$gradient_fast = (englandrf$av_incline_fast * 100) - 0.97
 englandrf$distance_quiet = englandrf$length_quiet / 1000
 englandrf$gradient_quiet = (englandrf$av_incline_quiet * 100) - 0.97
 
-englandrf$qdf = englandrf$distance_quiet/englandrf$distance_fast
 
-englandrf = englandrf[englandrf$distance_fast <= 15, ]
+nrow(englandrf)
+sel = which(englandrf$distance_fast <= 15)
+englandrf = englandrf[sel, ]
+nrow(englandrf)
+
+
+ggplot(englandrf@data, aes(distance_fast, pcycle)) + geom_point(alpha=0.5, size=1, shape=21, na.rm = T) + geom_smooth(na.rm = T) + xlim(0,15)
+ggplot(englandrf@data, aes(distance_quiet, pcycle)) + geom_point(alpha=0.5, size=1, shape=21, na.rm = T) + geom_smooth(na.rm = T) + xlim(0,15)
+
+
+englandrf$qdf = englandrf$distance_quiet/englandrf$distance_fast
+ggplot(englandrf@data, aes(qdf, pcycle)) + geom_point(alpha=0.5, size=1, shape=21, na.rm = T) #+ geom_smooth(na.rm = T)# + xlim(0,15)
+
+
+
+fast_routes_england = fast_routes_england[sel,]
+quiet_routes_england = quiet_routes_england[sel,]
+
+isTRUE(nrow(englandrf) == nrow(fast_routes_england))
+isTRUE(nrow(englandrf) == nrow(quiet_routes_england))
+
 
 #install.packages("Amelia")
 #library(Amelia)
 #missmap(englandrf@data)
+#dropcols = c("error_quiet","error_fast")
+#englandrf = englandrf[, !(names(englandrf) %in% dropcols)]
 
-dropcols = c("error_quiet","error_fast")
-englandrf = englandrf[, !(names(englandrf) %in% dropcols)]
+
+# trainforanna_idx = sample(seq_len(nrow(meltdf)), size=floor(0.5*nrow(meltdf)))
+# set.seed(5)
+# trainforanna_idx = sample(seq_len(nrow(meltdf)), size=floor(0.5*nrow(meltdf)))
+# trainforanna = meltdf[trainforanna_idx,]
+# testforanna = meltdf[-trainforanna_idx,]
+# readr::write_csv(trainforanna, "binary_50pc_england1.csv")
+# readr::write_csv(testforanna, "binary_50pc_england2.csv")
 
 
-#logitdf = cbind(englandrf@data, distance_fast, gradient_fast)  #decaydf[, c("distance_fast", "gradient_fast")]
-#logitdf = logitdf[, c("pcycle","distance_fast","gradient_fast")]
-
-smp_size = floor(0.6*nrow(englandrf))
+##############################################################################
+# SPLIT INTO TRAINING AND TEST SETS
+smp_size = floor(0.5*nrow(englandrf))
 set.seed(5)
 trainidx = sample(seq_len(nrow(englandrf)), size=smp_size)
 
 traindf = englandrf[trainidx,]
 testdf = englandrf[-trainidx,]
+##############################################################################
+
+# TO USE THE FULL DATASET TO TRAIN
+# traindf = englandrf
 
 traindf = traindf[complete.cases(traindf$CYCLE) & complete.cases(traindf$WALK) & complete.cases(traindf$CAR) & complete.cases(traindf$OTHER) & complete.cases(traindf$UNKNOWN) & complete.cases(traindf$distance_fast) & complete.cases(traindf$gradient_fast) & complete.cases(traindf$qdf), ]
 
 #traindf = as.data.frame(traindf)
 #names(traindf) = names(logitdf)
 
-if(!file.exists("private_data/meltdf.Rds")){
+if(!file.exists("private_data/meltdf_train.Rds")){
+#if(!file.exists("private_data/meltdf_full.Rds")){
   meltdf = data.frame(matrix(NA, nrow=sum(traindf$TOTAL), ncol=8))
   names(meltdf) = c("CYCLE","WALK","CAR","OTHER","UNKNOWN","distance_fast","gradient_fast","qdf")
   jstart = 1
@@ -335,9 +221,11 @@ if(!file.exists("private_data/meltdf.Rds")){
     }
   }
   meltdf[is.na(meltdf)] = 0
-  saveRDS(meltdf, "private_data/meltdf.Rds")
+  saveRDS(meltdf, "private_data/meltdf_train.Rds")
+  #saveRDS(meltdf, "private_data/meltdf_full.Rds")
   } else{
-    meltdf = readRDS("private_data/meltdf.Rds")
+    meltdf = readRDS("private_data/meltdf_train.Rds")
+    #meltdf = readRDS("private_data/meltdf_full.Rds")
 }
 
 isTRUE(sum(meltdf[!is.na(meltdf$CYCLE), "CYCLE"]) == sum(traindf$CYCLE))
@@ -353,7 +241,12 @@ isTRUE(nrow(meltdf) == sum(traindf$TOTAL))
 #   are the dominant features.
 
 library(glmnet)
-f = as.formula(~distance_fast+sqrt(distance_fast)+I(distance_fast^2)+gradient_fast+distance_fast:gradient_fast+sqrt(distance_fast):gradient_fast+qdf+I(distance_fast^(1/3)))
+# NOTE THAT A "-1" OR "+0" IN THE FORMULA IS CRUCIAL AS OTHERWISE IT WILL ADD AN INTERCEPT, WHICH GLMNET WILL ITSELF LATER DO
+# WITH QDF
+#f = as.formula(~distance_fast+sqrt(distance_fast)+I(distance_fast^2)+gradient_fast+distance_fast:gradient_fast+sqrt(distance_fast):gradient_fast+I(distance_fast^(1/3))+qdf+0)
+# WITHOUT QDF
+#f = as.formula(~distance_fast+sqrt(distance_fast)+I(distance_fast^2)+gradient_fast+distance_fast:gradient_fast+sqrt(distance_fast):gradient_fast+I(distance_fast^(1/3))+0)
+f = as.formula(~distance_fast+I(distance_fast^(2))+I(distance_fast^(1/2))+gradient_fast+0)
 x = model.matrix(f, meltdf)
 # glmnet has standardize=T by default, so this is not required
 y = as.matrix(meltdf$CYCLE, ncol=1)
@@ -364,7 +257,9 @@ y = as.matrix(meltdf$CYCLE, ncol=1)
 #nodes <- detectCores()
 #cl <- makeCluster(nodes)
 #registerDoParallel(cl)
-if(!file.exists("private_data/CV_models.Rdata")){
+
+if(!file.exists("private_data/CV_models_train.Rdata")){
+#if(!file.exists("private_data/CV_models_full.Rdata")){
   fitlasso = glmnet(x, y, family="binomial", alpha=1)
   fitridge = glmnet(x, y, family="binomial", alpha=0)
   fitelastic = glmnet(x, y, family="binomial", alpha=0.5)
@@ -377,9 +272,11 @@ if(!file.exists("private_data/CV_models.Rdata")){
     print(proc.time() - time1)
     cvmods = c(cvmods, paste("fit",i,sep=""))
   }
-  save(list=cvmods, file="private_data/CV_models.Rdata")
+  save(list=cvmods, file="private_data/CV_models_train.Rdata")
+  #save(list=cvmods, file="private_data/CV_models_full.Rdata")
 } else{
-  load(file="private_data/CV_models.Rdata")
+  load(file="private_data/CV_models_train.Rdata")
+  #load(file="private_data/CV_models_full.Rdata")
 }
 #stopCluster(cl)
 
@@ -397,30 +294,207 @@ plot(fit0, main="Ridge")
 
 #plot(fitelastic, xvar="lambda", label=T)
 plotmo::plot_glmnet(fitelastic)
-plot(fitridge, xvar="dev")
+plot(fitelastic, xvar="dev")
 plot(fit5, main="Elastic Net")
 
 
 
 # To get the coefficients fit model with lambda value found by cross-validation
 coef(fitelastic, s=fit5$lambda.min)
+#coef(fit5, s="lambda.min") #these should be the same as above since fitelastic and fit5 are both alpha=0.5 (elastic net)
 #coef(fitelastic, s=fit5$lambda.1se)
 
 
+#################################################################################
+# Fit a standard logistic regression, just for comparison
+# glm requires the formula with the intercept in, and the response variable:
+#f = as.formula(CYCLE~distance_fast+sqrt(distance_fast)+I(distance_fast^2)+gradient_fast+distance_fast:gradient_fast+sqrt(distance_fast):gradient_fast+I(distance_fast^(1/3)))
+f = as.formula(CYCLE~distance_fast+I(distance_fast^(2))+I(distance_fast^(1/2))+gradient_fast)
+glm(f, family=binomial(link="logit"), data=meltdf)
 
-
-# BINNING
-# bins = cut(traindf$distance_fast, seq(0.25, 15, by=0.5), include.lowest = TRUE)
-# meanobs = tapply(traindf$pcycle, bins, mean)
-# meanpred = tapply(traindf$pcycle_pred, bins, mean)
+# ##################################################################################################
+# # Attempt at combinatorial optimisation for variable selection
 # 
-# df <- quakes
-# df$bins <- with(df, cut(depth, breaks = c(0,40, 120, 200, 280, 360, 440, 520, 600, 680)))
-# df.plot <- ddply(df, .(bins), summarise, avg.mag = mean(mag))
-# qplot(bins, avg.mag, data = df.plot)
+# genModels = function(response, predictors, n_models){
+#   models_indicator = rbinom(n_models*length(predictors), size=1, prob=0.5)
+#   models_indicator = matrix(models_indicator, nrow=n_models, byrow=T)
+#   models_indicator = unique(models_indicator, MARGIN=1) # drop models with identical predictors
+#   models_indicator = models_indicator[rowSums(models_indicator)!=0, ] #drop models with no predictors
+#   comb_models = matrix(NA, nrow=nrow(models_indicator)*(1+length(predictors)), ncol=length(predictors))
+#   counter = 1
+#   for(i in 1:nrow(models_indicator)){
+#     comb_models[counter,] = models_indicator[i,]
+#     #print(paste("Base: ", comb_models[counter,]))
+#     for(j in 1:length(predictors)){
+#       counter = counter + 1
+#       comb_models[counter,] = models_indicator[i,]
+#       comb_models[counter, j] = ifelse(models_indicator[i, j] == 0, 1, 0)
+#       #print(paste("variant: ", comb_models[counter, ]))
+#     }
+#     #print(counter)
+#     counter = counter+1
+#   }
+#   comb_models
+#   comb_models = unique(comb_models, MARGIN=1)
+#   comb_models = comb_models[rowSums(comb_models)!=0, ] #drop models with no predictors
+#   models = c()
+#   for(i in 1:nrow(comb_models)){
+#     models = c(models, paste(response, '~', paste(predictors[as.logical(comb_models[i,])], collapse='+')))
+#   }
+#   models
+#   # Could use combn(predictors,2) to implement interaction and quadratic terms later
+# }
+# 
+# genModels("CYCLE", c("distance_fast","gradient_fast"), n_models=10)
+# 
 
 
 
+
+# # ###################################################################################
+# # THIS IS THE SECTION USED FOR MODEL SPECIFICATION/PREDICTOR SELECTION
+# # Let's try fitting an Elastic Net model with every term we can think of and see if it gives
+# #     us a decent subset of features to work with in a final model (ie doing feature selection)
+# 
+# smp_size = floor(0.15*nrow(meltdf))
+# set.seed(5)
+# trainidx = sample(seq_len(nrow(meltdf)), size=smp_size)
+# 
+# train_meltdf = meltdf[trainidx,]
+# test_meltdf = meltdf[-trainidx,]
+# 
+# train_meltdf = train_meltdf[complete.cases(train_meltdf),]
+# 
+# # Can't use cube root or log terms for gradients because gradients can be zero or negative
+# #f_feat = as.formula(~distance_fast+sqrt(distance_fast)+I(distance_fast^2)+I(distance_fast^3)+I(distance_fast^(1/3))+log(distance_fast)+gradient_fast+I(gradient_fast^2)+I(gradient_fast^3)+distance_fast:gradient_fast+0)
+# # The model above gives the most significant predictors as log(dist), dist^1/3, grad, and dist. With a maximum AUC of 0.7
+# # Let's see if we can get AUC 0.7 with less coefficients.
+# f_feat = as.formula(~distance_fast+I(distance_fast^(2))+I(distance_fast^(1/2))+gradient_fast+0)
+# # the linear and square/cube root terms are required to make the probability peak at low distances
+# # this is the simplest model I could build with AUC ~0.7 and which fits the data (for both distance and gradient plots)
+# 
+# x_feat = model.matrix(f_feat, train_meltdf)
+# y_feat = as.matrix(train_meltdf$CYCLE, ncol=1)
+# feat_sel_mod = glmnet(x_feat, y_feat, alpha=0.5, family="binomial")
+# 
+# plotmo::plot_glmnet(feat_sel_mod)
+# #plot(fitelastic, xvar="dev")
+# #plot(feat_sel_mod, main="Elastic Net")
+# 
+# feat_sel_mod_cv = cv.glmnet(x_feat, y_feat, type.measure = "auc", alpha=0.5, family="binomial", nfolds=3)
+# plot(feat_sel_mod_cv)
+# coef(feat_sel_mod_cv, s="lambda.min")
+# 
+# #copytraindf = traindf
+# smp_size = floor(0.15*nrow(traindf))
+# set.seed(5)
+# trainidx = sample(seq_len(nrow(traindf)), size=smp_size)
+# copytraindf=traindf[trainidx,]
+# 
+# xfeatpred = model.matrix(f_feat, copytraindf)
+# copytraindf$pcycle_pred = predict(feat_sel_mod, s=fit5$lambda.min, xfeatpred, type="response")
+# 
+# # Residual plot
+# ggplot(copytraindf@data, aes(x=pcycle_pred)) + geom_point(aes(y=pcycle-pcycle_pred)) + geom_smooth(aes(y=pcycle-pcycle_pred, col="red")) #+ geom_smooth(aes(y=pcycle_pred)) + geom_histogram(aes(pcycle), binwidth = 1)
+# # skewed because probabilities have a lower bound of 0
+# 
+# bw=0.001
+# ggplot(copytraindf@data) + geom_histogram(aes(pcycle_pred), binwidth=bw, fill="blue", alpha=0.3) + geom_histogram(aes(pcycle), binwidth=bw, fill="red", alpha=0.3) + xlim(c(-.01,0.08))
+# 
+# ggplot(copytraindf@data, aes(x=distance_fast)) + geom_smooth(aes(y=pcycle, col="red")) + geom_smooth(aes(y=pcycle_pred))
+# ggplot(copytraindf@data, aes(x=gradient_fast)) + geom_smooth(aes(y=pcycle, col="red")) + geom_smooth(aes(y=pcycle_pred))
+# 
+# ggplot(copytraindf@data, aes(x=distance_fast)) + geom_point(aes(y=pcycle)) + geom_smooth(aes(y=pcycle, col="red")) + geom_smooth(aes(y=pcycle_pred)) #+ xlim(c(0,5)) + ylim(c(0,0.5))
+# ggplot(copytraindf@data, aes(x=gradient_fast)) + geom_point(aes(y=pcycle)) + geom_smooth(aes(y=pcycle, col="red")) + geom_smooth(aes(y=pcycle_pred))
+# 
+# 
+# 
+# ##################################################################################
+# CHECK PERFORMANCE ON TEST SET
+
+testnow = TRUE
+
+if(testnow==TRUE){
+  
+  testdf = testdf[complete.cases(testdf$CYCLE) & complete.cases(testdf$WALK) & complete.cases(testdf$CAR) & complete.cases(testdf$OTHER) & complete.cases(testdf$UNKNOWN) & complete.cases(testdf$distance_fast) & complete.cases(testdf$gradient_fast) & complete.cases(testdf$qdf), ]
+  
+  #if(!file.exists("private_data/meltdf_test.Rds")){
+    meltdf_test = data.frame(matrix(NA, nrow=sum(testdf$TOTAL), ncol=8))
+    names(meltdf_test) = c("CYCLE","WALK","CAR","OTHER","UNKNOWN","distance_fast","gradient_fast","qdf")
+    jstart = 1
+    for(i in 1:nrow(testdf)){
+      blocklen = 0
+      if(testdf@data[i, "CYCLE"] > 0){
+        blocklen = testdf@data[i, "CYCLE"]
+        jend = jstart + blocklen - 1
+        meltdf_test[jstart:jend, "CYCLE"] = 1
+        meltdf_test[jstart:jend, "gradient_fast"] = testdf@data[i, "gradient_fast"]
+        meltdf_test[jstart:jend, "distance_fast"] = testdf@data[i, "distance_fast"]
+        meltdf_test[jstart:jend, "qdf"] = testdf@data[i, "qdf"]
+        jstart = jend + 1
+      }
+      if(testdf@data[i, "WALK"] > 0){
+        blocklen = testdf@data[i, "WALK"]
+        jend = jstart + blocklen - 1
+        meltdf_test[jstart:jend, "WALK"] = 1
+        meltdf_test[jstart:jend, "gradient_fast"] = testdf@data[i, "gradient_fast"]
+        meltdf_test[jstart:jend, "distance_fast"] = testdf@data[i, "distance_fast"]
+        meltdf_test[jstart:jend, "qdf"] = testdf@data[i, "qdf"]
+        jstart = jend + 1
+      }
+      if(testdf@data[i, "CAR"] > 0){
+        blocklen = testdf@data[i, "CAR"]
+        jend = jstart + blocklen - 1
+        meltdf_test[jstart:jend, "CAR"] = 1
+        meltdf_test[jstart:jend, "gradient_fast"] = testdf@data[i, "gradient_fast"]
+        meltdf_test[jstart:jend, "distance_fast"] = testdf@data[i, "distance_fast"]
+        meltdf_test[jstart:jend, "qdf"] = testdf@data[i, "qdf"]
+        jstart = jend + 1
+      }
+      if(testdf@data[i, "OTHER"] > 0){
+        blocklen = testdf@data[i, "OTHER"]
+        jend = jstart + blocklen - 1
+        meltdf_test[jstart:jend, "OTHER"] = 1
+        meltdf_test[jstart:jend, "gradient_fast"] = testdf@data[i, "gradient_fast"]
+        meltdf_test[jstart:jend, "distance_fast"] = testdf@data[i, "distance_fast"]
+        meltdf_test[jstart:jend, "qdf"] = testdf@data[i, "qdf"]
+        jstart = jend + 1
+      }
+      if(testdf@data[i, "UNKNOWN"] > 0){
+        blocklen = testdf@data[i, "UNKNOWN"]
+        jend = jstart + blocklen - 1
+        meltdf_test[jstart:jend, "UNKNOWN"] = 1
+        meltdf_test[jstart:jend, "gradient_fast"] = testdf@data[i, "gradient_fast"]
+        meltdf_test[jstart:jend, "distance_fast"] = testdf@data[i, "distance_fast"]
+        meltdf_test[jstart:jend, "qdf"] = testdf@data[i, "qdf"]
+        jstart = jend + 1
+      }
+    }
+    meltdf_test[is.na(meltdf_test)] = 0
+    #saveRDS(meltdf_test, "private_data/meltdf_test.Rds")
+#  } else{
+#    meltdf_test = readRDS("private_data/meltdf_test.Rds")
+#  }
+  
+  isTRUE(sum(meltdf_test[!is.na(meltdf_test$CYCLE), "CYCLE"]) == sum(testdf$CYCLE))
+  isTRUE(sum(meltdf_test[!is.na(meltdf_test$WALK), "WALK"]) == sum(testdf$WALK))
+  isTRUE(sum(meltdf_test[!is.na(meltdf_test$CAR), "CAR"]) == sum(testdf$CAR))
+  
+  isTRUE((sum(meltdf_test[!is.na(meltdf_test$CAR), "CAR"]) + sum(meltdf_test[!is.na(meltdf_test$WALK), "WALK"]) + sum(meltdf_test[!is.na(meltdf_test$CYCLE), "CYCLE"]) + sum(meltdf_test[!is.na(meltdf_test$OTHER), "OTHER"]) + sum(meltdf_test[!is.na(meltdf_test$UNKNOWN), "UNKNOWN"])) == sum(testdf$TOTAL))
+  isTRUE(nrow(meltdf_test) == sum(testdf$TOTAL))
+  
+  
+  test_xpred = model.matrix(f, meltdf_test)
+  test_pred = predict(fitelastic, s=fit5$lambda.min, test_xpred, type="response")
+  
+  #install.packages("ROCR")
+  pred_and_target = ROCR::prediction(test_pred, meltdf_test$CYCLE) #get it into form ROCR expects
+  auc = ROCR::performance(pred_and_target, "auc")@y.values[[1]][1]
+  print(auc)
+  roc = ROCR::performance(pred_and_target, "tpr", "fpr")
+  print(ROCR::plot(roc, colorize=TRUE))
+  print(ROCR::plot(roc, col=rainbow(10), print.cutoffs.at=seq(0.01,0.07, by=0.01)))
+}
 
 ###################################################################################
 
@@ -431,6 +505,9 @@ coef(fitelastic, s=fit5$lambda.min)
 # ResourceSelection::hoslem.test(meltdf$CYCLE, fitted(model))
 # 
 # traindf$pcycle_pred = predict(model, traindf@data, type="response")  #predict(model, list(wt=xvals), type="response")
+
+# TO PREDICT ON THE FULL DATA SET
+traindf = englandrf
 
 # Predict on the dataframe of flows, not the binary-coded one.
 # Gradient and distance_fast variables are the same for both, so this is fine.
@@ -465,8 +542,8 @@ traindf$govtarget_sic = traindf$govtarget_slc - traindf$CYCLE
 range(traindf$govtarget_sic)
 
 #Check that the GovTarget corresponds to a rough doubling of cycling numbers
-sum(traindf$govtarget_slc)
 sum(traindf$CYCLE)
+sum(traindf$govtarget_slc)
 
 # GoDutch scenario
 #traindf$pred_dutch = boot::inv.logit(boot::logit(traindf$pcycle_pred) + 4.838 + (0.9073*traindf$distance_fast)  + (-1.924*sqrt(traindf$distance_fast)))
@@ -505,8 +582,6 @@ ggplot(meltggplotgraddf, aes(x=Gradient, y=value, color=variable)) + geom_smooth
 
 
 
-
-
 ggplot(traindf@data, aes(distance_fast, pcycle)) + geom_point(alpha=0.5, size=1, shape=21, na.rm = T)
 
 ggplot(traindf@data, aes(distance_fast, gradient_fast)) + geom_point()
@@ -516,6 +591,61 @@ ggplot(traindf@data, aes(gradient_fast, pcycle_pred)) + geom_point() + geom_smoo
 
 
 
+
+
+
+###################################################################################################################################
+
+
+
+
+
+
+#saveRDS(traindf, "private_data/full_england_w_uptake_scenarios.Rds")
+#saveRDS(traindf[sample(seq_len(nrow(traindf)), size=1000),], "private_data/full_england_w_uptake_scenarios_1000.Rds")
+
+
+
+# Saving the spatial dataframes for the Shiny app
+# lads = readRDS("../pct-bigdata/england_lad_2011.Rds") ## 2001 LSOAs
+# lads = spTransform(lads, CRSobj = proj4string(las))
+# lads_leeds = lads[lads$name == "Leeds",]
+# #plot(lads_leeds)
+# sel_leeds = rgeos::gContains(lads_leeds, traindf, byid = T)
+# leeds_uptakes = traindf[c(sel_leeds),]
+# leeds_rf = fast_routes_england[c(sel_leeds),]
+# leeds_rq = quiet_routes_england[c(sel_leeds),]
+# isTRUE(nrow(leeds_uptakes) == nrow(leeds_rf))
+# isTRUE(nrow(leeds_uptakes) == nrow(leeds_rq))
+# plot(leeds_uptakes[666,])
+# plot(leeds_rf[666,], add = T)
+# plot(leeds_rq[666,], add = T)
+# saveRDS(leeds_uptakes, "private_data/leeds_uptakes.Rds")
+# saveRDS(leeds_rf, "private_data/leeds_rf.Rds")
+# saveRDS(leeds_rq, "private_data/leeds_rq.Rds")
+# 
+
+
+
+
+
+
+###################################################################################################################################
+
+
+
+
+
+
+
+# notcols = c("LSOA","LAESTAB_SPR11","URN","SCHOOLNAME_SPR11")
+# dataforapp = traindf[!(names(traindf) %in% notcols)]
+# names(dataforapp)
+# 
+# readr::write_csv(meltdf, "Binary-coded_full_England.csv")
+# readr::write_csv(dataforapp@data, "Uptake_scenarios_route_network.csv")
+# 
+# saveRDS(dataforapp, "Data_to_be_subset_for_Shiny_app.Rds")
 
 
 
