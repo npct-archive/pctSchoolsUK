@@ -309,8 +309,8 @@ coef(fitelastic, s=fit5$lambda.min)
 # Fit a standard logistic regression, just for comparison
 # glm requires the formula with the intercept in, and the response variable:
 #f = as.formula(CYCLE~distance_fast+sqrt(distance_fast)+I(distance_fast^2)+gradient_fast+distance_fast:gradient_fast+sqrt(distance_fast):gradient_fast+I(distance_fast^(1/3)))
-f = as.formula(CYCLE~distance_fast+I(distance_fast^(2))+I(distance_fast^(1/2))+gradient_fast)
-glm(f, family=binomial(link="logit"), data=meltdf)
+f_ordinary = as.formula(CYCLE~distance_fast+I(distance_fast^(2))+I(distance_fast^(1/2))+gradient_fast)
+glm(f_ordinary, family=binomial(link="logit"), data=meltdf)
 
 # ##################################################################################################
 # # Attempt at combinatorial optimisation for variable selection
@@ -485,7 +485,7 @@ if(testnow==TRUE){
   
   
   test_xpred = model.matrix(f, meltdf_test)
-  test_pred = predict(fitelastic, s=fit5$lambda.min, test_xpred, type="response")
+  test_pred = predict(fitelastic, s=fit5$lambda.min, test_xpred, type="response")[,1]
   
   #install.packages("ROCR")
   pred_and_target = ROCR::prediction(test_pred, meltdf_test$CYCLE) #get it into form ROCR expects
@@ -512,7 +512,7 @@ traindf = englandrf
 # Predict on the dataframe of flows, not the binary-coded one.
 # Gradient and distance_fast variables are the same for both, so this is fine.
 xpred = model.matrix(f, traindf)
-traindf$pcycle_pred = predict(fitelastic, s=fit5$lambda.min, xpred, type="response")
+traindf$pcycle_pred = predict(fitelastic, s=fit5$lambda.min, xpred, type="response")[,1] #this gives a 1D matrix, so take first col
 #traindf$pcycle_pred = predict(fitelastic, s=fit5$lambda.1se, xpred, type="response")
 #traindf$pcycle_pred = predict(fitelasticpred, xpred, type="response")
 
@@ -536,7 +536,8 @@ traindf$govtarget_slc = traindf$CYCLE + (traindf$pcycle_pred*traindf$TOTAL)
 # If GovTarget larger than number of commuters in flow, set to total number of commuters in flow
 sel = traindf$govtarget_slc > traindf$TOTAL
 if(sum(sel) > 0){
-  traindf$govtarget_slc[sel,] = traindf$TOTAL[sel,]
+  #traindf$govtarget_slc[sel,] = traindf$TOTAL[sel,]
+  traindf@data[sel, "govtarget_slc"] = traindf@data[sel, "TOTAL"]
 }
 traindf$govtarget_sic = traindf$govtarget_slc - traindf$CYCLE
 range(traindf$govtarget_sic)
@@ -547,15 +548,18 @@ sum(traindf$govtarget_slc)
 
 # GoDutch scenario
 #traindf$pred_dutch = boot::inv.logit(boot::logit(traindf$pcycle_pred) + 4.838 + (0.9073*traindf$distance_fast)  + (-1.924*sqrt(traindf$distance_fast)))
-traindf$pred_dutch = boot::inv.logit(boot::logit(traindf$pcycle_pred) + 3.682 + (0.3044*traindf$distance_fast))
+#traindf$pred_dutch = boot::inv.logit(boot::logit(traindf$pcycle_pred) + 3.682 + (0.3044*traindf$distance_fast))
+traindf$pred_dutch = boot::inv.logit(boot::logit(traindf$pcycle_pred) + 5.122)
 traindf$dutch_slc = traindf$pred_dutch*traindf$TOTAL
 sel = traindf$dutch_slc > traindf$TOTAL
 if(sum(sel) > 0){
-  traindf$dutch_slc[sel,] = traindf$TOTAL[sel,]
+  #traindf$dutch_slc[sel,] = traindf$TOTAL[sel,]
+  traindf@data[sel, "dutch_slc"] = traindf@data[sel, "TOTAL"]
 }
 sel = traindf$dutch_slc < traindf$CYCLE
 if(sum(sel) > 0){
-  traindf$dutch_slc[sel] = traindf$CYCLE[sel]
+  #traindf$dutch_slc[sel] = traindf$CYCLE[sel]
+  traindf@data[sel, "dutch_slc"] = traindf@data[sel, "CYCLE"]
 }
 traindf$dutch_sic = traindf$dutch_slc - traindf$CYCLE
 range(traindf$dutch_sic)
