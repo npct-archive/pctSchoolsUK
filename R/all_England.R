@@ -412,7 +412,7 @@ glm(f_ordinary, family=binomial(link="logit"), data=meltdf)
 # ##################################################################################
 # CHECK PERFORMANCE ON TEST SET
 
-testnow = TRUE
+testnow = FALSE
 
 if(testnow==TRUE){
   
@@ -594,6 +594,17 @@ ggplot(traindf@data, aes(distance_fast, pcycle_pred)) + geom_point() + geom_smoo
 ggplot(traindf@data, aes(gradient_fast, pcycle_pred)) + geom_point() + geom_smooth() #+ geom_point(aes(y=pcycle))
 
 
+# make sure that the desire lines (and uptake projections), the fastest route network, and the quiet route network flows, all match up
+isTRUE(nrow(traindf) == nrow(fast_routes_england))
+isTRUE(nrow(traindf) == nrow(quiet_routes_england))
+plot(traindf[5,])
+plot(fast_routes_england[5,], add = T)
+plot(quiet_routes_england[5,], add = T)
+
+saveRDS(traindf, "private_data/full_england_w_uptake_scenarios.Rds")
+
+
+#saveRDS(traindf[sample(seq_len(nrow(traindf)), size=1000),], "private_data/full_england_w_uptake_scenarios_1000.Rds")
 
 
 
@@ -605,8 +616,6 @@ ggplot(traindf@data, aes(gradient_fast, pcycle_pred)) + geom_point() + geom_smoo
 
 
 
-#saveRDS(traindf, "private_data/full_england_w_uptake_scenarios.Rds")
-#saveRDS(traindf[sample(seq_len(nrow(traindf)), size=1000),], "private_data/full_england_w_uptake_scenarios_1000.Rds")
 
 
 
