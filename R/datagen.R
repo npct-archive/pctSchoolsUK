@@ -5,19 +5,31 @@ source("setup.R")
 l = readRDS("private_data/l_leeds.Rds")
 rf = readRDS("private_data/leeds_rf.Rds")
 rq = readRDS("private_data/leeds_rq.Rds")
+sel = l$TOTAL > 50
+
+# subset for testing
+sum(sel) # 115 lines
+l = l[sel,]
+rf = rf[sel,]
+rq = rq[sel,]
+
 schools = readRDS("private_data/sld_leeds.Rds")
 las = readRDS("private_data/las_2011.Rds")
 cents_lsoa = readRDS("private_data/cents_lsoa_2011.Rds")
 cents_lsoa_leeds = cents_lsoa[grepl("Leeds", cents_lsoa$LSOA11NM),]
 las_leeds = las[cents_lsoa_leeds,]
 # l = readRDS("private_data/Data_to_be_subset_for_Shiny_app.Rds")
-# rf@data = cbind(l@data, rf@data)
+rf@data = cbind(l@data, rf@data)
+rf$bicycle = rf$CYCLE
 
 rnet = overline(sldf = rf, attrib = "bicycle", fun = sum)
+rnet_total = overline(sldf = rf, attrib = "TOTAL")
 rnet_govtarget = overline(sldf = rf, attrib = "govtarget_slc", fun = sum)
 rnet_dutch = overline(sldf = rf, attrib = "dutch_slc", fun = sum)
 rnet$govtarget_slc = rnet_govtarget$govtarget_slc
 rnet$dutch_slc = rnet_dutch$dutch_slc
+rnet$total = rnet_total$TOTAL
+summary(rnet)
 
 plot(rnet, lwd = rnet$dutch_slc / mean(rnet$bicycle))
 plot(rnet, lwd = rnet$govtarget_slc / mean(rnet$bicycle), add = T, col = "white")
