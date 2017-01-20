@@ -7,20 +7,54 @@ rf = readRDS("private_data/leeds_rf.Rds")
 rq = readRDS("private_data/leeds_rq.Rds")
 sel = l$TOTAL > 50
 
-# subset for testing
-sum(sel) # 115 lines
-l = l[sel,]
-rf = rf[sel,]
-rq = rq[sel,]
+# # subset for testing
+# sum(sel) # 115 lines
+# l = l[sel,]
+# rf = rf[sel,]
+# rq = rq[sel,]
 
 schools = readRDS("private_data/sld_leeds.Rds")
 las = readRDS("private_data/las_2011.Rds")
 cents_lsoa = readRDS("private_data/cents_lsoa_2011.Rds")
+lsoas = raster::shapefile("private_data/Lower_Layer_Super_Output_Areas_December_2011_Full_Clipped__Boundaries_in_England_and_Wales_SIMPLIFIED/Lower_Layer_Super_Output_Areas_December_2011_Full_Clipped__Boundaries_in_England_and_Wales.shp")
+lsoas = spTransform(lsoas, proj4string(cents_lsoa))
+lsoas_leeds = lsoas[cents_lsoa_leeds,]
+lsoas_leeds@data = over(lsoas_leeds, cents_lsoa_leeds)
+mapview::mapview(lsoas_leeds)
+ldf = l@data
+lsoa_data = ldf %>% group_by(LSOA) %>% 
+  summarise(
+    bicycle = sum(CYCLE),
+    car = sum(CAR),
+    foot = sum(WALK),
+    govtarget_slc = sum(govtarget_slc),
+    dutch_slc = sum(dutch_slc)
+  )
+
+lsoa_data = rename(lsoa_data, geo_code = LSOA)
+lsoas_leeds@data = rename(lsoas_leeds@data, geo_code = LSOA11CD)
+# convert matrices to numerics
+unmatrix_df = function(df){
+  for(i in 1:ncol(df)){
+    df[[i]] = c(df[[i]])
+  }
+  df
+}
+lsoa_data = unmatrix_df(lsoa_data)
+lsoa_newdat = left_join(lsoas_leeds@data, lsoa_data)
+nrow(lsoa_newdat) # left join keeps all rows
+summary(lsoas_leeds$geo_code == lsoa_newdat$geo_code)
+lsoas_leeds@data = lsoa_newdat
+qtm(lsoas_leeds, "dutch_slc")
+saveRDS(lsoas_leeds, "pctSchoolsApp/z.Rds")
+
 cents_lsoa_leeds = cents_lsoa[grepl("Leeds", cents_lsoa$LSOA11NM),]
 las_leeds = las[cents_lsoa_leeds,]
 # l = readRDS("private_data/Data_to_be_subset_for_Shiny_app.Rds")
 rf@data = cbind(l@data, rf@data)
 rf$bicycle = rf$CYCLE
+
+
 
 rnet = overline(sldf = rf, attrib = "bicycle", fun = sum)
 rnet_total = overline(sldf = rf, attrib = "TOTAL")
