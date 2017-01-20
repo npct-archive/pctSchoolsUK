@@ -1,0 +1,38 @@
+---
+title: 'Assessing the potential for uptake of cycling to school: a case study of England'
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Background
+
+<!-- Travel to school is the most regular type of travel undertaken by children across the world. -->
+<!-- This 'school commute' is generally of a shorter distance than commuting to work, especially in areas with high levels of school accessibility. -->
+Cycling the school commute has great potential health benefits, ensuring children get regular daily exercise.
+This paper demonstrates and implements a method for estimating the potential for modal switch to cycling for the school commute down to the route network level, based on a case study of English data.
+  
+## Methods
+
+The data source for this paper was the 2011 School Census, provided by the Department for Education (DfE). This comprised two main tables: a school-level dataset representing 21,523 educational institutions and an origin-destination (OD) level dataset with 908,034 origin-destination pairs representing an average of 42 desire lines to each school.
+
+After filtering to include only secondary schools (as secondary school children are more likely to be able to switch to cycling than primary school children) and school commutes below a 'cyclable' distance (set as 15 km on the route network) 134,274 OD pairs, representing 1.37 million school commutes.
+
+For each OD pair we modelled current and potential future levels of cycling uptake based on route distance and hilliness (generated using the cyclestreets.net API). Model parameters were trained with additional data from the Dutch National Travel Survey for the 'Go Dutch' scenario.
+
+<!-- We created extended functions in the **stplanr** R package that enabled the conversion -->
+
+## Results
+
+We find that the potential update of cycling for travel to school is even higher, as a percentage of trips, than the potential for cycling to work.
+The percentage of children cycling to school presently in England is 2.7%. Under the Government Target, this doubles 5.4%, suggesting where safe-routes to school could be prioritised for the 'near market'.
+The Go Dutch scenario represents a transformation in travel to school patterns in England, whereby almost three quarters of children in the sampled OD pairs cycle to school (approaching the level observed in The Netherlands). 
+
+## Conclusion
+
+To our knowledge, this is the first time that a national database on school travel at the origin-destination level has been analysed from a 'safe routes to school' perspective at high geographical resolution, down to the route network level.
+The analysis demonstrates that new 'Big Data' methods of handling large geographical datasets can provide useful information guiding interventions to create safe routes to school where they are most needed, based on the best available evidence.
+The results show that 'getting kids cycling' would have huge knock-on benefits which we hypothesise could be realised world-wide if building safe routes to school becomes a global transport planning priority.
+
