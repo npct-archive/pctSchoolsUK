@@ -16,6 +16,11 @@ sel = l$TOTAL > 50
 schools = readRDS("private_data/sld_leeds.Rds")
 las = readRDS("private_data/las_2011.Rds")
 cents_lsoa = readRDS("private_data/cents_lsoa_2011.Rds")
+cents_lsoa_leeds = cents_lsoa[grepl("Leeds", cents_lsoa$LSOA11NM),]
+names(cents_lsoa_leeds) = c("geo_code",                 "geo_label")
+saveRDS(cents_lsoa_leeds, "pctSchoolsApp/c.Rds")
+
+las_leeds = las[cents_lsoa_leeds,]
 lsoas = raster::shapefile("private_data/Lower_Layer_Super_Output_Areas_December_2011_Full_Clipped__Boundaries_in_England_and_Wales_SIMPLIFIED/Lower_Layer_Super_Output_Areas_December_2011_Full_Clipped__Boundaries_in_England_and_Wales.shp")
 lsoas = spTransform(lsoas, proj4string(cents_lsoa))
 lsoas_leeds = lsoas[cents_lsoa_leeds,]
@@ -48,8 +53,6 @@ lsoas_leeds@data = lsoa_newdat
 qtm(lsoas_leeds, "dutch_slc")
 saveRDS(lsoas_leeds, "pctSchoolsApp/z.Rds")
 
-cents_lsoa_leeds = cents_lsoa[grepl("Leeds", cents_lsoa$LSOA11NM),]
-las_leeds = las[cents_lsoa_leeds,]
 # l = readRDS("private_data/Data_to_be_subset_for_Shiny_app.Rds")
 rf@data = cbind(l@data, rf@data)
 rf$bicycle = rf$CYCLE
