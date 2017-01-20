@@ -2,6 +2,7 @@
 
 source("setup.R")
 
+l_nat = readRDS("private_data/l_national.Rds")
 l = readRDS("private_data/l_leeds.Rds")
 rf = readRDS("private_data/leeds_rf.Rds")
 rq = readRDS("private_data/leeds_rq.Rds")
@@ -29,6 +30,7 @@ mapview::mapview(lsoas_leeds)
 ldf = l@data
 lsoa_data = ldf %>% group_by(LSOA) %>% 
   summarise(
+    all = sum(TOTAL),
     bicycle = sum(CYCLE),
     car = sum(CAR),
     foot = sum(WALK),
@@ -50,7 +52,7 @@ lsoa_newdat = left_join(lsoas_leeds@data, lsoa_data)
 nrow(lsoa_newdat) # left join keeps all rows
 summary(lsoas_leeds$geo_code == lsoa_newdat$geo_code)
 lsoas_leeds@data = lsoa_newdat
-qtm(lsoas_leeds, "dutch_slc")
+qtm(lsoas_leeds, "all")
 saveRDS(lsoas_leeds, "pctSchoolsApp/z.Rds")
 
 # l = readRDS("private_data/Data_to_be_subset_for_Shiny_app.Rds")
