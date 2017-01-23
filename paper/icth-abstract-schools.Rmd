@@ -22,7 +22,7 @@ Input data from the 2011 School Census, provided by the English Department for E
 
 ## Results
 
-Among those travelling less than 15km, the current percentage of children cycling to school in England is 2.7%. Our model of cycling potential highlights areas and routes with particularly high cycling potential, to help prioritize investment in safe routes to school. The scenarios show the scale of transformation possible in school travel patterns: 'Going Dutch' would see over two-thirds of these children cycle to school, approaching the level observed in The Netherlands, higher than the 27% cycle mode share in an equivalent 'Go Dutch' scenario for cycling to work, implying that the potential uptake of cycling for travel to school could be even higher, as a percentage of trips, than the potential for cycling to work. This can be explained by the lower average trip distance of educational trips than commute trips.
+Among those travelling less than 15km, the current percentage of children cycling to school in England is 2.7%. Our model of cycling potential highlights areas and routes with particularly high cycling potential, to help prioritize investment in safe routes to school. The scenarios show the scale of transformation possible in school travel patterns: 'Going Dutch' would see over two-thirds of these children cycle to school, approaching the level observed in The Netherlands, higher than the 27% cycle mode share in an equivalent 'Go Dutch' scenario for cycling to work, implying that the potential uptake of cycling for travel to school could be even higher, as a percentage of trips, than the potential for cycling to work.
 
 ## Conclusion
 
