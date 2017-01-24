@@ -136,8 +136,8 @@ isTRUE(nrow(englandrf) == nrow(quiet_routes_england))
 #install.packages("Amelia")
 #library(Amelia)
 #missmap(englandrf@data)
-#dropcols = c("error_quiet","error_fast")
-#englandrf = englandrf[, !(names(englandrf) %in% dropcols)]
+dropcols = c("error_quiet","error_fast")
+englandrf = englandrf[, !(names(englandrf) %in% dropcols)]
 
 
 # trainforanna_idx = sample(seq_len(nrow(meltdf)), size=floor(0.5*nrow(meltdf)))
@@ -149,26 +149,29 @@ isTRUE(nrow(englandrf) == nrow(quiet_routes_england))
 # readr::write_csv(testforanna, "binary_50pc_england2.csv")
 
 
+
 ##############################################################################
 # SPLIT INTO TRAINING AND TEST SETS
-smp_size = floor(0.5*nrow(englandrf))
-set.seed(5)
-trainidx = sample(seq_len(nrow(englandrf)), size=smp_size)
-
-traindf = englandrf[trainidx,]
-testdf = englandrf[-trainidx,]
+# smp_size = floor(0.5*nrow(englandrf))
+# set.seed(5)
+# trainidx = sample(seq_len(nrow(englandrf)), size=smp_size)
+# 
+# traindf = englandrf[trainidx,]
+# testdf = englandrf[-trainidx,]
 ##############################################################################
 
+
 # TO USE THE FULL DATASET TO TRAIN
-# traindf = englandrf
+# Justification: point 3) here:  http://www.fharrell.com/2017/01/split-sample-model-validation.html
+traindf = englandrf
 
 traindf = traindf[complete.cases(traindf$CYCLE) & complete.cases(traindf$WALK) & complete.cases(traindf$CAR) & complete.cases(traindf$OTHER) & complete.cases(traindf$UNKNOWN) & complete.cases(traindf$distance_fast) & complete.cases(traindf$gradient_fast) & complete.cases(traindf$qdf), ]
 
 #traindf = as.data.frame(traindf)
 #names(traindf) = names(logitdf)
 
-if(!file.exists("private_data/meltdf_train.Rds")){
-#if(!file.exists("private_data/meltdf_full.Rds")){
+#if(!file.exists("private_data/meltdf_train.Rds")){
+if(!file.exists("private_data/meltdf_full.Rds")){
   meltdf = data.frame(matrix(NA, nrow=sum(traindf$TOTAL), ncol=8))
   names(meltdf) = c("CYCLE","WALK","CAR","OTHER","UNKNOWN","distance_fast","gradient_fast","qdf")
   jstart = 1
@@ -221,11 +224,11 @@ if(!file.exists("private_data/meltdf_train.Rds")){
     }
   }
   meltdf[is.na(meltdf)] = 0
-  saveRDS(meltdf, "private_data/meltdf_train.Rds")
-  #saveRDS(meltdf, "private_data/meltdf_full.Rds")
+  #saveRDS(meltdf, "private_data/meltdf_train.Rds")
+  saveRDS(meltdf, "private_data/meltdf_full.Rds")
   } else{
-    meltdf = readRDS("private_data/meltdf_train.Rds")
-    #meltdf = readRDS("private_data/meltdf_full.Rds")
+    #meltdf = readRDS("private_data/meltdf_train.Rds")
+    meltdf = readRDS("private_data/meltdf_full.Rds")
 }
 
 isTRUE(sum(meltdf[!is.na(meltdf$CYCLE), "CYCLE"]) == sum(traindf$CYCLE))
@@ -246,7 +249,7 @@ library(glmnet)
 #f = as.formula(~distance_fast+sqrt(distance_fast)+I(distance_fast^2)+gradient_fast+distance_fast:gradient_fast+sqrt(distance_fast):gradient_fast+I(distance_fast^(1/3))+qdf+0)
 # WITHOUT QDF
 #f = as.formula(~distance_fast+sqrt(distance_fast)+I(distance_fast^2)+gradient_fast+distance_fast:gradient_fast+sqrt(distance_fast):gradient_fast+I(distance_fast^(1/3))+0)
-f = as.formula(~distance_fast+I(distance_fast^(2))+I(distance_fast^(1/2))+gradient_fast+0)
+f = as.formula(~distance_fast+I(distance_fast^(2))+I(distance_fast^(1/2))+gradient_fast+distance_fast:gradient_fast+0)
 x = model.matrix(f, meltdf)
 # glmnet has standardize=T by default, so this is not required
 y = as.matrix(meltdf$CYCLE, ncol=1)
@@ -258,8 +261,8 @@ y = as.matrix(meltdf$CYCLE, ncol=1)
 #cl <- makeCluster(nodes)
 #registerDoParallel(cl)
 
-if(!file.exists("private_data/CV_models_train.Rdata")){
-#if(!file.exists("private_data/CV_models_full.Rdata")){
+#if(!file.exists("private_data/CV_models_train.Rdata")){
+if(!file.exists("private_data/CV_models_full.Rdata")){
   fitlasso = glmnet(x, y, family="binomial", alpha=1)
   fitridge = glmnet(x, y, family="binomial", alpha=0)
   fitelastic = glmnet(x, y, family="binomial", alpha=0.5)
@@ -272,11 +275,11 @@ if(!file.exists("private_data/CV_models_train.Rdata")){
     print(proc.time() - time1)
     cvmods = c(cvmods, paste("fit",i,sep=""))
   }
-  save(list=cvmods, file="private_data/CV_models_train.Rdata")
-  #save(list=cvmods, file="private_data/CV_models_full.Rdata")
+  #save(list=cvmods, file="private_data/CV_models_train.Rdata")
+  save(list=cvmods, file="private_data/CV_models_full.Rdata")
 } else{
-  load(file="private_data/CV_models_train.Rdata")
-  #load(file="private_data/CV_models_full.Rdata")
+  #load(file="private_data/CV_models_train.Rdata")
+  load(file="private_data/CV_models_full.Rdata")
 }
 #stopCluster(cl)
 
@@ -309,7 +312,7 @@ coef(fitelastic, s=fit5$lambda.min)
 # Fit a standard logistic regression, just for comparison
 # glm requires the formula with the intercept in, and the response variable:
 #f = as.formula(CYCLE~distance_fast+sqrt(distance_fast)+I(distance_fast^2)+gradient_fast+distance_fast:gradient_fast+sqrt(distance_fast):gradient_fast+I(distance_fast^(1/3)))
-f_ordinary = as.formula(CYCLE~distance_fast+I(distance_fast^(2))+I(distance_fast^(1/2))+gradient_fast)
+f_ordinary = as.formula(CYCLE~distance_fast+I(distance_fast^(2))+I(distance_fast^(1/2))+gradient_fast+distance_fast:gradient_fast)
 glm(f_ordinary, family=binomial(link="logit"), data=meltdf)
 
 # ##################################################################################################
@@ -506,8 +509,10 @@ if(testnow==TRUE){
 # 
 # traindf$pcycle_pred = predict(model, traindf@data, type="response")  #predict(model, list(wt=xvals), type="response")
 
+
 # TO PREDICT ON THE FULL DATA SET
-traindf = englandrf
+#traindf = englandrf
+
 
 # Predict on the dataframe of flows, not the binary-coded one.
 # Gradient and distance_fast variables are the same for both, so this is fine.
@@ -531,6 +536,8 @@ ggplot(traindf@data, aes(x=gradient_fast)) + geom_point(aes(y=pcycle)) + geom_sm
 
 
 
+##############################################################################################
+
 # Government scenario
 traindf$govtarget_slc = traindf$CYCLE + (traindf$pcycle_pred*traindf$TOTAL)
 # If GovTarget larger than number of commuters in flow, set to total number of commuters in flow
@@ -546,10 +553,43 @@ range(traindf$govtarget_sic)
 sum(traindf$CYCLE)
 sum(traindf$govtarget_slc)
 
+
+
+#############################################################################################
+# THE GODUTCH SCENARIO
+
+ntsdf = readr::read_csv("private_data/School_NTS_170121.csv", col_types = "iiidddd")
+# converting to factors is not required as model.matrix() will then convert to dummy variables, but they are already in that form
+#ntsdf$netherlands = as.factor(ntsdf$netherlands)
+#str(ntsdf)
+
+f_dutch_ordinary = as.formula(cycle~trip_distraw_km+trip_distraw_kmsqrt+trip_distraw_kmsq+netherlands)
+glm(f_dutch_ordinary, family=binomial(link="logit"), data=ntsdf, weight=hillweight)
+
+library(glmnet)
+f_dutch_reg = as.formula(~trip_distraw_km+trip_distraw_kmsqrt+trip_distraw_kmsq+netherlands+0)
+x_dutch = model.matrix(f_dutch_reg, ntsdf)
+y_dutch = as.matrix(ntsdf$cycle, ncol=1)
+weights = ntsdf$hillweight
+dutchelastic_cv = cv.glmnet(x_dutch, y_dutch, weights, type.measure = "auc", alpha=0.5, family="binomial", nfolds=10)
+
+dutchelastic = glmnet(x_dutch, y_dutch, family="binomial", weights, alpha=0.5)
+
+plotmo::plot_glmnet(dutchelastic)
+#plot(dutchelastic, xvar="dev")
+plot(dutchelastic_cv, main="Elastic Net")
+
+dutchcoef = coef(dutchelastic_cv, s="lambda.min")
+print(dutchcoef)
+dutchnesscoef = dutchcoef[dutchcoef@Dimnames[[1]]=="netherlands",]
+print(dutchnesscoef)
+
 # GoDutch scenario
 #traindf$pred_dutch = boot::inv.logit(boot::logit(traindf$pcycle_pred) + 4.838 + (0.9073*traindf$distance_fast)  + (-1.924*sqrt(traindf$distance_fast)))
 #traindf$pred_dutch = boot::inv.logit(boot::logit(traindf$pcycle_pred) + 3.682 + (0.3044*traindf$distance_fast))
-traindf$pred_dutch = boot::inv.logit(boot::logit(traindf$pcycle_pred) + 5.122)
+#traindf$pred_dutch = boot::inv.logit(boot::logit(traindf$pcycle_pred) + 5.122)
+#traindf$pred_dutch = boot::inv.logit(boot::logit(traindf$pcycle_pred) + dutchnesscoef) # 4.49885
+traindf$pred_dutch = boot::inv.logit(boot::logit(traindf$pcycle_pred) + 4.912)
 traindf$dutch_slc = traindf$pred_dutch*traindf$TOTAL
 sel = traindf$dutch_slc > traindf$TOTAL
 if(sum(sel) > 0){
@@ -564,7 +604,7 @@ if(sum(sel) > 0){
 traindf$dutch_sic = traindf$dutch_slc - traindf$CYCLE
 range(traindf$dutch_sic)
 
-
+#######################################################################################
 
 
 
@@ -573,7 +613,7 @@ range(traindf$dutch_sic)
 
 traindf$pred_govtarget = traindf$govtarget_slc/traindf$TOTAL
 
-ggplotdf = data.frame(Distance=traindf$distance_fast, Gradient=traindf$gradient_fast, Observed=traindf$pcycle, Model=c(traindf$pcycle_pred), GovTarget=c(traindf$pred_govtarget), GoDutch=c(traindf$pred_dutch))
+ggplotdf = data.frame(Distance=traindf$distance_fast, Gradient=traindf$gradient_fast, Observed=traindf$pcycle, Model=traindf$pcycle_pred, GovTarget=traindf$pred_govtarget, GoDutch=traindf$pred_dutch)
 meltggplotdistdf = ggplotdf[c("Distance","Observed","GovTarget","GoDutch","Model")]
 meltggplotdistdf = reshape2::melt(meltggplotdistdf, id.vars="Distance")
 meltggplotgraddf = ggplotdf[c("Gradient","Observed","GovTarget","GoDutch","Model")]
@@ -598,10 +638,16 @@ ggplot(traindf@data, aes(gradient_fast, pcycle_pred)) + geom_point() + geom_smoo
 isTRUE(nrow(traindf) == nrow(fast_routes_england))
 isTRUE(nrow(traindf) == nrow(quiet_routes_england))
 plot(traindf[5,])
-plot(fast_routes_england[5,], add = T)
-plot(quiet_routes_england[5,], add = T)
+plot(fast_routes_england[5,], col="red", add = T)
+plot(quiet_routes_england[5,], col="blue", add = T)
 
-saveRDS(traindf, "private_data/full_england_w_uptake_scenarios.Rds")
+
+#Amelia::missmap(traindf@data)
+#saveRDS(traindf, "private_data/l_national.Rds")
+
+
+
+
 
 
 #saveRDS(traindf[sample(seq_len(nrow(traindf)), size=1000),], "private_data/full_england_w_uptake_scenarios_1000.Rds")
