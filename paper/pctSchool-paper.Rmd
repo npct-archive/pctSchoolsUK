@@ -217,18 +217,27 @@ with the $L_1$ and $L_2$ regularisation terms equally weighted and included in t
 
 This model provides a baseline probability for cycling for a given route distance and gradient, as shown in the figures below
 
-```{r, echo=FALSE, fig.cap="The fraction of commuting pupils choosing to cycle to school, as a function of the commute distance (via the fastest route network-level path) and the gradient of the path.", fig.align='center', out.width="49%", fig.show='hold'}
-#par(mfrow=c(1,2))
-ggplot(traindf@data, aes(x=distance_fast)) + geom_smooth(aes(y=pcycle, col="red")) + geom_smooth(aes(y=pcycle_pred))
-ggplot(traindf@data, aes(x=gradient_fast)) + geom_smooth(aes(y=pcycle, col="red")) + geom_smooth(aes(y=pcycle_pred))
+<!-- ```{r, echo=FALSE, fig.cap="The fraction of commuting pupils choosing to cycle to school, as a function of the commute distance (via the fastest route network-level path) and the gradient of the path.", fig.align='center', out.width="49%", fig.show='hold'} -->
+<!-- #par(mfrow=c(1,2)) -->
+<!-- ggplot(traindf@data, aes(x=distance_fast)) + geom_smooth(aes(y=pcycle, col="red")) + geom_smooth(aes(y=pcycle_pred)) -->
+<!-- ggplot(traindf@data, aes(x=gradient_fast)) + geom_smooth(aes(y=pcycle, col="red")) + geom_smooth(aes(y=pcycle_pred)) -->
+<!-- ``` -->
+
+```{r modeldistance, echo=FALSE, out.width="49%", fig.show='hold', fig.cap="The modelled vs observed cycling percentages, as a function of distance.", fig.align='center', eval=TRUE}
+knitr::include_graphics(c("figures/data_model_distance.png", "figures/data_model_scatter_distance.png"))
 ```
+
 
 The model fit along with the data points are shown below
 
-```{r, echo=FALSE, fig.cap="The modelling fit to cycling prevalence, as a function of the fastest route network-level commute distance and the gradient of the path.", fig.align='center', out.width="49%", fig.show='hold'}
-#par(mfrow=c(1,2))
-ggplot(traindf@data, aes(x=distance_fast)) + geom_point(aes(y=pcycle)) + geom_smooth(aes(y=pcycle, col="red")) + geom_smooth(aes(y=pcycle_pred))
-ggplot(traindf@data, aes(x=gradient_fast)) + geom_point(aes(y=pcycle)) + geom_smooth(aes(y=pcycle, col="red")) + geom_smooth(aes(y=pcycle_pred))
+<!-- ```{r, echo=FALSE, fig.cap="The modelling fit to cycling prevalence, as a function of the fastest route network-level commute distance and the gradient of the path.", fig.align='center', out.width="49%", fig.show='hold'} -->
+<!-- #par(mfrow=c(1,2)) -->
+<!-- ggplot(traindf@data, aes(x=distance_fast)) + geom_point(aes(y=pcycle)) + geom_smooth(aes(y=pcycle, col="red")) + geom_smooth(aes(y=pcycle_pred)) -->
+<!-- ggplot(traindf@data, aes(x=gradient_fast)) + geom_point(aes(y=pcycle)) + geom_smooth(aes(y=pcycle, col="red")) + geom_smooth(aes(y=pcycle_pred)) -->
+<!-- ``` -->
+
+```{r modelgradient, echo=FALSE, out.width="49%", fig.show='hold', fig.cap="The modelled vs observed cycling percentages, as a function of gradient.", fig.align='center', eval=TRUE}
+knitr::include_graphics(c("figures/data_model_gradient.png", "figures/data_model_scatter_gradient.png"))
 ```
 
 
@@ -250,13 +259,23 @@ We modelled two potential uptake scenarios: the UK Government Target of doubling
 
 Incorporating these two scenarios into the logistic regression model, the following uptake distance (and gradient) decay curves can be obtained
 
-```{r, echo=FALSE, fig.cap="The fraction of commuting pupils choosing to cycle to school observed, the model fit to the data, and the Government Target and Go Dutch scenario projections, as a function of the fastest route network commute distance and the gradient of the path.", fig.align='center', out.width="49%", fig.show='hold'}
-#par(mfrow=c(1,2))
-ggplot(meltggplotdistdf, aes(x=Distance, y=value, color=variable)) + geom_smooth()
-ggplot(meltggplotgraddf, aes(x=Gradient, y=value, color=variable)) + geom_smooth()
-#ggplot(meltggplotdistdf, aes(distance, pcycle)) + geom_point(alpha=0.5, size=1, shape=21, na.rm = T) + geom_smooth(na.rm = T) + xlim(0,15000)
+<!-- ```{r, echo=FALSE, fig.cap="The fraction of commuting pupils choosing to cycle to school observed, the model fit to the data, and the Government Target and Go Dutch scenario projections, as a function of the fastest route network commute distance and the gradient of the path.", fig.align='center', out.width="49%", fig.show='hold'} -->
+<!-- #par(mfrow=c(1,2)) -->
+<!-- ggplot(meltggplotdistdf, aes(x=Distance, y=value, color=variable)) + geom_smooth() -->
+<!-- ggplot(meltggplotgraddf, aes(x=Gradient, y=value, color=variable)) + geom_smooth() -->
+<!-- #ggplot(meltggplotdistdf, aes(distance, pcycle)) + geom_point(alpha=0.5, size=1, shape=21, na.rm = T) + geom_smooth(na.rm = T) + xlim(0,15000) -->
+<!-- ``` -->
+
+
+```{r uptakedistanceplot, echo=FALSE, out.width="49%", fig.show='hold', fig.cap="The cycling percentages observed, modelled, and projected under the Government Target and Go Dutch scenarios, as a function of distance.", fig.align='center', eval=TRUE}
+knitr::include_graphics("figures/uptake_distance.png")
 ```
 
+
+
+```{r uptakegradientplot, echo=FALSE, out.width="49%", fig.show='hold', fig.cap="The cycling percentages observed, modelled, and projected under the Government Target and Go Dutch scenarios, as a function of gradient.", fig.align='center', eval=TRUE}
+knitr::include_graphics("figures/uptake_gradient.png")
+```
 
 
 

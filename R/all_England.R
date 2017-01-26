@@ -117,12 +117,12 @@ englandrf = englandrf[sel, ]
 nrow(englandrf)
 
 
-ggplot(englandrf@data, aes(distance_fast, pcycle)) + geom_point(alpha=0.5, size=1, shape=21, na.rm = T) + geom_smooth(na.rm = T) + xlim(0,15)
-ggplot(englandrf@data, aes(distance_quiet, pcycle)) + geom_point(alpha=0.5, size=1, shape=21, na.rm = T) + geom_smooth(na.rm = T) + xlim(0,15)
-
+# Just smooth fits to the raw pcycle vs dist/grad data
+#ggplot(englandrf@data, aes(distance_fast, pcycle)) + geom_point(alpha=0.3, size=1, shape=1, na.rm = T) + geom_smooth(na.rm = T) + xlim(0,15)
+#ggplot(englandrf@data, aes(distance_quiet, pcycle)) + geom_point(alpha=0.3, size=1, shape=1, na.rm = T) + geom_smooth(na.rm = T) + xlim(0,15)
 
 englandrf$qdf = englandrf$distance_quiet/englandrf$distance_fast
-ggplot(englandrf@data, aes(qdf, pcycle)) + geom_point(alpha=0.5, size=1, shape=21, na.rm = T) #+ geom_smooth(na.rm = T)# + xlim(0,15)
+ggplot(englandrf@data, aes(qdf, pcycle)) + geom_point(alpha=0.3, size=1, shape=1, na.rm = T) #+ geom_smooth(na.rm = T)# + xlim(0,15)
 
 
 
@@ -138,6 +138,18 @@ isTRUE(nrow(englandrf) == nrow(quiet_routes_england))
 #missmap(englandrf@data)
 dropcols = c("error_quiet","error_fast")
 englandrf = englandrf[, !(names(englandrf) %in% dropcols)]
+
+
+# Create the columns necessary for plotting bins of average values within each bin
+#tapply(englandrf$pcycle, cut(englandrf$gradient_fast, breaks = seq(min(englandrf$gradient_fast), max(englandrf$gradient_fast))), length)
+#tapply(englandrf$pcycle, cut(englandrf$gradient_fast, breaks = seq(-1, 8)), mean)
+#tapply(englandrf$pcycle, cut(englandrf$gradient_fast, breaks = seq(-1, 8), labels=seq(0,8)), mean)
+englandrf$gradbins = cut(englandrf$gradient_fast, breaks = seq(-1, 8), labels=seq(0,8))
+
+#tapply(englandrf$pcycle, cut(englandrf$distance_fast, breaks = seq(min(englandrf$distance_fast), max(englandrf$distance_fast))), length)
+#tapply(englandrf$pcycle, cut(englandrf$distance_fast, breaks = seq(0, 14)), mean)
+#tapply(englandrf$pcycle, cut(englandrf$distance_fast, breaks = seq(0, 14), labels=seq(1,14)), mean)
+englandrf$distbins = cut(englandrf$distance_fast, breaks = seq(0, 14), labels=seq(1,14))
 
 
 # trainforanna_idx = sample(seq_len(nrow(meltdf)), size=floor(0.5*nrow(meltdf)))
@@ -528,11 +540,60 @@ traindf$pcycle_pred = predict(fitelastic, s=fit5$lambda.min, xpred, type="respon
 #ggplot(residuals, aes(x=Predicted, y=Residual)) + geom_point() + geom_hline(yintercept = 0, col="red") + stat_smooth(method="lm", linetype=2, se=FALSE)
 
 
-ggplot(traindf@data, aes(x=distance_fast)) + geom_smooth(aes(y=pcycle, col="red")) + geom_smooth(aes(y=pcycle_pred))
-ggplot(traindf@data, aes(x=gradient_fast)) + geom_smooth(aes(y=pcycle, col="red")) + geom_smooth(aes(y=pcycle_pred))
 
-ggplot(traindf@data, aes(x=distance_fast)) + geom_point(aes(y=pcycle)) + geom_smooth(aes(y=pcycle, col="red")) + geom_smooth(aes(y=pcycle_pred))
-ggplot(traindf@data, aes(x=gradient_fast)) + geom_point(aes(y=pcycle)) + geom_smooth(aes(y=pcycle, col="red")) + geom_smooth(aes(y=pcycle_pred))
+datmoddistscatterplot = ggplot(traindf@data, aes(x=distance_fast)) +
+  geom_point(aes(y=pcycle), shape=1, alpha=0.3) +
+  geom_smooth(aes(y=pcycle, colour="Observed")) +
+  geom_smooth(aes(y=pcycle_pred, colour="Modelled")) +
+  scale_color_manual("", breaks=c("Observed","Modelled"), values=c("blue","red")) +
+  xlab("Distance (km, fastest route)") +
+  ylab("% children cycling to school")
+
+print(datmoddistscatterplot)
+ggsave(plot=datmoddistscatterplot, filename = "paper/figures/data_model_scatter_distance.png")
+
+
+datmodgradscatterplot = ggplot(traindf@data, aes(x=gradient_fast)) +
+  geom_point(aes(y=pcycle), shape=1, alpha=0.3) +
+  geom_smooth(aes(y=pcycle, colour="Observed")) +
+  geom_smooth(aes(y=pcycle_pred, colour="Modelled")) +
+  scale_color_manual("", breaks=c("Observed","Modelled"), values=c("blue","red")) +
+  xlab("Route gradient (average %, fastest route)") +
+  ylab("% children cycling to school")
+
+print(datmodgradscatterplot)
+ggsave(plot=datmodgradscatterplot, filename="paper/figures/data_model_scatter_gradient.png")
+
+
+
+
+#ggplot(traindf@data, aes(x=distance_fast)) + geom_smooth(aes(y=pcycle, col="red")) + geom_smooth(aes(y=pcycle_pred))
+datmoddistplot = ggplot(traindf@data[!is.na(traindf$distbins),], aes(x=distbins)) +
+  stat_summary(aes(y=100*pcycle, group=1, colour="Observed"), fun.y=mean, geom="line", size=1) +
+  stat_summary(aes(y=100*pcycle_pred, group=1, colour="Modelled"), fun.y=mean, geom="line", size=1) +
+  scale_color_manual("", breaks=c("Observed","Modelled"), values=c("blue","red")) +
+  xlab("Distance (km, fastest route)") +
+  ylab("% children cycling to school")
+
+print(datmoddistplot)
+ggsave(plot=datmoddistplot, filename = "paper/figures/data_model_distance.png")
+
+
+# https://stackoverflow.com/questions/33150915/ggplot-plotting-the-bins-on-x-axis-and-the-average-on-y-axis
+
+#ggplot(traindf@data, aes(x=gradient_fast)) + geom_smooth(aes(y=pcycle, col="red")) + geom_smooth(aes(y=pcycle_pred))
+datmodgradplot = ggplot(traindf@data[!is.na(traindf$gradbins),], aes(x=gradbins)) +
+  stat_summary(aes(y=100*pcycle, group=1, colour="Observed"), fun.y=mean, geom="line", size=1) +
+  stat_summary(aes(y=100*pcycle_pred, group=1, colour="Modelled"), fun.y=mean, geom="line", size=1) +
+  scale_color_manual("", breaks=c("Observed","Modelled"), values=c("blue","red")) +
+  xlab("Route gradient (average %, fastest route)") +
+  ylab("% children cycling to school")
+
+print(datmodgradplot)
+ggsave(plot=datmodgradplot, filename="paper/figures/data_model_gradient.png")
+
+
+
 
 
 
@@ -613,25 +674,51 @@ range(traindf$dutch_sic)
 
 traindf$pred_govtarget = traindf$govtarget_slc/traindf$TOTAL
 
+
+
+
 ggplotdf = data.frame(Distance=traindf$distance_fast, Gradient=traindf$gradient_fast, Observed=traindf$pcycle, Model=traindf$pcycle_pred, GovTarget=traindf$pred_govtarget, GoDutch=traindf$pred_dutch)
 meltggplotdistdf = ggplotdf[c("Distance","Observed","GovTarget","GoDutch","Model")]
 meltggplotdistdf = reshape2::melt(meltggplotdistdf, id.vars="Distance")
 meltggplotgraddf = ggplotdf[c("Gradient","Observed","GovTarget","GoDutch","Model")]
 meltggplotgraddf = reshape2::melt(meltggplotgraddf, id.vars="Gradient")
 
-ggplot(meltggplotdistdf, aes(x=Distance, y=value, color=variable)) + geom_smooth()
-ggplot(meltggplotgraddf, aes(x=Gradient, y=value, color=variable)) + geom_smooth()
+#ggplot(meltggplotgraddf, aes(x=Gradient, y=value, color=variable)) + geom_smooth()
 
 
 
+
+
+meltggplotdistdf$distbins = cut(meltggplotdistdf$Distance, breaks = seq(-1, 8), labels=seq(0,8))
+meltggplotgraddf$gradbins = cut(meltggplotgraddf$Gradient, breaks = seq(0, 14), labels=seq(1,14))
+
+#ggplot(meltggplotdistdf, aes(x=Distance, y=value, color=variable)) + geom_smooth()
+uptakesdistplot = ggplot(meltggplotdistdf[!is.na(meltggplotdistdf$distbins),]) +
+  stat_summary(aes(x=distbins, y=100*value, color=variable, group=variable), fun.y=mean, geom="line", size=1) +
+  xlab("Distance (km, fastest route)") + 
+  ylab("% children cycling to school") +
+  labs(colour="")
+
+print(uptakesdistplot)
+ggsave(plot=uptakesdistplot, filename = "paper/figures/uptake_distance.png")
+
+
+uptakesgradplot = ggplot(meltggplotgraddf[!is.na(meltggplotgraddf$gradbins),]) +
+  stat_summary(aes(x=gradbins, y=100*value, color=variable, group=variable), fun.y=mean, geom="line", size=1) +
+  xlab("Route gradient (average %, fastest route)") + 
+  ylab("% children cycling to school") +
+  labs(colour="")
+
+print(uptakesgradplot)
+ggsave(plot=uptakesgradplot, filename = "paper/figures/uptake_gradient.png")
 
 
 ggplot(traindf@data, aes(distance_fast, pcycle)) + geom_point(alpha=0.5, size=1, shape=21, na.rm = T)
 
-ggplot(traindf@data, aes(distance_fast, gradient_fast)) + geom_point()
+ggplot(traindf@data, aes(distance_fast, gradient_fast)) + geom_point(shape=1, alpha=0.3)
 
-ggplot(traindf@data, aes(distance_fast, pcycle_pred)) + geom_point() + geom_smooth() #+ geom_point(aes(y=pcycle))
-ggplot(traindf@data, aes(gradient_fast, pcycle_pred)) + geom_point() + geom_smooth() #+ geom_point(aes(y=pcycle))
+ggplot(traindf@data, aes(distance_fast, pcycle_pred)) + geom_point(shape=1, alpha=0.3) + geom_smooth() #+ geom_point(aes(y=pcycle))
+ggplot(traindf@data, aes(gradient_fast, pcycle_pred)) + geom_point(shape=1, alpha=0.3) + geom_smooth() #+ geom_point(aes(y=pcycle))
 
 
 # make sure that the desire lines (and uptake projections), the fastest route network, and the quiet route network flows, all match up
