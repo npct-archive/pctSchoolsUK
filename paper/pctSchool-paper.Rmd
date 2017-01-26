@@ -211,7 +211,10 @@ knitr::kable(temp[1:10,])
 Following the model fitting and uptake scenario modelling in [@lovelace_propensity_2016], we have fit an (elastic net) regularised logistic regression model to the school commuting data, obtaining the fits shown in (FIGURES), with a model and regression coefficients as follows
 
 $$
-P(y_i = 1) = \mathrm{logit}^{-1} \left( \beta_1 d_i +\beta_2 d_i^{1/2} + \beta_3 d_i^2 + \beta_4 g_i + \beta_5 d_i g_i + \beta_6 d_i^{1/2} g_i + \beta_7 d_i^{1/3} + \beta_8 q_i \right)
+P(y_i = 1) = \mathrm{logit}^{-1} \
+left(
+\beta_1 d_i + \beta_2 d_i^{1/2} + \beta_3 d_i^2 + \beta_4 g_i + \beta_5 d_i g_i 
+\right)
 $$
 with the $L_1$ and $L_2$ regularisation terms equally weighted and included in the optimisation, and where $y_i$ is a binary-valued response equal to 1 when the pupil performed his/her school commute by cycling, $d_i$ is the route length in kilometres, $g_i$ is the gradient of the route measured in (UNITS), and $q_i$ is the quietness diversion factor (the ratio of the length of the quiet route divided by the length of the fast route).
 
