@@ -66,7 +66,7 @@ if(!run_code) {
 
 Active travel to school offers many benefits across a range of policy objectives. From a public health perspective it contributes to the physical and mental wellbeing of new generations [@oja_health_2011]. Active travel to school also has environmental benefits, in the form of reduced motorised traffic, improved air quality and reduced greenhouse gas emissions [@singleton_gis_2014]. 
 <!-- A knock-on health co-benefit reduced levels of danger of road traffic casualties resulting from the reduction in road traffic. -->
-From an education perspective, physical and mental barriers to educational success can be reduced by physical activity, and there is evidence to suggest that increased levels of physical activity can improve student learning [@shephard_required_1984, @sallis_effects_1999].
+From an education perspective, physical and mental barriers to educational success can be reduced by physical activity, and there is evidence to suggest that increased levels of physical activity can improve student learning [@shephard_required_1984;@sallis_effects_1999].
 
 In terms of health, regular exercise has multiple, mutually reinforcing benefits^[There are of course risks that come with cycling, which likely vary with the level of training and cycling proficiency [@teyhan_impact_2016, @tetali_road_2016], however we will not discuss those here.]. Over the space of a lifetime habitual physical activity reduces the risk of common causes of death, including heart disease and diabetes. In addition to mitigating health risks, the benefits of regular physical activity also include increased aerobic capacity, muscle and bone strength, flexibility, insulin sensitivity, and healthier blood lipid profiles; as well as reduced stress, anxiety, and depression. Heart health in particular benefits from exercise, and the benefits of active transport (e.g. walking or cycling) to school on heart health have been specifically studied before [@pate_promoting_2006, @sleap_are_1993]. In a more general context, the impact of childhood obesity intervention programmes (including increased physical activity) on health as measured by blood lipid levels has also been studied and found to be positive [@cai_effect_2014]. The impact of regular physical activity on pupils' mental health is harder to quantitatively ascertain, though studies in this direction give tentative indications pointing to a positive impact as well [@biddle_physical_2011, @ahn_meta-analysis_2011]. These health benefits are possibly further enhanced by an observed correlation between active transport to school and overall higher levels of physical activity [@cooper_commuting_2003, @cooper_physical_2005], if such a correlation proved to be causal.
 
@@ -211,10 +211,7 @@ knitr::kable(temp[1:10,])
 Following the model fitting and uptake scenario modelling in [@lovelace_propensity_2016], we have fit an (elastic net) regularised logistic regression model to the school commuting data, obtaining the fits shown in (FIGURES), with a model and regression coefficients as follows
 
 $$
-P(y_i = 1) = \mathrm{logit}^{-1} \
-left(
-\beta_1 d_i + \beta_2 d_i^{1/2} + \beta_3 d_i^2 + \beta_4 g_i + \beta_5 d_i g_i 
-\right)
+P(y_i = 1) = \mathrm{logit}^{-1} \left( \beta_1 d_i + \beta_2 d_i^{1/2} + \beta_3 d_i^2 + \beta_4 g_i + \beta_5 d_i g_i \right)
 $$
 with the $L_1$ and $L_2$ regularisation terms equally weighted and included in the optimisation, and where $y_i$ is a binary-valued response equal to 1 when the pupil performed his/her school commute by cycling, $d_i$ is the route length in kilometres, $g_i$ is the gradient of the route measured in (UNITS), and $q_i$ is the quietness diversion factor (the ratio of the length of the quiet route divided by the length of the fast route).
 
