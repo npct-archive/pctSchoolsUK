@@ -22,12 +22,30 @@ names(cents_lsoa_leeds) = c("geo_code",                 "geo_label")
 saveRDS(cents_lsoa_leeds, "pctSchoolsApp/c.Rds")
 
 las_leeds = las[cents_lsoa_leeds,]
-lsoas = raster::shapefile("private_data/Lower_Layer_Super_Output_Areas_December_2011_Full_Clipped__Boundaries_in_England_and_Wales_SIMPLIFIED/Lower_Layer_Super_Output_Areas_December_2011_Full_Clipped__Boundaries_in_England_and_Wales.shp")
+download.file("http://geoportal.statistics.gov.uk/datasets/da831f80764346889837c72508f046fa_3.zip",
+              "lsoas.zip")
+unzip("lsoas.zip", exdir = "private_data/")
+lsoas = raster::shapefile("private_data/Lower_Layer_Super_Output_Areas_December_2011_Super_Generalised_Clipped__Boundaries_in_England_and_Wales.shp")
 lsoas = spTransform(lsoas, proj4string(cents_lsoa))
-lsoas_leeds = lsoas[cents_lsoa_leeds,]
-lsoas_leeds@data = over(lsoas_leeds, cents_lsoa_leeds)
+summary(cents_lsoa_leeds$geo_code %in% lsoas$lsoa11cd)
+lsoas@data = rename(lsoas@data, geo_code = lsoa11cd)
+lsoas = lsoas[grep("E", lsoas$geo_code),]
+
+# get 2001 lsoas
+u2001 = "http://geoportal.statistics.gov.uk/datasets/90e15daaaeef4baa877f4bffe01ebef0_2.zip"
+download.file(u2001, "lsoa2001.zip")
+unzip("lsoa2001.zip", exdir = "private_data/")
+lsoas_2001 = raster::shapefile("private_data/Lower_Layer_Super_Output_Areas_December_2001_Generalised_Clipped_Boundaries_in_England_and_Wales.shp")
+lsoas_2001@data = rename(lsoas_2001@data, geo_code = lsoa01cd)
+lsoas_2001 = lsoas_2001[grep("E", lsoas$geo_code),]
+
+# subset by cents code name
+lsoas_leeds = lsoas[lsoas$geo_code %in% cents_lsoa_leeds$geo_code,]
+# subset by name
+lsoas_leeds = lsoas[grepl("Leeds", lsoas$lsoa11nm),]
+
 mapview::mapview(lsoas_leeds)
-ldf = l@data
+ldf = l_nat@data
 lsoa_data = ldf %>% group_by(LSOA) %>% 
   summarise(
     all = sum(TOTAL),
@@ -39,7 +57,6 @@ lsoa_data = ldf %>% group_by(LSOA) %>%
   )
 
 lsoa_data = rename(lsoa_data, geo_code = LSOA)
-lsoas_leeds@data = rename(lsoas_leeds@data, geo_code = LSOA11CD)
 # convert matrices to numerics
 unmatrix_df = function(df){
   for(i in 1:ncol(df)){
@@ -53,6 +70,16 @@ nrow(lsoa_newdat) # left join keeps all rows
 summary(lsoas_leeds$geo_code == lsoa_newdat$geo_code)
 lsoas_leeds@data = lsoa_newdat
 qtm(lsoas_leeds, "all")
+
+# explore missing LSOAs
+(lsoa_missing = lsoas_leeds$geo_code[is.na(lsoas_leeds$bicycle)]) 
+lsoa_missing %in% l_nat$LSOA
+# check in original data
+s11 = readr::read_tsv(file = "private_data/Spring_Census_2011.txt")
+summary({lmissing_orig = lsoas_leeds$geo_code %in% s11$LLSOA_SPR11}) # 42 missing
+summary(lsoas$geo_code %in% s11$LLSOA_SPR11)
+summary(lsoas_2001$geo_code %in% s11$LLSOA_SPR11)
+(lsoas_leeds$geo_code[lmissing_orig & is.na(lsoas_leeds$all)])
 saveRDS(lsoas_leeds, "pctSchoolsApp/z.Rds")
 
 # l = readRDS("private_data/Data_to_be_subset_for_Shiny_app.Rds")
