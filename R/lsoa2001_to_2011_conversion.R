@@ -46,9 +46,41 @@ s11new_m = s11new %>% filter(CHGIND=="M") %>%
 #   group_by_(.dots=c("LSOA11CD","URN_SPR11")) %>%
 #   summarise(TOTAL=first(TOTAL), CAR=first(CAR), CYCLE=first(CYCLE), WALK=first(WALK), OTHER=first(OTHER), UNKNOWN=first(UNKNOWN))
 
+
+integerSplit = function(intgr, parts){
+  if(intgr==0){
+    partition = rep(0,parts)
+  }
+  if(intgr==1){
+    #print(intgr)
+    #print(parts)
+    partition = c(1, rep(0, parts-1))
+    partition = sample(partition, replace = F, size=length(partition))
+  }else if((intgr!=1) & (parts==1)){
+    partition = intgr
+  }else if((intgr !=1) & (parts>1)){
+    partitions = partitions::restrictedparts(intgr, parts, decreasing=T)
+    partition = partitions[,ncol(partitions)]
+  }
+  partition = as.integer(partition)
+  #if(!is.integer(partition))
+  #  print(paste0(intgr, parts, partition))
+  if(length(partition) > parts)
+    print(paste(partition, parts))
+  #return(data.frame(partition))
+  return(as.numeric(partition))
+}
+
+#integerSplit = Vectorize(integerSplit)
+
+# http://stat545.com/block023_dplyr-do.html
+s2 = s11new_s %>% group_by_(.dots=c("LSOA11CD","URN_SPR11")) %>% do(TOTAL=integerSplit(.$TOTAL,length(.$TOTAL)), CAR=integerSplit(.$CAR,length(.$CAR)), CYCLE=integerSplit(.$CYCLE,length(.$CYCLE)), WALK=integerSplit(.$WALK,length(.$WALK)), OTHER=integerSplit(.$OTHER,length(.$OTHER)), UNKNOWN=integerSplit(.$UNKNOWN,length(.$UNKNOWN)))
+#s11new_s %>% group_by_(.dots=c("LSOA11CD","URN_SPR11")) %>% do(integerSplit(.$TOTAL,length(.$TOTAL)), integerSplit(.$CAR,length(.$CAR)), integerSplit(.$CYCLE,length(.$CYCLE)), integerSplit(.$WALK,length(.$WALK)), integerSplit(.$OTHER,length(.$OTHER)), integerSplit(.$UNKNOWN,length(.$UNKNOWN)))
+
+
 s11new_s = s11new  %>% filter(CHGIND=="S") %>%
   group_by_(.dots=c("LSOA11CD","URN_SPR11")) %>%
-  summarise(TOTAL=round(first(TOTAL)/n()), CAR=round(first(CAR)/n()), CYCLE=round(first(CYCLE)/n()), WALK=round(first(WALK)/n()), OTHER=round(first(OTHER)/n()), UNKNOWN=round(first(UNKNOWN)/n()))
+  summarise(TOTAL=floor(first(TOTAL)/n()), CAR=floor(first(CAR)/n()), CYCLE=floor(first(CYCLE)/n()), WALK=floor(first(WALK)/n()), OTHER=floor(first(OTHER)/n()), UNKNOWN=floor(first(UNKNOWN)/n()))
 
 
 
@@ -96,30 +128,6 @@ sum(s11$TOTAL)-sum(s11new2$TOTAL)
 # partitions = partitions::restrictedparts(5,3, decreasing=T)
 # partitions[,ncol(partitions)]
 # 
-# integerSplit = function(intgr, parts){
-#   if(intgr==0){
-#     partition = rep(0,parts)
-#   }
-#   if(intgr==1){
-#     partition = c(1, rep(0, parts-1))
-#     partition = sample(partition, replace = F, size=length(partition))
-#   }else if((intgr!=1) & (parts==1)){
-#     partition = intgr
-#   }else if((intgr !=1) & (parts>1)){
-#     partitions = partitions::restrictedparts(intgr, parts, decreasing=T)
-#     partition = partitions[,ncol(partitions)]
-#   }
-#   partition = as.integer(partition)
-#   #if(!is.integer(partition))
-#   #  print(paste0(intgr, parts, partition))
-#   if(length(partition) > parts)
-#     print(paste(partition, parts))
-#   return(partition)
-# }
-# 
-# integerSplit = Vectorize(integerSplit)
-# # http://stat545.com/block023_dplyr-do.html
-# s11new_s %>% group_by_(.dots=c("LSOA01CD","URN_SPR11")) %>% do(TOTAL=integerSplit(.$TOTAL,nrow(.$TOTAL)), CAR=integerSplit(.$CAR,nrow(.$CAR)), CYCLE=integerSplit(.$CYCLE,nrow(.$CYCLE)), WALK=integerSplit(.$WALK,nrow(.$WALK)), OTHER=integerSplit(.$OTHER,nrow(.$OTHER)), UNKNOWN=integerSplit(.$UNKNOWN,nrow(.$UNKNOWN)))
 # s11new_s %>% group_by_(.dots=c("LSOA01CD","URN_SPR11")) %>% do(TOTAL=integerSplit(first(.$TOTAL),nrow(.$TOTAL)))
 # s11new_s %>% group_by_(.dots=c("LSOA01CD","URN_SPR11")) %>% do(TOTAL=partitions::restrictedparts(first(.$TOTAL), tally(.$TOTAL), decreasing=T)[,1])
 # s11new_s %>% group_by_(.dots=c("LSOA11CD","LSOA11CD","URN_SPR11")) %>% mutate(TOTAL=n())
