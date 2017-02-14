@@ -1,3 +1,6 @@
+library(ggplot2)
+library(dplyr)
+
 # Aim: subset the data to a region
 
 #setwd("/home/geoif/pct/pctSchoolsUK")
@@ -54,37 +57,42 @@ if(!exists("sld11"))
 # BASELINE MODEL FITTING FOR ENGLAND
 
 # See ?stplanr::route_cyclestreet for methods to save and use Cyclestreets API key
-if(!file.exists("private_data/rf_england_schools.Rds") | !file.exists("private_data/rq_england_schools.Rds")){
+
+# READ IN THE ROUTES FROM THE ORIGINAL DATA SET WHERE WE MISIDENTIFIED THE LSOAS AS BEING 2011 WHEN THEY WERE IN FACT 2001
+# THIS DOESN'T MATTER AS ALL THIS WILL DO IS THAT LINES WHICH DON'T MATCH WITH THE 2011 CENTROIDS WILL BE DROPPED SO THERE WILL BE A SLIGHT LOSS OF DATA
+# WE USE THIS ONLY TO TRAIN THE MODEL, AND THIS HAS INTEGER FLOWS AS REQUIRED FOR THAT
+# AT THE END WE WILL PREDICT ON THE CORRECTLY CONVERTED 2011 LSOAS WITH NON-INTEGER FLOWS (FROM LSOAS WHICH SPLIT 2001-->2011) AND THIS IS THE FINAL, CORRECT OUTPUT
+if(!file.exists("private_data/rf_england_schools.Rds")){
   # , base_url="http://pct.cyclestreets.net/api/"
   fast_routes_england = line2route(l = flow, route_fun = route_cyclestreet, plan = "fastest", n_processes = 10, base_url="http://pct.cyclestreets.net/api/")
   saveRDS(fast_routes_england, "private_data/rf_england_schools.Rds")
-  quiet_routes_england = line2route(l = flow, route_fun = route_cyclestreet, plan = "quietest", n_processes = 10, base_url="http://pct.cyclestreets.net/api/")
-  saveRDS(quiet_routes_england, "private_data/rq_england_schools.Rds")
+  #quiet_routes_england = line2route(l = flow, route_fun = route_cyclestreet, plan = "quietest", n_processes = 10, base_url="http://pct.cyclestreets.net/api/")
+  #saveRDS(quiet_routes_england, "private_data/rq_england_schools.Rds")
 } else{
   fast_routes_england = readRDS("private_data/rf_england_schools.Rds")
-  quiet_routes_england = readRDS("private_data/rq_england_schools.Rds")
+  #quiet_routes_england = readRDS("private_data/rq_england_schools.Rds")
 }
 
 
 #plot(las); plot(flow, col="blue", add=T); plot(fast_routes_england, col="red", add = T)
 
-summary(fast_routes_england$length)
-summary(quiet_routes_england$length)
-
-mean(fast_routes_england$length, na.rm=TRUE)
-sd(fast_routes_england$length, na.rm=TRUE)
-IQR(fast_routes_england$length, na.rm=TRUE)
-
-mean(quiet_routes_england$length, na.rm=TRUE)
-sd(quiet_routes_england$length, na.rm=TRUE)
-IQR(quiet_routes_england$length, na.rm=TRUE)
-
-boxplot(quiet_routes_england$length, fast_routes_england$length)
-
-violindf1 = data.frame(Type="Quiet", Length=quiet_routes_england$length)
-violindf2 = data.frame(Type="Fast", Length=fast_routes_england$length)
-violindf = rbind(violindf1, violindf2)
-#violindf = data.frame(fast_routes_england)
+# summary(fast_routes_england$length)
+# summary(quiet_routes_england$length)
+# 
+# mean(fast_routes_england$length, na.rm=TRUE)
+# sd(fast_routes_england$length, na.rm=TRUE)
+# IQR(fast_routes_england$length, na.rm=TRUE)
+# 
+# mean(quiet_routes_england$length, na.rm=TRUE)
+# sd(quiet_routes_england$length, na.rm=TRUE)
+# IQR(quiet_routes_england$length, na.rm=TRUE)
+# 
+# boxplot(quiet_routes_england$length, fast_routes_england$length)
+# 
+# violindf1 = data.frame(Type="Quiet", Length=quiet_routes_england$length)
+# violindf2 = data.frame(Type="Fast", Length=fast_routes_england$length)
+# violindf = rbind(violindf1, violindf2)
+# #violindf = data.frame(fast_routes_england)
 
 # Mode = function(x) {
 #   ux = unique(x)
@@ -94,21 +102,23 @@ violindf = rbind(violindf1, violindf2)
 #hist(quiet_routes_england$length)
 #hist(fast_routes_england$length)
 
-library(ggplot2)
-ggplot(violindf, aes(x=Type, y=Length)) + geom_violin(trim=T, fill="blue", alpha=0.4) + geom_boxplot(width=0.1, outlier.size = 2, outlier.color = "red", outlier.shape = 21) + stat_summary(fun.y=mean, geom="point", shape=18, color="blue", size=3) #+ ylim(0, 20000)#+ stat_summary(fun.data = mean_sdl, geom="pointrange", color="red", fun.args=list(mult=1))#+ stat_summary(fun.y=mean, geom="point")  + stat_summary(fun.y=median, geom="point", shape=23, color="red")#+ geom_hline(aes(yintercept=Mode(quiet_routes_england$length)), col="red")
+#ggplot(violindf, aes(x=Type, y=Length)) + geom_violin(trim=T, fill="blue", alpha=0.4) + geom_boxplot(width=0.1, outlier.size = 2, outlier.color = "red", outlier.shape = 21) + stat_summary(fun.y=mean, geom="point", shape=18, color="blue", size=3) #+ ylim(0, 20000)#+ stat_summary(fun.data = mean_sdl, geom="pointrange", color="red", fun.args=list(mult=1))#+ stat_summary(fun.y=mean, geom="point")  + stat_summary(fun.y=median, geom="point", shape=23, color="red")#+ geom_hline(aes(yintercept=Mode(quiet_routes_england$length)), col="red")
 
 names(fast_routes_england) = paste(names(fast_routes_england),"fast", sep = "_")
-names(quiet_routes_england) = paste(names(quiet_routes_england),"quiet", sep = "_")
+#names(quiet_routes_england) = paste(names(quiet_routes_england),"quiet", sep = "_")
 
-englandrf = cbind(flow, fast_routes_england, quiet_routes_england)#@data
+#englandrf = cbind(flow, fast_routes_england, quiet_routes_england)#@data
+
+englandrf = fast_routes_england
+englandrf@data = cbind(flow@data, fast_routes_england@data)
 
 englandrf$pcycle = englandrf$CYCLE/englandrf$TOTAL
 
 
 englandrf$distance_fast = englandrf$length_fast / 1000
 englandrf$gradient_fast = (englandrf$av_incline_fast * 100) - 0.97
-englandrf$distance_quiet = englandrf$length_quiet / 1000
-englandrf$gradient_quiet = (englandrf$av_incline_quiet * 100) - 0.97
+#englandrf$distance_quiet = englandrf$length_quiet / 1000
+#englandrf$gradient_quiet = (englandrf$av_incline_quiet * 100) - 0.97
 
 
 nrow(englandrf)
@@ -121,28 +131,29 @@ nrow(englandrf)
 #ggplot(englandrf@data, aes(distance_fast, pcycle)) + geom_point(alpha=0.3, size=1, shape=1, na.rm = T) + geom_smooth(na.rm = T) + xlim(0,15)
 #ggplot(englandrf@data, aes(distance_quiet, pcycle)) + geom_point(alpha=0.3, size=1, shape=1, na.rm = T) + geom_smooth(na.rm = T) + xlim(0,15)
 
-englandrf$qdf = englandrf$distance_quiet/englandrf$distance_fast
-ggplot(englandrf@data, aes(qdf, pcycle)) + geom_point(alpha=0.3, size=1, shape=1, na.rm = T) #+ geom_smooth(na.rm = T)# + xlim(0,15)
+# QDF FACTOR
+#englandrf$qdf = englandrf$distance_quiet/englandrf$distance_fast
+#ggplot(englandrf@data, aes(qdf, pcycle)) + geom_point(alpha=0.3, size=1, shape=1, na.rm = T) #+ geom_smooth(na.rm = T)# + xlim(0,15)
 
 
-
+# Keep the desire lines in these and the covariates and uptake predictions in englandrf matching up row by row
 fast_routes_england = fast_routes_england[sel,]
-quiet_routes_england = quiet_routes_england[sel,]
+#quiet_routes_england = quiet_routes_england[sel,]
 
 isTRUE(nrow(englandrf) == nrow(fast_routes_england))
-isTRUE(nrow(englandrf) == nrow(quiet_routes_england))
+#isTRUE(nrow(englandrf) == nrow(quiet_routes_england))
 
 
 #install.packages("Amelia")
 #library(Amelia)
 #missmap(englandrf@data)
-dropcols = c("error_quiet","error_fast")
+#dropcols = c("error_quiet","error_fast")
+dropcols = c("error_fast")
 englandrf = englandrf[, !(names(englandrf) %in% dropcols)]
 
 
 # Create the columns necessary for plotting bins of average values within each bin
 #tapply(englandrf$pcycle, cut(englandrf$gradient_fast, breaks = seq(min(englandrf$gradient_fast), max(englandrf$gradient_fast))), length)
-#tapply(englandrf$pcycle, cut(englandrf$gradient_fast, breaks = seq(-1, 8)), mean)
 #tapply(englandrf$pcycle, cut(englandrf$gradient_fast, breaks = seq(-1, 8), labels=seq(0,8)), mean)
 englandrf$gradbins = cut(englandrf$gradient_fast, breaks = seq(-1, 8), labels=seq(0,8))
 
@@ -526,22 +537,94 @@ if(testnow==TRUE){
 #traindf = englandrf
 
 
+# NOW WE PREDICT ON THE ROUTE NETWORK LINES FROM THE (NON-INTEGER) ROUTE NETWORK FLOWS WITH THE CORRECT 2011 LSOAS
+
+if(!file.exists("private_data/england_flows_lsoa2011.Rds")){
+  source("R/lsoa2001_to_2011_conversion.R")
+  predictflow = readRDS("private_data/england_flows_lsoa2011.Rds") 
+} else{
+  predictflow = readRDS("private_data/england_flows_lsoa2011.Rds") 
+}
+
+if(!file.exists("private_data/rf_england_schools_lsoa2011.Rds")){
+  source("R/lsoa2001_to_2011_conversion.R")
+  fast_routes_england_predict = readRDS("private_data/rf_england_schools_lsoa2011.Rds")
+  #quiet_routes_england_predict = readRDS("private_data/rq_england_schools_lsoa2011.Rds")
+} else{
+  fast_routes_england_predict = readRDS("private_data/rf_england_schools_lsoa2011.Rds")
+  #quiet_routes_england_predict = readRDS("private_data/rq_england_schools_lsoa2011.Rds")
+}
+
+names(fast_routes_england_predict) = paste(names(fast_routes_england_predict),"fast", sep = "_")
+#names(quiet_routes_england_predict) = paste(names(quiet_routes_england_predict),"quiet", sep = "_")
+
+
+#predictdf = cbind(predictflow@data, fast_routes_england_predict, quiet_routes_england_predict@data)#@data
+#predictdf = cbind(predictflow@data, fast_routes_england_predict)#@data
+#predictdf = cbind(predictflow@data, fast_routes_england_predict)
+
+predictdf = fast_routes_england_predict
+predictdf@data = cbind(predictflow@data, fast_routes_england_predict@data)
+
+
+predictdf$pcycle = predictdf$CYCLE/predictdf$TOTAL
+
+
+predictdf$distance_fast = predictdf$length_fast / 1000
+predictdf$gradient_fast = (predictdf$av_incline_fast * 100) - 0.97
+#predictdf$distance_quiet = predictdf$length_quiet / 1000
+#predictdf$gradient_quiet = (predictdf$av_incline_quiet * 100) - 0.97
+
+
+nrow(predictdf)
+sel = which(predictdf$distance_fast <= 15)
+predictdf = predictdf[sel, ]
+nrow(predictdf)
+
+
+# Just smooth fits to the raw pcycle vs dist/grad data
+#ggplot(predictdf@data, aes(distance_fast, pcycle)) + geom_point(alpha=0.3, size=1, shape=1, na.rm = T) + geom_smooth(na.rm = T) + xlim(0,15)
+#ggplot(predictdf@data, aes(distance_quiet, pcycle)) + geom_point(alpha=0.3, size=1, shape=1, na.rm = T) + geom_smooth(na.rm = T) + xlim(0,15)
+
+# QDF FACTOR
+#predictdf$qdf = predictdf$distance_quiet/predictdf$distance_fast
+#ggplot(predictdf@data, aes(qdf, pcycle)) + geom_point(alpha=0.3, size=1, shape=1, na.rm = T) #+ geom_smooth(na.rm = T)# + xlim(0,15)
+
+# Keep the desire lines in these and the covariates and uptake predictions in predictdf matching up row by row
+fast_routes_england_predict = fast_routes_england_predict[sel,]
+#quiet_routes_england_predict = quiet_routes_england_predict[sel,]
+
+isTRUE(nrow(predictdf) == nrow(fast_routes_england_predict))
+#isTRUE(nrow(predictdf) == nrow(quiet_routes_england_predict))
+
+
+#install.packages("Amelia")
+#library(Amelia)
+#Amelia::missmap(predictdf@data)
+#dropcols = c("error_quiet","error_fast")
+dropcols = c("error_fast")
+predictdf = predictdf[, !(names(predictdf) %in% dropcols)]
+
+predictdf$gradbins = cut(predictdf$gradient_fast, breaks = seq(-1, 8), labels=seq(0,8))
+predictdf$distbins = cut(predictdf$distance_fast, breaks = seq(0, 14), labels=seq(1,14))
+
+
 # Predict on the dataframe of flows, not the binary-coded one.
 # Gradient and distance_fast variables are the same for both, so this is fine.
-xpred = model.matrix(f, traindf)
-traindf$pcycle_pred = predict(fitelastic, s=fit5$lambda.min, xpred, type="response")[,1] #this gives a 1D matrix, so take first col
-#traindf$pcycle_pred = predict(fitelastic, s=fit5$lambda.1se, xpred, type="response")
-#traindf$pcycle_pred = predict(fitelasticpred, xpred, type="response")
+xpred = model.matrix(f, predictdf)
+predictdf$pcycle_pred = predict(fitelastic, s=fit5$lambda.min, xpred, type="response")[,1] #this gives a 1D matrix, so take first col
+#predictdf$pcycle_pred = predict(fitelastic, s=fit5$lambda.1se, xpred, type="response")
+#predictdf$pcycle_pred = predict(fitelasticpred, xpred, type="response")
 
 
 # Frank Harrell discourages residual plots for logistic regression(!!)
 # https://stats.stackexchange.com/questions/45050/diagnostics-for-logistic-regression/70583#70583
-#residuals = data.frame(Predicted=c(traindf$pcycle_pred), Residual=c(traindf$pcycle-traindf$pcycle_pred))
+#residuals = data.frame(Predicted=c(predictdf$pcycle_pred), Residual=c(predictdf$pcycle-predictdf$pcycle_pred))
 #ggplot(residuals, aes(x=Predicted, y=Residual)) + geom_point() + geom_hline(yintercept = 0, col="red") + stat_smooth(method="lm", linetype=2, se=FALSE)
 
 
 
-datmoddistscatterplot = ggplot(traindf@data, aes(x=distance_fast)) +
+datmoddistscatterplot = ggplot(predictdf@data, aes(x=distance_fast)) +
   geom_point(aes(y=pcycle), shape=1, alpha=0.3) +
   geom_smooth(aes(y=pcycle, colour="Observed")) +
   geom_smooth(aes(y=pcycle_pred, colour="Modelled")) +
@@ -553,7 +636,7 @@ print(datmoddistscatterplot)
 ggsave(plot=datmoddistscatterplot, filename = "paper/figures/data_model_scatter_distance.png")
 
 
-datmodgradscatterplot = ggplot(traindf@data, aes(x=gradient_fast)) +
+datmodgradscatterplot = ggplot(predictdf@data, aes(x=gradient_fast)) +
   geom_point(aes(y=pcycle), shape=1, alpha=0.3) +
   geom_smooth(aes(y=pcycle, colour="Observed")) +
   geom_smooth(aes(y=pcycle_pred, colour="Modelled")) +
@@ -567,8 +650,8 @@ ggsave(plot=datmodgradscatterplot, filename="paper/figures/data_model_scatter_gr
 
 
 
-#ggplot(traindf@data, aes(x=distance_fast)) + geom_smooth(aes(y=pcycle, col="red")) + geom_smooth(aes(y=pcycle_pred))
-datmoddistplot = ggplot(traindf@data[!is.na(traindf$distbins),], aes(x=distbins)) +
+#ggplot(predictdf@data, aes(x=distance_fast)) + geom_smooth(aes(y=pcycle, col="red")) + geom_smooth(aes(y=pcycle_pred))
+datmoddistplot = ggplot(predictdf@data[!is.na(predictdf$distbins),], aes(x=distbins)) +
   stat_summary(aes(y=100*pcycle, group=1, colour="Observed"), fun.y=mean, geom="line", size=1) +
   stat_summary(aes(y=100*pcycle_pred, group=1, colour="Modelled"), fun.y=mean, geom="line", size=1) +
   scale_color_manual("", breaks=c("Observed","Modelled"), values=c("blue","red")) +
@@ -581,8 +664,8 @@ ggsave(plot=datmoddistplot, filename = "paper/figures/data_model_distance.png")
 
 # https://stackoverflow.com/questions/33150915/ggplot-plotting-the-bins-on-x-axis-and-the-average-on-y-axis
 
-#ggplot(traindf@data, aes(x=gradient_fast)) + geom_smooth(aes(y=pcycle, col="red")) + geom_smooth(aes(y=pcycle_pred))
-datmodgradplot = ggplot(traindf@data[!is.na(traindf$gradbins),], aes(x=gradbins)) +
+#ggplot(predictdf@data, aes(x=gradient_fast)) + geom_smooth(aes(y=pcycle, col="red")) + geom_smooth(aes(y=pcycle_pred))
+datmodgradplot = ggplot(predictdf@data[!is.na(predictdf$gradbins),], aes(x=gradbins)) +
   stat_summary(aes(y=100*pcycle, group=1, colour="Observed"), fun.y=mean, geom="line", size=1) +
   stat_summary(aes(y=100*pcycle_pred, group=1, colour="Modelled"), fun.y=mean, geom="line", size=1) +
   scale_color_manual("", breaks=c("Observed","Modelled"), values=c("blue","red")) +
@@ -600,24 +683,26 @@ ggsave(plot=datmodgradplot, filename="paper/figures/data_model_gradient.png")
 ##############################################################################################
 
 # Government scenario
-traindf$govtarget_slc = traindf$CYCLE + (traindf$pcycle_pred*traindf$TOTAL)
+predictdf$govtarget_slc = predictdf$CYCLE + (predictdf$pcycle_pred*predictdf$TOTAL)
 # If GovTarget larger than number of commuters in flow, set to total number of commuters in flow
-sel = traindf$govtarget_slc > traindf$TOTAL
+sel = predictdf$govtarget_slc > predictdf$TOTAL
 if(sum(sel) > 0){
-  #traindf$govtarget_slc[sel,] = traindf$TOTAL[sel,]
-  traindf@data[sel, "govtarget_slc"] = traindf@data[sel, "TOTAL"]
+  #predictdf$govtarget_slc[sel,] = predictdf$TOTAL[sel,]
+  predictdf@data[sel, "govtarget_slc"] = predictdf@data[sel, "TOTAL"]
 }
-traindf$govtarget_sic = traindf$govtarget_slc - traindf$CYCLE
-range(traindf$govtarget_sic)
+predictdf$govtarget_sic = predictdf$govtarget_slc - predictdf$CYCLE
+range(predictdf$govtarget_sic)
 
 #Check that the GovTarget corresponds to a rough doubling of cycling numbers
-sum(traindf$CYCLE)
-sum(traindf$govtarget_slc)
+sum(predictdf$CYCLE)
+sum(predictdf$govtarget_slc)
 
 
 
 #############################################################################################
 # THE GODUTCH SCENARIO
+# THE UNREGULARISED MODEL AGREED WITH ANNA'S ANSWER, SO THE DUTCHNESS COEFFICIENT FROM THEREGULARISED VERSION SHOULD BE SENSIBLE,
+#   BUT WE ENDED UP USING A VALUE ANNA PROVIDED AS SHE MADE THE CASE THAT AGREEMENT WITH DATA WAS BETTER WITH THIS VALUE
 
 ntsdf = readr::read_csv("private_data/School_NTS_170121.csv", col_types = "iiidddd")
 # converting to factors is not required as model.matrix() will then convert to dummy variables, but they are already in that form
@@ -646,38 +731,42 @@ dutchnesscoef = dutchcoef[dutchcoef@Dimnames[[1]]=="netherlands",]
 print(dutchnesscoef)
 
 # GoDutch scenario
-#traindf$pred_dutch = boot::inv.logit(boot::logit(traindf$pcycle_pred) + 4.838 + (0.9073*traindf$distance_fast)  + (-1.924*sqrt(traindf$distance_fast)))
-#traindf$pred_dutch = boot::inv.logit(boot::logit(traindf$pcycle_pred) + 3.682 + (0.3044*traindf$distance_fast))
-#traindf$pred_dutch = boot::inv.logit(boot::logit(traindf$pcycle_pred) + 5.122)
-#traindf$pred_dutch = boot::inv.logit(boot::logit(traindf$pcycle_pred) + dutchnesscoef) # 4.49885
-traindf$pred_dutch = boot::inv.logit(boot::logit(traindf$pcycle_pred) + 4.912)
-traindf$dutch_slc = traindf$pred_dutch*traindf$TOTAL
-sel = traindf$dutch_slc > traindf$TOTAL
+
+# PREVIOUS VALUES USED...
+#predictdf$pred_dutch = boot::inv.logit(boot::logit(predictdf$pcycle_pred) + 4.838 + (0.9073*predictdf$distance_fast)  + (-1.924*sqrt(predictdf$distance_fast)))
+#predictdf$pred_dutch = boot::inv.logit(boot::logit(predictdf$pcycle_pred) + 3.682 + (0.3044*predictdf$distance_fast))
+#predictdf$pred_dutch = boot::inv.logit(boot::logit(predictdf$pcycle_pred) + 5.122)
+
+# THE REGULARISED COEFFICIENT WE GOT, OR ANNA'S VALUE. WE OPTED FOR THE LATTER
+#predictdf$pred_dutch = boot::inv.logit(boot::logit(predictdf$pcycle_pred) + dutchnesscoef) # 4.49885
+predictdf$pred_dutch = boot::inv.logit(boot::logit(predictdf$pcycle_pred) + 4.912)
+predictdf$dutch_slc = predictdf$pred_dutch*predictdf$TOTAL
+sel = predictdf$dutch_slc > predictdf$TOTAL
 if(sum(sel) > 0){
-  #traindf$dutch_slc[sel,] = traindf$TOTAL[sel,]
-  traindf@data[sel, "dutch_slc"] = traindf@data[sel, "TOTAL"]
+  #predictdf$dutch_slc[sel,] = predictdf$TOTAL[sel,]
+  predictdf@data[sel, "dutch_slc"] = predictdf@data[sel, "TOTAL"]
 }
-sel = traindf$dutch_slc < traindf$CYCLE
+sel = predictdf$dutch_slc < predictdf$CYCLE
 if(sum(sel) > 0){
-  #traindf$dutch_slc[sel] = traindf$CYCLE[sel]
-  traindf@data[sel, "dutch_slc"] = traindf@data[sel, "CYCLE"]
+  #predictdf$dutch_slc[sel] = predictdf$CYCLE[sel]
+  predictdf@data[sel, "dutch_slc"] = predictdf@data[sel, "CYCLE"]
 }
-traindf$dutch_sic = traindf$dutch_slc - traindf$CYCLE
-range(traindf$dutch_sic)
+predictdf$dutch_sic = predictdf$dutch_slc - predictdf$CYCLE
+range(predictdf$dutch_sic)
 
 #######################################################################################
 
 
 
-#ggplot(traindf@data, aes(x=distance_fast)) + geom_smooth(aes(y=CYCLE, col="red")) + geom_smooth(aes(y=pcycle_pred*TOTAL, col="blue")) + geom_smooth(aes(y=govtarget_slc, col="green")) + geom_smooth(aes(y=dutch_slc, col="orange"))
-#ggplot(traindf@data, aes(x=distance_fast)) + geom_point(aes(y=CYCLE)) + geom_smooth(aes(y=CYCLE, col="red")) + geom_smooth(aes(y=pcycle_pred*TOTAL, col="blue")) + geom_smooth(aes(y=govtarget_slc, col="green")) + geom_smooth(aes(y=dutch_slc, col="orange"))
+#ggplot(predictdf@data, aes(x=distance_fast)) + geom_smooth(aes(y=CYCLE, col="red")) + geom_smooth(aes(y=pcycle_pred*TOTAL, col="blue")) + geom_smooth(aes(y=govtarget_slc, col="green")) + geom_smooth(aes(y=dutch_slc, col="orange"))
+#ggplot(predictdf@data, aes(x=distance_fast)) + geom_point(aes(y=CYCLE)) + geom_smooth(aes(y=CYCLE, col="red")) + geom_smooth(aes(y=pcycle_pred*TOTAL, col="blue")) + geom_smooth(aes(y=govtarget_slc, col="green")) + geom_smooth(aes(y=dutch_slc, col="orange"))
 
-traindf$pred_govtarget = traindf$govtarget_slc/traindf$TOTAL
-
-
+predictdf$pred_govtarget = predictdf$govtarget_slc/predictdf$TOTAL
 
 
-ggplotdf = data.frame(Distance=traindf$distance_fast, Gradient=traindf$gradient_fast, Observed=traindf$pcycle, Model=traindf$pcycle_pred, GovTarget=traindf$pred_govtarget, GoDutch=traindf$pred_dutch)
+
+
+ggplotdf = data.frame(Distance=predictdf$distance_fast, Gradient=predictdf$gradient_fast, Observed=predictdf$pcycle, Model=predictdf$pcycle_pred, GovTarget=predictdf$pred_govtarget, GoDutch=predictdf$pred_dutch)
 meltggplotdistdf = ggplotdf[c("Distance","Observed","GovTarget","GoDutch","Model")]
 meltggplotdistdf = reshape2::melt(meltggplotdistdf, id.vars="Distance")
 meltggplotgraddf = ggplotdf[c("Gradient","Observed","GovTarget","GoDutch","Model")]
@@ -713,31 +802,39 @@ print(uptakesgradplot)
 ggsave(plot=uptakesgradplot, filename = "paper/figures/uptake_gradient.png")
 
 
-ggplot(traindf@data, aes(distance_fast, pcycle)) + geom_point(alpha=0.5, size=1, shape=21, na.rm = T)
+ggplot(predictdf@data, aes(distance_fast, pcycle)) + geom_point(alpha=0.5, size=1, shape=21, na.rm = T)
 
-ggplot(traindf@data, aes(distance_fast, gradient_fast)) + geom_point(shape=1, alpha=0.3)
+ggplot(predictdf@data, aes(distance_fast, gradient_fast)) + geom_point(shape=1, alpha=0.3)
 
-ggplot(traindf@data, aes(distance_fast, pcycle_pred)) + geom_point(shape=1, alpha=0.3) + geom_smooth() #+ geom_point(aes(y=pcycle))
-ggplot(traindf@data, aes(gradient_fast, pcycle_pred)) + geom_point(shape=1, alpha=0.3) + geom_smooth() #+ geom_point(aes(y=pcycle))
+ggplot(predictdf@data, aes(distance_fast, pcycle_pred)) + geom_point(shape=1, alpha=0.3) + geom_smooth() #+ geom_point(aes(y=pcycle))
+ggplot(predictdf@data, aes(gradient_fast, pcycle_pred)) + geom_point(shape=1, alpha=0.3) + geom_smooth() #+ geom_point(aes(y=pcycle))
 
 
 # make sure that the desire lines (and uptake projections), the fastest route network, and the quiet route network flows, all match up
-isTRUE(nrow(traindf) == nrow(fast_routes_england))
-isTRUE(nrow(traindf) == nrow(quiet_routes_england))
-plot(traindf[5,])
-plot(fast_routes_england[5,], col="red", add = T)
-plot(quiet_routes_england[5,], col="blue", add = T)
-
-
-#Amelia::missmap(traindf@data)
-#saveRDS(traindf, "private_data/l_national.Rds")
+isTRUE(nrow(predictdf) == nrow(fast_routes_england_predict))
+#isTRUE(nrow(predictdf) == nrow(quiet_routes_england_predict))
 
 
 
 
+# MAKE SURE DESIRE LINES AND ROUTE NETWORK FLOWS STILL MATCH UP
+plot(predictflow[5,])
+plot(fast_routes_england_predict[5,], col="red", add = T)
+#plot(quiet_routes_england_predict[5,], col="blue", add = T)
+
+#Amelia::missmap(predictdf@data)
+#saveRDS(predictdf, "private_data/l_national.Rds")
+
+# PLOT THE FINAL DESIRE LINES AND ROUTE NETWORK FLOWS (WHICH HAVE THE UPTAKE SCENARIO PROJECTIONS), TO MAKE SURE EVERYTHING A-OK
+#plot(las); plot(predictflow, add=T,col="blue")
+#plot(las); plot(predictdf, add=T,col="red")
+
+saveRDS(predictdf, "private_data/uptake_scenarios_final.Rds")
 
 
-#saveRDS(traindf[sample(seq_len(nrow(traindf)), size=1000),], "private_data/full_england_w_uptake_scenarios_1000.Rds")
+
+
+#saveRDS(predictdf[sample(seq_len(nrow(predictdf)), size=1000),], "private_data/full_england_w_uptake_scenarios_1000.Rds")
 
 
 
@@ -757,8 +854,8 @@ plot(quiet_routes_england[5,], col="blue", add = T)
 # lads = spTransform(lads, CRSobj = proj4string(las))
 # lads_leeds = lads[lads$name == "Leeds",]
 # #plot(lads_leeds)
-# sel_leeds = rgeos::gContains(lads_leeds, traindf, byid = T)
-# leeds_uptakes = traindf[c(sel_leeds),]
+# sel_leeds = rgeos::gContains(lads_leeds, predictdf, byid = T)
+# leeds_uptakes = predictdf[c(sel_leeds),]
 # leeds_rf = fast_routes_england[c(sel_leeds),]
 # leeds_rq = quiet_routes_england[c(sel_leeds),]
 # isTRUE(nrow(leeds_uptakes) == nrow(leeds_rf))
@@ -785,7 +882,7 @@ plot(quiet_routes_england[5,], col="blue", add = T)
 
 
 # notcols = c("LSOA","LAESTAB_SPR11","URN","SCHOOLNAME_SPR11")
-# dataforapp = traindf[!(names(traindf) %in% notcols)]
+# dataforapp = predictdf[!(names(predictdf) %in% notcols)]
 # names(dataforapp)
 # 
 # readr::write_csv(meltdf, "Binary-coded_full_England.csv")
@@ -899,79 +996,79 @@ plot(quiet_routes_england[5,], col="blue", add = T)
 # set.seed(5)
 # trainidx = sample(seq_len(nrow(logitdf)), size=smp_size)
 # 
-# traindf = logitdf[trainidx,]
+# predictdf = logitdf[trainidx,]
 # testdf = logitdf[-trainidx,]
 # 
 # 
-# traindf = as.data.frame(traindf)
-# names(traindf) = names(logitdf)
+# predictdf = as.data.frame(predictdf)
+# names(predictdf) = names(logitdf)
 # 
 # 
 # 
 # #modes = c("CYCLE","WALK","CAR","OTHER","UNKNOWN")
-# #meltdf_minimal = traindf[c(modes, "distance", "gradient")]
+# #meltdf_minimal = predictdf[c(modes, "distance", "gradient")]
 # 
 # # head(meltdf)
-# # indeces = rep(1:nrow(traindf), traindf[i])
+# # indeces = rep(1:nrow(predictdf), predictdf[i])
 # # indeces[1:100]
-# # traindf$TOTAL[1]
+# # predictdf$TOTAL[1]
 # # meltdf = meltdf[indeces,]
 # 
-# traindf = traindf[traindf$TOTAL >= 10, ]
-# traindf = traindf[traindf$distance <= 30, ]
+# predictdf = predictdf[predictdf$TOTAL >= 10, ]
+# predictdf = predictdf[predictdf$distance <= 30, ]
 # 
-# meltdf = data.frame(matrix(NA, nrow=sum(traindf$TOTAL), ncol=7))
+# meltdf = data.frame(matrix(NA, nrow=sum(predictdf$TOTAL), ncol=7))
 # names(meltdf) = c("CYCLE","WALK","CAR","OTHER","UNKNOWN","distance","gradient")
 # jstart = 1
-# for(i in 1:nrow(traindf)){
+# for(i in 1:nrow(predictdf)){
 #   #indeces_melt = which(indeces == i)
-#   #cycle_index = indeces_melt[1:traindf$CYCLE[i]]
+#   #cycle_index = indeces_melt[1:predictdf$CYCLE[i]]
 #   #meltdf$CYCLE[cycle_index] = 1
 #   #meltdf$CYCLE
 #   #print(jstart)
 #   blocklen = 0
-#   if(traindf[i, "CYCLE"] > 0){
-#     blocklen = traindf[i, "CYCLE"]
+#   if(predictdf[i, "CYCLE"] > 0){
+#     blocklen = predictdf[i, "CYCLE"]
 #     jend = jstart + blocklen - 1
 #     meltdf[jstart:jend, "CYCLE"] = 1
-#     meltdf[jstart:jend, "gradient"] = traindf[i, "gradient"]
-#     meltdf[jstart:jend, "distance"] = traindf[i, "distance"]
+#     meltdf[jstart:jend, "gradient"] = predictdf[i, "gradient"]
+#     meltdf[jstart:jend, "distance"] = predictdf[i, "distance"]
 #     jstart = jend + 1
 #   }
-#   if(traindf[i, "WALK"] > 0){
+#   if(predictdf[i, "WALK"] > 0){
 #     # if(blocklen == 0)
-#     #   blocklen = traindf[i, "WALK"]
+#     #   blocklen = predictdf[i, "WALK"]
 #     # else
-#     #   blocklen = blocklen + traindf[i, "WALK"]
-#     blocklen = traindf[i, "WALK"]
+#     #   blocklen = blocklen + predictdf[i, "WALK"]
+#     blocklen = predictdf[i, "WALK"]
 #     jend = jstart + blocklen - 1
 #     meltdf[jstart:jend, "WALK"] = 1
-#     meltdf[jstart:jend, "gradient"] = traindf[i, "gradient"]
-#     meltdf[jstart:jend, "distance"] = traindf[i, "distance"]
+#     meltdf[jstart:jend, "gradient"] = predictdf[i, "gradient"]
+#     meltdf[jstart:jend, "distance"] = predictdf[i, "distance"]
 #     jstart = jend + 1
 #   }
-#   if(traindf[i, "CAR"] > 0){
-#     blocklen = traindf[i, "CAR"]
+#   if(predictdf[i, "CAR"] > 0){
+#     blocklen = predictdf[i, "CAR"]
 #     jend = jstart + blocklen - 1
 #     meltdf[jstart:jend, "CAR"] = 1
-#     meltdf[jstart:jend, "gradient"] = traindf[i, "gradient"]
-#     meltdf[jstart:jend, "distance"] = traindf[i, "distance"]
+#     meltdf[jstart:jend, "gradient"] = predictdf[i, "gradient"]
+#     meltdf[jstart:jend, "distance"] = predictdf[i, "distance"]
 #     jstart = jend + 1
 #   }
-#   if(traindf[i, "OTHER"] > 0){
-#     blocklen = traindf[i, "OTHER"]
+#   if(predictdf[i, "OTHER"] > 0){
+#     blocklen = predictdf[i, "OTHER"]
 #     jend = jstart + blocklen - 1
 #     meltdf[jstart:jend, "OTHER"] = 1
-#     meltdf[jstart:jend, "gradient"] = traindf[i, "gradient"]
-#     meltdf[jstart:jend, "distance"] = traindf[i, "distance"]
+#     meltdf[jstart:jend, "gradient"] = predictdf[i, "gradient"]
+#     meltdf[jstart:jend, "distance"] = predictdf[i, "distance"]
 #     jstart = jend + 1
 #   }
-#   if(traindf[i, "UNKNOWN"] > 0){
-#     blocklen = traindf[i, "UNKNOWN"]
+#   if(predictdf[i, "UNKNOWN"] > 0){
+#     blocklen = predictdf[i, "UNKNOWN"]
 #     jend = jstart + blocklen - 1
 #     meltdf[jstart:jend, "UNKNOWN"] = 1
-#     meltdf[jstart:jend, "gradient"] = traindf[i, "gradient"]
-#     meltdf[jstart:jend, "distance"] = traindf[i, "distance"]
+#     meltdf[jstart:jend, "gradient"] = predictdf[i, "gradient"]
+#     meltdf[jstart:jend, "distance"] = predictdf[i, "distance"]
 #     jstart = jend + 1
 #   }
 #   #print(jend)
@@ -979,12 +1076,12 @@ plot(quiet_routes_england[5,], col="blue", add = T)
 # 
 # meltdf[is.na(meltdf)] = 0
 # 
-# isTRUE(sum(meltdf[!is.na(meltdf$CYCLE), "CYCLE"]) == sum(traindf$CYCLE))
-# isTRUE(sum(meltdf[!is.na(meltdf$WALK), "WALK"]) == sum(traindf$WALK))
-# isTRUE(sum(meltdf[!is.na(meltdf$CAR), "CAR"]) == sum(traindf$CAR))
+# isTRUE(sum(meltdf[!is.na(meltdf$CYCLE), "CYCLE"]) == sum(predictdf$CYCLE))
+# isTRUE(sum(meltdf[!is.na(meltdf$WALK), "WALK"]) == sum(predictdf$WALK))
+# isTRUE(sum(meltdf[!is.na(meltdf$CAR), "CAR"]) == sum(predictdf$CAR))
 # 
-# isTRUE((sum(meltdf[!is.na(meltdf$CAR), "CAR"]) + sum(meltdf[!is.na(meltdf$WALK), "WALK"]) + sum(meltdf[!is.na(meltdf$CYCLE), "CYCLE"]) + sum(meltdf[!is.na(meltdf$OTHER), "OTHER"]) + sum(meltdf[!is.na(meltdf$UNKNOWN), "UNKNOWN"])) == sum(traindf$TOTAL))
-# isTRUE(nrow(meltdf) == sum(traindf$TOTAL))
+# isTRUE((sum(meltdf[!is.na(meltdf$CAR), "CAR"]) + sum(meltdf[!is.na(meltdf$WALK), "WALK"]) + sum(meltdf[!is.na(meltdf$CYCLE), "CYCLE"]) + sum(meltdf[!is.na(meltdf$OTHER), "OTHER"]) + sum(meltdf[!is.na(meltdf$UNKNOWN), "UNKNOWN"])) == sum(predictdf$TOTAL))
+# isTRUE(nrow(meltdf) == sum(predictdf$TOTAL))
 # 
 # 
 # model = glm(CYCLE~distance+sqrt(distance)+I(distance^2)+gradient+distance:gradient+sqrt(distance):gradient, family=binomial(link='logit'), data=meltdf, na.action = na.omit)
@@ -995,12 +1092,12 @@ plot(quiet_routes_england[5,], col="blue", add = T)
 # # H0 : no significant difference between model and observed data (if p> 0.05)
 # ResourceSelection::hoslem.test(meltdf$CYCLE, fitted(model))
 # 
-# #range(traindf$distance)
-# #xvals = traindf$distance
-# #pcycle_pred = boot::inv.logit(predict(model, traindf, type="response"))  #predict(model, list(wt=xvals), type="response")
-# pcycle_pred = predict(model, traindf, type="response")  #predict(model, list(wt=xvals), type="response")
+# #range(predictdf$distance)
+# #xvals = predictdf$distance
+# #pcycle_pred = boot::inv.logit(predict(model, predictdf, type="response"))  #predict(model, list(wt=xvals), type="response")
+# pcycle_pred = predict(model, predictdf, type="response")  #predict(model, list(wt=xvals), type="response")
 # 
-# plotdf = cbind(traindf, pcycle_pred)
+# plotdf = cbind(predictdf, pcycle_pred)
 # 
 # ggplot(plotdf, aes(distance, pcycle)) + geom_point(alpha=0.5, size=1, shape=21, na.rm = T)
 # 

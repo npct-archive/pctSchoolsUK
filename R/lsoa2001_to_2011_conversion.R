@@ -7,8 +7,18 @@ s11 = readr::read_tsv(file = "private_data/Spring_Census_2011.txt")
 #s11$LSOA01CD = s11$LLSOA_SPR11
 names(s11)[names(s11)=="LLSOA_SPR11"] = "LSOA01CD"
 lookup01to11 = readr::read_csv("private_data/lower_layer_super_output_areas_(2001)_to_lower_layer_super_output_areas_(2011)_to_local_authority_districts_(2011)_e+w_lookup/LSOA01_LSOA11_LAD11_EW_LU.csv")
+#lookup01to11[duplicated(lookup01to11$LSOA01CD),]
 lookup_unique = distinct(lookup01to11, LSOA01CD, .keep_all = T)
+#lookup_unique = distinct(lookup01to11, LSOA01CD, LSOA11CD, .keep_all = T)
 # lookup01to11[!duplicated(lookup01to11$LSOA01CD),] # the base R way
+
+# Just exploring the lookup table
+# LSOAs which split 2001 --> 2011
+splitlsoas = lookup01to11 %>% group_by(LSOA01CD) %>% mutate(n=n()) %>% filter(n>1) #these indeed all have CHGIND = S
+table(splitlsoas$n) # most are 1->2 splits but there are up to 1->11 splits present
+# LSOAs which merged 2001 --> 2011
+mergedlsoas = lookup01to11 %>% group_by(LSOA11CD) %>% mutate(n=n()) %>% filter(n>1) %>% filter(CHGIND == "M") #some would be CHGIND = X so we remove these
+table(mergedlsoas$n) #mostly 2->1 merges
 
 #isTRUE(nrow(lookup_unique) == nrow(lookup01to11))
 #anti_join(lookup01to11,lookup_unique, by="LSOA01CD")
@@ -42,13 +52,15 @@ sum(s11ns$TOTAL)/sum(s11new$TOTAL)
 sum(s11nm$TOTAL)/sum(s11new$TOTAL)
 sum(s11nx$TOTAL)/sum(s11new$TOTAL)
 
-# # # # #
-# split #
-# # # # #
+# # # # # #
+# # split #
+# # # # # #
+#
 
-s11ns_dups = inner_join(s11ns, select(lookup01to11, LSOA01CD), by="LSOA01CD")
 # Rows of s11 which have a single 2001 LSOA code match to two different 2011 LSOA codes in the lookup,
-#   so inner_join duplicates, with one entry for each 2011 LSOA code
+#   so inner_join duplicates, with one entry for each 2011 LSOA code. Remove these duplicates
+s11ns_dups = inner_join(s11ns, select(lookup01to11, LSOA01CD), by="LSOA01CD")
+
 nrow(s11ns_dups) / nrow(s11ns) # rows have correctly increased
 sum(s11ns_dups$TOTAL) / sum(s11ns$TOTAL) # totals have incorrectly changed...
 
@@ -62,6 +74,86 @@ s11new_s = select(s11new_s, match(names(s11ns), names(s11new_s)))
 nrow(s11ns) / nrow(s11new_s) # many lsoas added
 sum(s11new_s$TOTAL) / sum(s11ns$TOTAL) # same total!
 
+# TO GET THE INTEGERISED FORM RUN THE LINE BELOW, BUT WE HAVE DECIDED NOT TO DO THIS
+# Integerises while preserving the column sum. My form below integerises preserving total flows for each 2001 LSOA
+#s11new_s[, c("TOTAL", "CAR", "CYCLE", "WALK", "OTHER", "UNKNOWN")] = apply(s11new_s[, c("TOTAL", "CAR", "CYCLE", "WALK", "OTHER", "UNKNOWN")], 2, rakeR::integerise )
+#sum(s11new_s$TOTAL)
+#sum(s11ns$TOTAL)
+
+
+# #############################################################################
+# # MY CODE TO INTEGERISE WHILE PRESERVING THE TOTALS WITHIN EACH 2001 LSOA (I.E. THE DATA WE WERE GIVEN), NOT JUST THE TOTAL FLOW OF THE FULL DATASET
+# #  FAILED DUE TO THE CASE INTGR=1, PARTS=2 INEXPLICABLY BEING SENT INTO THE WRONG IF STATEMENT AND INTO restrictedparts()
+# #
+# integerSplit = function(intgr, parts){
+#   print(intgr,parts)
+#   #print(dim(intgr), dim(parts))
+#   if(intgr==0){
+#     print("A")
+#     partition = rep(0,parts)
+#   }else{ if(intgr==1){
+#     #print(intgr)
+#     #print(parts)
+#     print("B")
+#     partition = c(1, rep(0, parts-1))
+#     partition = sample(partition, replace = F, size=length(partition))
+#   }
+#     else{
+#       if(intgr>1){
+#         if(parts==1){
+#           print("C")
+#           partition = intgr
+#         }else if(parts>1){
+#           print("D")
+#           partitions = partitions::restrictedparts(intgr, parts, decreasing=T)
+#           partition = partitions[,ncol(partitions)]
+#         }
+#       }
+#     }
+#   }
+#   # }else if(intgr!=1 & parts==1){
+#   #   print("C")
+#   #   partition = intgr
+#   # }else if(intgr!=1 && parts>1){
+#   #   print("D")
+#   #   partitions = partitions::restrictedparts(intgr, parts, decreasing=T)
+#   #   partition = partitions[,ncol(partitions)]
+#   # }
+#   partition = as.integer(partition)
+#   #if(!is.integer(partition))
+#   #  print(paste0(intgr, parts, partition))
+#   #if(length(partition) > parts)
+#   #  print(paste(partition, parts))
+#   #return(data.frame(partition))
+#   return(partition)
+# }
+# 
+# integerSplitDF = function(df){
+#   lsoas = df[["LSOA11CD"]]
+#   newdf = df[, c("TOTAL", "CAR", "CYCLE", "WALK", "OTHER", "UNKNOWN")]
+#   for(i in 1:ncol(newdf)){
+#     newdf[, i] = integerSplit(newdf[1, i], nrow(newdf[, i]))
+#     #print(paste(newdf[1, i], nrow(newdf[, i])))
+#     #print(integerSplit(newdf[1, i], nrow(newdf[, i])))
+#   }
+#   newdf = cbind(lsoas, newdf)
+#   names(newdf) = c("LSOA11CD","TOTAL", "CAR", "CYCLE", "WALK", "OTHER", "UNKNOWN")
+#   return(newdf)
+# }
+# #testdf = s11ns[1:2, c("LSOA01CD", "LSOA11CD", "URN_SPR11", "TOTAL", "CAR", "CYCLE", "WALK", "OTHER", "UNKNOWN")]
+# #testdfnum = testdf[, c("TOTAL", "CAR", "CYCLE", "WALK", "OTHER", "UNKNOWN")]
+# #integerSplitDF(testdf)
+# 
+# s11ns = dplyr::inner_join(s11, select(lookup01to11, LSOA01CD, LSOA11CD, CHGIND), by="LSOA01CD") %>% filter(CHGIND=="S")
+# 
+# testdf = s11ns[1:10, c("LSOA01CD", "LSOA11CD", "URN_SPR11", "TOTAL", "CAR", "CYCLE", "WALK", "OTHER", "UNKNOWN")]
+# testdf %>% group_by(LSOA01CD, URN_SPR11) #input
+# testdf %>% group_by(LSOA01CD, URN_SPR11) %>% do(integerSplitDF(.)) #output. It works!!
+# 
+# s11ns_new = s11ns %>% group_by(LSOA01CD, URN_SPR11) %>% do(integerSplitDF(.)) ## fails due to not respecting if statements, no idea why!
+# 
+
+###############
 # # # # #
 # merge #
 # # # # #
@@ -76,7 +168,7 @@ nrow(s11nm) / nrow(s11new_m) # most duplicated, not all
 sum(s11new_m$TOTAL) / sum(s11nm$TOTAL) # same total!
 names(s11new_m) == names(s11nm) # incorrect col order
 s11new_m = select(s11new_m, match(names(s11nm), names(s11new_m)))
-colMeans(s11new_m[5:10]) / colMeans(s11nm[5:10])
+#colMeans(s11new_m[5:10]) / colMeans(s11nm[5:10])
 colSums(s11new_m[5:10]) / colSums(s11nm[5:10])
 
 # # # # # # # #
@@ -98,7 +190,7 @@ colSums(s11new_nc[numeric_vars]) == colSums(s11n[numeric_vars])
 # # # # # # # # # # # 
 
 # if you don't want to rerun code above and already have the Rds:
-s11n = readRDS("private_data/s11n.Rds")
+#s11n = readRDS("private_data/s11n.Rds")
 
 # Load the flows data, identifying LSOA of orgin and URN of school (destination)
 #s11 = readr::read_tsv(file = "private_data/Spring_Census_2011.txt")
@@ -176,14 +268,14 @@ saveRDS(flow, "private_data/england_flows_lsoa2011.Rds")
 
 
 # Check the desire lines by plotting them for Leeds
-# library(raster)
-# las = shapefile("private_data/Lower_Layer_Super_Output_Areas_December_2011_Full_Clipped__Boundaries_in_England_and_Wales/Lower_Layer_Super_Output_Areas_December_2011_Full_Clipped__Boundaries_in_England_and_Wales.shp")
-# las = spTransform(las, CRS(proj4string(cents_lsoa)))
-# leeds_las = las[grepl("Leeds", las$lsoa11nm),]
-# plot(leeds_las)
-# plot(flow[leeds_las,], add=T, col="blue")
-# plot(las)
-# plot(flow[leeds_las,], add=T, col="red")
+library(raster)
+las = shapefile("private_data/Lower_Layer_Super_Output_Areas_December_2011_Full_Clipped__Boundaries_in_England_and_Wales/Lower_Layer_Super_Output_Areas_December_2011_Full_Clipped__Boundaries_in_England_and_Wales.shp")
+las = spTransform(las, CRS(proj4string(cents_lsoa)))
+leeds_las = las[grepl("Leeds", las$lsoa11nm),]
+plot(leeds_las)
+plot(flow[leeds_las,], add=T, col="blue")
+plot(las)
+plot(flow[leeds_las,], add=T, col="red")
 
 
 if(!file.exists("private_data/rf_england_schools_lsoa2011.Rds") | !file.exists("private_data/rq_england_schools_lsoa2011.Rds")){
@@ -197,3 +289,6 @@ if(!file.exists("private_data/rf_england_schools_lsoa2011.Rds") | !file.exists("
   fast_routes_england = readRDS("private_data/rf_england_schools_lsoa2011.Rds")
   quiet_routes_england = readRDS("private_data/rq_england_schools_lsoa2011.Rds")
 }
+
+example = 50
+plot(flow[example,]); plot(fast_routes_england[example,], col="red", add=T); plot(quiet_routes_england[example,], col="blue", add=T)
