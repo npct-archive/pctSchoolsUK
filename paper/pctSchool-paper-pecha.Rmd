@@ -1,7 +1,7 @@
 ---
-title: 'Assessing the potential for uptake of cycling to school: a case study of England'
-author: Robin Lovelace, Ilan Fridman Rojas, James Woodcock, Rachel Aldred, Anna Goodman
-date: Slides - see [rpubs.com/robinlovelace](http://rpubs.com/RobinLovelace/287635)
+title: 'Where to build safe routes to school? Evidence from the Propensity to Cycle Tool'
+author: Robin Lovelace, Ilan Fridman-Rojas, James Woodcock, Rachel Aldred, Anna Goodman
+date: Slides at [rpubs.com/robinlovelace](http://rpubs.com/RobinLovelace/287635)
 output:
   ioslides_presentation:
     widescreen: true
