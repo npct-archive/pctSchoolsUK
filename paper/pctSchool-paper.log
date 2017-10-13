@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2016.12.10)  4 JAN 2017 17:58
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2016.12.10)  27 JAN 2017 00:29
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -971,65 +971,102 @@ File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 \openout4 = `pctSchool-paper.toc'.
 
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 110.
+(Font)              <8> on input line 115.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 110.
+(Font)              <6> on input line 115.
 [1
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}] [2] <figures/schoolsEnglan
 d.png, id=83, 481.8pt x 481.8pt>
 File: figures/schoolsEngland.png Graphic file (type png)
 <use figures/schoolsEngland.png>
-Package pdftex.def Info: figures/schoolsEngland.png used on input line 272.
+Package pdftex.def Info: figures/schoolsEngland.png used on input line 277.
 (pdftex.def)             Requested size: 230.18066pt x 230.18066pt.
 <figures/pcycle_schools.png, id=85, 469.755pt x 325.215pt>
 File: figures/pcycle_schools.png Graphic file (type png)
 <use figures/pcycle_schools.png>
-Package pdftex.def Info: figures/pcycle_schools.png used on input line 288.
+Package pdftex.def Info: figures/pcycle_schools.png used on input line 293.
 (pdftex.def)             Requested size: 230.18196pt x 159.35674pt.
 <figures/pcycle_work.png, id=86, 469.755pt x 325.215pt>
 File: figures/pcycle_work.png Graphic file (type png)
 <use figures/pcycle_work.png>
-Package pdftex.def Info: figures/pcycle_work.png used on input line 288.
+Package pdftex.def Info: figures/pcycle_work.png used on input line 293.
 (pdftex.def)             Requested size: 230.18196pt x 159.35674pt.
 <figures/active_choropleth.png, id=87, 469.755pt x 325.215pt>
 File: figures/active_choropleth.png Graphic file (type png)
 <use figures/active_choropleth.png>
-Package pdftex.def Info: figures/active_choropleth.png used on input line 304.
+Package pdftex.def Info: figures/active_choropleth.png used on input line 309.
 (pdftex.def)             Requested size: 230.18196pt x 159.35674pt.
-[3 <./figures/schoolsEngland.png (PNG copy)>] [4 <./figures/pcycle_schools.png 
-(PNG copy)> <./figures/pcycle_work.png (PNG copy)> <./figures/active_choropleth
-.png (PNG copy)>] <figures/flowsEngland.png, id=105, 481.8pt x 481.8pt>
+[3] [4 <./figures/schoolsEngland.png (PNG copy)> <./figures/pcycle_schools.png 
+(PNG copy)> <./figures/pcycle_work.png (PNG copy)>] <figures/data_model_distanc
+e.png, id=100, 626.34pt x 383.031pt>
+File: figures/data_model_distance.png Graphic file (type png)
+<use figures/data_model_distance.png>
+Package pdftex.def Info: figures/data_model_distance.png used on input line 344
+.
+(pdftex.def)             Requested size: 230.18434pt x 140.76657pt.
+<figures/data_model_scatter_distance.png, id=101, 626.34pt x 383.031pt>
+File: figures/data_model_scatter_distance.png Graphic file (type png)
+<use figures/data_model_scatter_distance.png>
+Package pdftex.def Info: figures/data_model_scatter_distance.png used on input 
+line 344.
+(pdftex.def)             Requested size: 230.18434pt x 140.76657pt.
+<figures/data_model_gradient.png, id=102, 626.34pt x 383.031pt>
+File: figures/data_model_gradient.png Graphic file (type png)
+<use figures/data_model_gradient.png>
+Package pdftex.def Info: figures/data_model_gradient.png used on input line 355
+.
+(pdftex.def)             Requested size: 230.18434pt x 140.76657pt.
+<figures/data_model_scatter_gradient.png, id=103, 626.34pt x 383.031pt>
+File: figures/data_model_scatter_gradient.png Graphic file (type png)
+<use figures/data_model_scatter_gradient.png>
+Package pdftex.def Info: figures/data_model_scatter_gradient.png used on input 
+line 355.
+(pdftex.def)             Requested size: 230.18434pt x 140.76657pt.
+<figures/uptake_distance.png, id=104, 626.34pt x 383.031pt>
+File: figures/uptake_distance.png Graphic file (type png)
+<use figures/uptake_distance.png>
+Package pdftex.def Info: figures/uptake_distance.png used on input line 375.
+(pdftex.def)             Requested size: 230.18434pt x 140.76657pt.
+<figures/uptake_gradient.png, id=105, 626.34pt x 383.031pt>
+File: figures/uptake_gradient.png Graphic file (type png)
+<use figures/uptake_gradient.png>
+Package pdftex.def Info: figures/uptake_gradient.png used on input line 384.
+(pdftex.def)             Requested size: 230.18434pt x 140.76657pt.
+<figures/flowsEngland.png, id=107, 481.8pt x 481.8pt>
 File: figures/flowsEngland.png Graphic file (type png)
 <use figures/flowsEngland.png>
-Package pdftex.def Info: figures/flowsEngland.png used on input line 359.
+Package pdftex.def Info: figures/flowsEngland.png used on input line 400.
 (pdftex.def)             Requested size: 230.18066pt x 230.18066pt.
-[5 <./figures/flowsEngland.png (PNG copy)>] [6]
-Underfull \hbox (badness 1681) in paragraph at lines 549--553
+[5 <./figures/active_choropleth.png (PNG copy)> <./figures/data_model_distance.
+png (PNG copy)> <./figures/data_model_scatter_distance.png (PNG copy)>] [6 <./f
+igures/data_model_gradient.png (PNG copy)> <./figures/data_model_scatter_gradie
+nt.png (PNG copy)> <./figures/uptake_distance.png (PNG copy)> <./figures/uptake
+_gradient.png (PNG copy)>] [7 <./figures/flowsEngland.png (PNG copy)>] [8]
+Underfull \hbox (badness 1681) in paragraph at lines 590--594
 \T1/lmr/m/n/10 (+20) School Com-mute.'' \T1/lmr/m/it/10 (+20) In-ter-na-tional 
 Jour-nal of Ge-o-graph-i-cal In-for-ma-tion Sci-ence \T1/lmr/m/n/10 (+20) 28 (2
 ): 256--73.
  []
 
-[7]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 586.
-[8]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 586.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 627.
+[9]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 627.
 (./pctSchool-paper.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 586.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 586.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 627.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 627.
 Package rerunfilecheck Info: File `pctSchool-paper.out' has not changed.
 (rerunfilecheck)             Checksum: F6CA516699C2C4FD8F8F9A8A10D83330;1492.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 586.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 627.
  ) 
 Here is how much of TeX's memory you used:
- 12531 strings out of 494953
- 180311 string characters out of 6180976
- 279387 words of memory out of 5000000
- 15474 multiletter control sequences out of 15000+600000
- 63867 words of font info for 107 fonts, out of 8000000 for 9000
+ 12562 strings out of 494953
+ 181327 string characters out of 6180976
+ 279887 words of memory out of 5000000
+ 15502 multiletter control sequences out of 15000+600000
+ 63784 words of font info for 106 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 31i,8n,35p,429b,367s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 31i,8n,35p,429b,371s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texmf/fonts/enc/dvips/lm/lm-ec.enc}{/usr/share/texmf/fonts/enc/dv
 ips/lm/lm-mathex.enc}{/usr/share/texmf/fonts/enc/dvips/lm/lm-mathsy.enc}{/usr/s
 hare/texmf/fonts/enc/dvips/lm/lm-mathit.enc}{/usr/share/texmf/fonts/enc/dvips/l
@@ -1042,10 +1079,10 @@ ts/type1/public/lm/lmmi7.pfb></usr/share/texmf/fonts/type1/public/lm/lmr10.pfb>
 e/texmf/fonts/type1/public/lm/lmr8.pfb></usr/share/texmf/fonts/type1/public/lm/
 lmri10.pfb></usr/share/texmf/fonts/type1/public/lm/lmsy10.pfb></usr/share/texmf
 /fonts/type1/public/lm/lmsy7.pfb>
-Output written on pctSchool-paper.pdf (8 pages, 1920442 bytes).
+Output written on pctSchool-paper.pdf (9 pages, 4014452 bytes).
 PDF statistics:
- 252 PDF objects out of 1000 (max. 8388607)
- 221 compressed objects within 3 object streams
- 57 named destinations out of 1000 (max. 500000)
- 12394 words of extra memory for PDF output out of 14400 (max. 10000000)
+ 267 PDF objects out of 1000 (max. 8388607)
+ 229 compressed objects within 3 object streams
+ 62 named destinations out of 1000 (max. 500000)
+ 12424 words of extra memory for PDF output out of 14400 (max. 10000000)
 
