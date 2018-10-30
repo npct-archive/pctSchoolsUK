@@ -44,9 +44,9 @@ qtm(lag_new, vars_to_plot[2:4]) +
   tm_borders()
   
 # polished version
-b = c(0, 1, 2, 4, 8, 16, 32, 64)
+b = c(0, 2, 4, 6, 10, 15, 20, 25, 30, 40, 60)
 tm_shape(lag_new) +
-  tm_fill(col = vars_to_plot[2:4], title = "") +
+  tm_fill(col = vars_to_plot[2:4], title = "", breaks = b, palette = "RdYlBu", midpoint = 15) +
   tm_shape(ukboundary) +
   tm_borders() +
   tm_legend(title = "Cycle to school (%)") +
